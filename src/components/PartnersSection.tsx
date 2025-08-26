@@ -19,7 +19,7 @@ export const PartnersSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Placeholder partners - you can replace with actual partner logos
+  // Placeholder partners 
   const partners = [
     { name: "TechCorp", logo: "TC" },
     { name: "CyberSec Solutions", logo: "CSS" },

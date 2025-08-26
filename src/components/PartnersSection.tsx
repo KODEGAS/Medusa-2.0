@@ -57,7 +57,7 @@ export const PartnersSection = () => {
             className="flex gap-8 overflow-x-hidden scroll-smooth"
             style={{ scrollBehavior: 'auto' }}
           >
-            {/* Duplicate the array to create seamless loop */}
+            {/* Duplicate the array to loop */}
             {[...partners, ...partners, ...partners].map((partner, index) => (
               <div
                 key={`${partner.name}-${index}`}

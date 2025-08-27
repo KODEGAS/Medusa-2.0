@@ -1,3 +1,6 @@
+
+import { useState } from "react"; // 1. Import useState
+
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { AboutSection } from "@/components/AboutSection";
@@ -6,8 +9,14 @@ import { PartnersSection } from "@/components/PartnersSection";
 import { ContactUsSection } from "@/components/ContactUsSection";
 import { Footer } from "@/components/Footer";
 import PrizePoolSection from "@/components/PrizePoolSection";
+
+import { CtfChallenge } from "@/components/CTFChallenge";
+import { PreviousEventsSection } from "@/components/PreviousEventsSection";
+import { MedusaShowcase } from "@/components/MedusaShowcase";
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+
 
 const Index = () => {
   return (
@@ -18,6 +27,8 @@ const Index = () => {
         <div id="about"><AboutSection /></div>
         <div id="timeline"><TimelineSection /></div>
         <div id="prizes"><PrizePoolSection /></div>
+        <div id="previous-events"><PreviousEventsSection /></div>
+        <div id="medusa"><MedusaShowcase /></div>
         <div id="partners"><PartnersSection /></div>
         <div id="contact"><ContactUsSection /></div>
         <div id="register" className="flex justify-center py-8">

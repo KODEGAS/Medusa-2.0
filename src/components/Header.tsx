@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Shield, Zap, Users, Calendar, Award, Phone } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,7 +11,7 @@ export const Header = () => {
     { name: "Timeline", href: "#timeline", icon: Calendar },
     { name: "Partners", href: "#partners", icon: Users },
     { name: "Contact", href: "#contact", icon: Phone },
-    { name: "Register", href: "#register", icon: Zap },
+    { name: "Register", href: "/register", icon: Zap, isRoute: true },
   ];
 
   const scrollToSection = (href: string) => {
@@ -41,25 +42,32 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => scrollToSection(item.href)}
-                className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
-              >
-                <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
-                {item.name}
-              </button>
+              item.isRoute ? (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
+                >
+                  <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
+                  {item.name}
+                </Link>
+              ) : (
+                <button
+                  key={item.name}
+                  onClick={() => scrollToSection(item.href)}
+                  className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
+                >
+                  <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
+                  {item.name}
+                </button>
+              )
             ))}
           </nav>
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Button 
-              variant="cyber" 
-              size="sm"
-              onClick={() => scrollToSection("#register")}
-            >
-              Join CTF
+            <Button variant="cyber" size="sm" asChild>
+              <Link to="/register">Join CTF</Link>
             </Button>
           </div>
 
@@ -77,23 +85,27 @@ export const Header = () => {
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => scrollToSection(item.href)}
-                  className="flex items-center gap-3 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-card"
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.name}
-                </button>
+                item.isRoute ? (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="flex items-center gap-3 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-card"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.name}
+                  </Link>
+                ) : (
+                  <button
+                    key={item.name}
+                    onClick={() => scrollToSection(item.href)}
+                    className="flex items-center gap-3 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-card"
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.name}
+                  </button>
+                )
               ))}
-              <Button 
-                variant="cyber" 
-                size="sm" 
-                className="mt-2"
-                onClick={() => scrollToSection("#register")}
-              >
-                Join CTF
-              </Button>
             </nav>
           </div>
         )}

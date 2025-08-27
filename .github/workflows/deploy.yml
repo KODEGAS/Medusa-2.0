@@ -1,0 +1,107 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: 'Docker image tag to deploy (leave empty for latest)'
+        required: false
+        type: string
+      confirm_deployment:
+        description: 'Type "yes" to confirm deployment'
+        required: true
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  validate-inputs:
+    name: Validate Inputs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate confirmation
+        if: github.event.inputs.confirm_deployment != 'yes'
+        run: |
+          echo "❌ Deployment not confirmed. Please type 'yes' to confirm."
+          exit 1
+
+      - name: Validate environment
+        run: |
+          if [ "${{ github.event.inputs.environment }}" != "staging" ] && [ "${{ github.event.inputs.environment }}" != "production" ]; then
+            echo "❌ Invalid environment: ${{ github.event.inputs.environment }}"
+            exit 1
+          fi
+          echo "✅ Environment: ${{ github.event.inputs.environment }}"
+
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: validate-inputs
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine image tag
+        id: image-tag
+        run: |
+          if [ -n "${{ github.event.inputs.image_tag }}" ]; then
+            echo "tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to ${{ github.event.inputs.environment }}
+        run: |
+          echo "🚀 Starting deployment to ${{ github.event.inputs.environment }}"
+          echo "📦 Image: ${{ env.REGISTRY }}/${{ github.repository }}:${{ steps.image-tag.outputs.tag }}"
+          echo "🌐 Domain: ${{ github.event.inputs.environment == 'production' && 'https://medusa.ecsc.uok.com' || 'https://staging.medusa.ecsc.uok.com' }}"
+
+          # Add your deployment commands here based on environment
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "Deploying to production..."
+            # Production deployment commands
+            # ssh user@${{ secrets.PRODUCTION_SERVER_HOST }} << EOF
+            #   cd /path/to/medusa-app
+            #   docker-compose pull
+            #   docker-compose up -d
+            #   docker-compose ps
+            # EOF
+          else
+            echo "Deploying to staging..."
+            # Staging deployment commands
+            # ssh user@${{ secrets.STAGING_SERVER_HOST }} << EOF
+            #   cd /path/to/medusa-app
+            #   docker-compose pull
+            #   docker-compose up -d
+            #   docker-compose ps
+            # EOF
+          fi
+
+      - name: Health check
+        run: |
+          echo "🔍 Performing health check..."
+          # Add health check commands here
+          # Example:
+          # curl -f ${{ github.event.inputs.environment == 'production' && 'https://medusa.ecsc-uok.com/health' || 'https://staging.medusa.ecsc-uok.com/health' }} || exit 1
+
+      - name: Notify deployment result
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Deployment to ${{ github.event.inputs.environment }} successful!"
+            echo "🌐 Access your application at: ${{ github.event.inputs.environment == 'production' && 'https://medusa.ecsc-uok.com' || 'https://staging.medusa.ecsc-uok.com' }}"
+          else
+            echo "❌ Deployment to ${{ github.event.inputs.environment }} failed!"
+          fi

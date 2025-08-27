@@ -163,7 +163,37 @@ The enhanced `deploy.sh` script supports multiple deployment methods:
 - **Hot reload** in development mode
 - **Optimized build context** with `.dockerignore`
 
-## 🤝 Contributing
+## � CI/CD Pipeline
+
+This project includes comprehensive GitHub Actions workflows for automated testing, building, and deployment:
+
+### Available Workflows
+- **CI/CD** - Build, test, and deploy to GitHub Pages
+- **Docker Build** - Multi-platform Docker builds with security scanning
+- **Security Scan** - Automated vulnerability scanning
+- **Manual Deploy** - On-demand deployment to staging/production
+
+### Quick Setup
+1. Push to `main` branch → Automatic production deployment
+2. Push to `develop` branch → Automatic staging deployment
+3. Create tags → Versioned Docker images
+4. Manual trigger → Deploy specific versions
+
+### Docker Deployment
+```bash
+# Automatic (via GitHub Actions)
+git push origin main
+
+# Manual Docker deployment
+docker-compose up -d
+
+# Development with hot reload
+docker-compose --profile dev up -d
+```
+
+See [`.github/GITHUB_ACTIONS_SETUP.md`](.github/GITHUB_ACTIONS_SETUP.md) for detailed setup instructions.
+
+## �🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch

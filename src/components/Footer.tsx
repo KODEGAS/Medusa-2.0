@@ -3,9 +3,8 @@ import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
   const socialLinks = [
-    { name: "GitHub", icon: Github, href: "#" },
-    { name: "Twitter", icon: Twitter, href: "#" },
-    { name: "LinkedIn", icon: Linkedin, href: "#" },
+    { name: "WhatsApp", icon: Twitter, href: "#" },
+    { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/medusaecs/" },
   ];
 
   const quickLinks = [
@@ -17,8 +16,8 @@ export const Footer = () => {
   ];
 
   const contactInfo = [
-    { icon: Mail, text: "info@medusa.com", href: "mailto:info@medusa.com" },
-    { icon: Phone, text: "+94 (555) 000 222", href: "tel:+94555000222" },
+    { icon: Mail, text: "info@medusa.com", href: "mailto:contact@ecsc-uok.com" },
+    { icon: Phone, text: "+94 (72) 66 77 555", href: "tel:+94726677555" },
     { icon: MapPin, text: "University of Kaleniya", href: "#" },
   ];
 
@@ -34,7 +33,7 @@ export const Footer = () => {
       {/* Background Effects */}
       <div className="absolute inset-0 cyber-grid opacity-5" />
       <div className="absolute inset-0 matrix-rain opacity-3" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         {/* Main Footer Content */}
         <div className="py-16">
@@ -53,7 +52,7 @@ export const Footer = () => {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground font-mono mb-6">
-                The ultimate inter-university cybersecurity challenge. Test your skills, 
+                The ultimate inter-university cybersecurity challenge. Test your skills,
                 defend your network, and emerge victorious in the digital realm.
               </p>
               <div className="flex gap-4">

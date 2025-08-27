@@ -1,24 +1,272 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Medusa 2.0 - Inter-University CTF Competition</title>
-    <meta name="description" content="Crack the Code. Rule the Game. Join the ultimate cybersecurity competition." />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-    <meta name="author" content="ECS" />
+<html lang="en" itemscope itemtype="https://schema.org/WebSite">
 
-    <meta property="og:title" content="medusa-cyber-nexus" />
-    <meta property="og:description" content="KODEGAS Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  </head>
+  <!-- Primary Meta Tags -->
+  <title>Medusa 2.0 - Inter-University CTF Competition | Cybersecurity Challenge 2025</title>
+  <meta name="title" content="Medusa 2.0 - Inter-University CTF Competition | Cybersecurity Challenge 2025" />
+  <meta name="description"
+    content="Join Medusa 2.0, the ultimate inter-university cybersecurity competition. Compete in capture the flag challenges, test your hacking skills, and win LKR 70K+ in prizes. August 27-29, 2025." />
+  <meta name="keywords"
+    content="CTF, cybersecurity, competition, university, hacking, capture the flag, Medusa, cyber security, ethical hacking, penetration testing, Sri Lanka, university competition, cyber challenge, security competition, CTF 2025" />
+  <meta name="author" content="ECS - Medusa 2.0 Organizing Committee" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="revisit-after" content="1 days" />
+  <meta name="language" content="English" />
+  <meta name="geo.region" content="LK" />
+  <meta name="geo.country" content="Sri Lanka" />
+  <meta name="ICBM" content="7.8731,80.7718" />
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Medusa 2.0" />
+  <meta property="og:title" content="Medusa 2.0 - Inter-University CTF Competition | Cybersecurity Challenge 2025" />
+  <meta property="og:description"
+    content="Join the ultimate cybersecurity competition where universities collide in digital warfare. Test your skills, defend your network, and emerge victorious with LKR 70K+ in prizes." />
+  <meta property="og:url" content="https://medusa.ecsc-uok.com/" />
+  <meta property="og:image" content="https://medusa.ecsc-uok.com/og-image.jpg" />
+  <meta property="og:image:secure_url" content="https://medusa.ecsc-uok.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Medusa 2.0 - Inter-University CTF Competition Logo" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="si_LK" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@medusa_ctf" />
+  <meta name="twitter:creator" content="@medusa_ctf" />
+  <meta name="twitter:title" content="Medusa 2.0 - Inter-University CTF Competition | Cybersecurity Challenge 2025" />
+  <meta name="twitter:description"
+    content="Join the ultimate cybersecurity competition where universities collide in digital warfare. Test your skills, defend your network, and emerge victorious with LKR 70K+ in prizes." />
+  <meta name="twitter:image" content="https://medusa.ecsc-uok.com/og-image.jpg" />
+  <meta name="twitter:image:alt" content="Medusa 2.0 - Inter-University CTF Competition Logo" />
+  <meta name="twitter:url" content="https://medusa.ecsc-uok.com/" />
+
+  <!-- Additional Social Media -->
+  <meta property="og:email" content="contact@medusa.ecsc-uok.com" />
+  <meta property="og:phone_number" content="+94-11-1234567" />
+
+  <!-- Favicon and Icons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <!-- Preconnect to external domains for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+
+  <!-- DNS prefetch for external resources -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+  <link rel="dns-prefetch" href="//www.google-analytics.com" />
+  <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+
+  <!-- Optimized font loading with font-display -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'" />
+
+  <!-- Theme color for mobile browsers -->
+  <meta name="theme-color" content="#39FF14" />
+  <meta name="msapplication-TileColor" content="#39FF14" />
+  <meta name="msapplication-TileImage" content="/ms-tile-144x144.png" />
+  <meta name="msapplication-config" content="/browserconfig.xml" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://medusa.ecsc-uok.com/" />
+
+  <!-- Alternate languages (if applicable) -->
+  <link rel="alternate" hreflang="en" href="https://medusa.ecsc-uok.com/" />
+  <link rel="alternate" hreflang="si" href="https://medusa.ecsc-uok.com/si/" />
+
+  <!-- Structured Data - Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Medusa 2.0",
+    "url": "https://medusa.ecsc-uok.com/",
+    "logo": "https://medusa.ecsc-uok.com/logo.png",
+    "description": "Inter-University Cybersecurity Competition and CTF Challenge",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "LK",
+      "addressRegion": "Western Province"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+94-11-1234567",
+      "email": "contact@medusa.ecsc-uok.com",
+      "contactType": "customer service"
+    },
+    "sameAs": [
+      "https://twitter.com/medusa_ctf",
+      "https://linkedin.com/company/medusa-ctf",
+      "https://github.com/medusa-ctf"
+    ]
+  }
+  </script>
+
+  <!-- Structured Data - Event -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "Medusa 2.0 - Inter-University CTF Competition",
+    "description": "The ultimate cybersecurity challenge where universities compete in capture the flag challenges, penetration testing, and digital forensics",
+    "startDate": "2025-08-27T09:00:00+05:30",
+    "endDate": "2025-08-29T18:00:00+05:30",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+    "location": {
+      "@type": "VirtualLocation",
+      "url": "https://medusa.ecsc-uok.com/"
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": "ECS",
+      "url": "https://medusa.ecsc-uok.com/"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "LKR",
+      "availability": "https://schema.org/InStock",
+      "validFrom": "2025-08-27T00:00:00+05:30",
+      "description": "Free registration for university teams"
+    },
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Capture The Flag",
+        "description": "Cybersecurity competition format"
+      },
+      {
+        "@type": "Thing",
+        "name": "Penetration Testing",
+        "description": "Ethical hacking challenges"
+      },
+      {
+        "@type": "Thing",
+        "name": "Digital Forensics",
+        "description": "Computer forensics challenges"
+      }
+    ],
+    "audience": {
+      "@type": "EducationalAudience",
+      "educationalRole": "student",
+      "audienceType": "university students"
+    },
+    "teaches": [
+      "Cybersecurity",
+      "Ethical Hacking",
+      "Penetration Testing",
+      "Digital Forensics",
+      "Network Security"
+    ]
+  }
+  </script>
+
+  <!-- Breadcrumbs Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://medusa.ecsc-uok.com/"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Website Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Medusa 2.0",
+    "url": "https://medusa.ecsc-uok.com/",
+    "description": "Inter-University Cybersecurity Competition and CTF Challenge",
+    "inLanguage": "en-US",
+    "copyrightHolder": {
+      "@type": "Organization",
+      "name": "ECS"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://medusa.ecsc-uok.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Additional Performance and SEO Meta Tags -->
+  <meta name="format-detection" content="telephone=yes" />
+  <meta name="HandheldFriendly" content="true" />
+  <meta name="MobileOptimized" content="width" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Medusa 2.0" />
+
+  <!-- Security Headers (CSP, HSTS, etc. should be set server-side) -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+
+  <!-- Performance hints -->
+  <link rel="preload" href="/src/main.tsx" as="script" crossorigin />
+  <link rel="modulepreload" href="/src/App.tsx" />
+  <link rel="modulepreload" href="/src/main.tsx" />
+
+</head>
+
+<body>
+  <!-- Skip to main content for accessibility -->
+  <a href="#main-content"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded z-50">
+    Skip to main content
+  </a>
+
+  <!-- Main application root -->
+  <div id="root" role="application" aria-label="Medusa 2.0 CTF Competition"></div>
+
+  <!-- Loading fallback (shown before React loads) -->
+  <noscript>
+    <div style="text-align: center; padding: 2rem; font-family: Arial, sans-serif;">
+      <h1>Medusa 2.0 - CTF Competition</h1>
+      <p>This website requires JavaScript to function properly.</p>
+      <p>Please enable JavaScript in your browser settings and reload the page.</p>
+    </div>
+  </noscript>
+
+  <!-- Main application script -->
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- Google Analytics (replace with your GA4 ID) -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+  -->
+</body>
+
 </html>

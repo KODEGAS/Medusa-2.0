@@ -17,7 +17,7 @@ export const buttonVariants = cva(
         // Cyber variants
         cyber: "bg-gradient-neon text-primary-foreground font-orbitron font-bold hover:shadow-neon transform hover:scale-105 transition-all duration-300 animate-pulse-glow",
         matrix: "bg-accent text-accent-foreground border-2 border-accent font-mono hover:shadow-green hover:bg-accent/80 transition-all duration-300",
-        neon: "bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground hover:shadow-neon transition-all duration-300 glow-text",
+        neon: "bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300",
         hologram: "bg-card/50 backdrop-blur-sm border border-border text-foreground hover:bg-card/70 hover:border-primary transition-all duration-300 holographic-card",
       },
       size: {

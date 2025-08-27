@@ -180,7 +180,7 @@ export const TimelineSection = () => {
         {/* Call to Action */}
         <div className="text-center mt-16">
           <div className="bg-card/20 backdrop-blur-sm rounded-2xl p-8 border border-border/50 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-orbitron font-bold mb-4 text-primary glow-text">
+            <h3 className="text-2xl font-orbitron font-bold mb-4 text-primary">
               Ready to Join the Battle?
             </h3>
             <p className="font-mono text-muted-foreground mb-6">

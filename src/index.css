@@ -146,17 +146,17 @@
   /* Glowing Text */
   .glow-text {
     text-shadow: 
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      0 0 15px currentColor;
+      0 0 2px currentColor,
+      0 0 4px currentColor,
+      0 0 6px currentColor;
   }
 
   /* Neon Border */
   .neon-border {
     box-shadow: 
-      0 0 5px hsl(var(--neon-green)),
-      inset 0 0 5px hsl(var(--neon-green)),
-      0 0 15px hsl(var(--neon-green));
+      0 0 2px hsl(var(--neon-green)),
+      inset 0 0 2px hsl(var(--neon-green)),
+      0 0 6px hsl(var(--neon-green));
   }
 
   /* Holographic Card */
@@ -191,10 +191,10 @@
 
   @keyframes pulse-glow {
     0%, 100% { 
-      box-shadow: 0 0 5px hsl(var(--neon-green)), 0 0 10px hsl(var(--neon-green)); 
+      box-shadow: 0 0 2px hsl(var(--neon-green)), 0 0 4px hsl(var(--neon-green)); 
     }
     50% { 
-      box-shadow: 0 0 20px hsl(var(--neon-green)), 0 0 30px hsl(var(--neon-green)); 
+      box-shadow: 0 0 8px hsl(var(--neon-green)), 0 0 12px hsl(var(--neon-green)); 
     }
   }
 

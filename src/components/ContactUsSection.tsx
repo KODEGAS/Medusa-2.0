@@ -23,7 +23,7 @@ export const ContactUsSection = () => {
       position: "Chief Coordinator",
       name: "Kavindu Sachinthe",
       email: "galkotu-ec22053@stu.kln.ac.lk",
-      phone: "+94 72 667 7555",
+      phone: "+94 72 66 77 555",
       icon: User,
       color: "text-accent"
     },
@@ -50,7 +50,7 @@ export const ContactUsSection = () => {
       {/* Background Effects */}
       <div className="absolute inset-0 matrix-rain opacity-5" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -120,7 +120,7 @@ export const ContactUsSection = () => {
               General Inquiry
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              info@medusa.com
+              contact@ecsc-uok.com
             </p>
           </div>
 
@@ -131,7 +131,7 @@ export const ContactUsSection = () => {
               Emergency Support
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              +94 (555) 000 222
+              +94 (72) 66 77 555
             </p>
           </div>
 

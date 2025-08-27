@@ -104,17 +104,64 @@ bun run build:analyze
 - Lazy-loaded routes for better performance
 - 23% reduction in initial bundle size
 
-## 🌐 Deployment
+## 🐳 Docker Deployment
 
-The application is optimized for deployment on:
-- **Vercel** (recommended)
-- **Netlify**
-- **GitHub Pages**
-- **AWS S3 + CloudFront**
-- **Any static hosting service**
+This project includes Docker support for easy deployment and development.
 
-### Environment Variables
-No environment variables are required for the frontend application.
+### Docker Files Included
+- `Dockerfile` - Production build with nginx
+- `Dockerfile.dev` - Development build with hot reload
+- `docker-compose.yml` - Orchestration for easy deployment
+- `nginx.conf` - Optimized nginx configuration for React SPA
+- `.dockerignore` - Optimized Docker build context
+
+### Quick Start with Docker
+
+#### Production Deployment
+```sh
+# Build and run with Docker Compose (recommended)
+docker-compose up -d
+
+# Or build and run manually
+docker build -t medusa-2.0 .
+docker run -d -p 3000:80 --name medusa-frontend medusa-2.0
+```
+
+#### Development with Docker
+```sh
+# Start development environment with hot reload
+docker-compose --profile dev up -d
+
+# Access the application
+# Production: http://localhost:3000
+# Development: http://localhost:8080
+```
+
+### Deployment Script
+The enhanced `deploy.sh` script supports multiple deployment methods:
+
+```sh
+# Traditional deployment (build and upload manually)
+./deploy.sh production traditional
+
+# Docker deployment
+./deploy.sh production docker
+
+# Docker Compose deployment
+./deploy.sh production docker-compose
+
+# Development with Docker Compose
+./deploy.sh development docker-compose
+```
+
+### Docker Features
+- **Multi-stage builds** for optimized image size
+- **nginx server** for production with proper SPA routing
+- **Gzip compression** and caching headers
+- **Security headers** (CSP, XSS protection, etc.)
+- **Health check endpoint** at `/health`
+- **Hot reload** in development mode
+- **Optimized build context** with `.dockerignore`
 
 ## 🤝 Contributing
 

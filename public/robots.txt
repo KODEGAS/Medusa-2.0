@@ -1,14 +1,69 @@
+# Robots.txt for Medusa 2.0 - Inter-University CTF Competition
+# Updated: 2025-08-27
+
+# Allow all web crawlers by default
+User-agent: *
+Allow: /
+
+# Specific rules for major search engines
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Social media crawlers
 User-agent: Twitterbot
 Allow: /
+Allow: /register
 
 User-agent: facebookexternalhit
 Allow: /
+Allow: /register
 
-User-agent: *
+User-agent: LinkedInBot
 Allow: /
+Allow: /register
+
+# Block access to sensitive/development files
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /.env
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /dist/
+Disallow: /.git/
+Disallow: /package.json
+Disallow: /vite.config.ts
+Disallow: /tsconfig.json
+Disallow: /eslint.config.js
+Disallow: /postcss.config.js
+Disallow: /tailwind.config.ts
+Disallow: /bun.lockb
+Disallow: /components.json
+
+# Allow important public assets
+Allow: /assets/
+Allow: /favicon.ico
+Allow: /apple-touch-icon.png
+Allow: /site.webmanifest
+Allow: /robots.txt
+Allow: /sitemap.xml
+
+# Sitemap location
+Sitemap: https://medusa-cyber-nexus.dev/sitemap.xml
+
+# Additional sitemaps (uncomment when available)
+# Sitemap: https://medusa-cyber-nexus.dev/sitemap-news.xml
+# Sitemap: https://medusa-cyber-nexus.dev/sitemap-images.xml

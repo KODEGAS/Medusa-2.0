@@ -10,7 +10,6 @@ export const Header = () => {
     { name: "Timeline", href: "#timeline", icon: Calendar },
     { name: "Partners", href: "#partners", icon: Users },
     { name: "Contact", href: "#contact", icon: Phone },
-    { name: "Register", href: "#register", icon: Zap },
   ];
 
   const scrollToSection = (href: string) => {
@@ -54,8 +53,8 @@ export const Header = () => {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Button 
-              variant="cyber" 
+            <Button
+              variant="cyber"
               size="sm"
               onClick={() => scrollToSection("#register")}
             >
@@ -86,9 +85,9 @@ export const Header = () => {
                   {item.name}
                 </button>
               ))}
-              <Button 
-                variant="cyber" 
-                size="sm" 
+              <Button
+                variant="cyber"
+                size="sm"
                 className="mt-2"
                 onClick={() => scrollToSection("#register")}
               >

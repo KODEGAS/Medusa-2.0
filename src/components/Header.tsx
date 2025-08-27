@@ -73,8 +73,8 @@ export const Header = () => {
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="py-4 border-t border-border">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <button
@@ -96,7 +96,7 @@ export const Header = () => {
               </Button>
             </nav>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );

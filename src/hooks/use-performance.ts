@@ -1,10 +1,13 @@
 import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 
 // Debounce hook for performance optimization
-export const useDebounce = (callback: Function, delay: number) => {
+export const useDebounce = <T extends unknown[]>(
+  callback: (...args: T) => void,
+  delay: number
+) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  return useCallback((...args: any[]) => {
+  return useCallback((...args: T) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -16,10 +19,13 @@ export const useDebounce = (callback: Function, delay: number) => {
 };
 
 // Throttle hook for performance optimization
-export const useThrottle = (callback: Function, delay: number) => {
+export const useThrottle = <T extends unknown[]>(
+  callback: (...args: T) => void,
+  delay: number
+) => {
   const lastCallRef = useRef<number>(0);
 
-  return useCallback((...args: any[]) => {
+  return useCallback((...args: T) => {
     const now = Date.now();
 
     if (now - lastCallRef.current >= delay) {
@@ -72,7 +78,7 @@ export const useLocalStorage = <T>(key: string, initialValue: T) => {
 
   const setValue = useCallback((value: T | ((val: T) => T)) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore = typeof value === 'function' ? (value as (val: T) => T)(storedValue) : value;
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {

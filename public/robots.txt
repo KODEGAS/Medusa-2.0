@@ -62,8 +62,8 @@ Allow: /robots.txt
 Allow: /sitemap.xml
 
 # Sitemap location
-Sitemap: https://medusa-cyber-nexus.dev/sitemap.xml
+Sitemap: https://medusa.ecsc-uok.com/sitemap.xml
 
 # Additional sitemaps (uncomment when available)
-# Sitemap: https://medusa-cyber-nexus.dev/sitemap-news.xml
-# Sitemap: https://medusa-cyber-nexus.dev/sitemap-images.xml
+# Sitemap: https://medusa.ecsc-uok.com/sitemap-news.xml
+# Sitemap: https://medusa.ecsc-uok.com/sitemap-images.xml

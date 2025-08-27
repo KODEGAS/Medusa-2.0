@@ -1,3 +1,6 @@
+import { useState } from "react"; // 1. Import useState
+
+// Your existing component imports
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { AboutSection } from "@/components/AboutSection";
@@ -8,7 +11,19 @@ import { RegistrationForm } from "@/components/RegistrationForm";
 import { Footer } from "@/components/Footer";
 import PrizePoolSection from "@/components/PrizePoolSection";
 
+// 2. Import your new challenge component
+import { CtfChallenge } from "@/components/CTFChallenge";
+
+
 const Index = () => {
+  // 3. Add state to track if the challenge is solved
+  const [isChallengeSolved, setIsChallengeSolved] = useState(false);
+
+  // 4. Create the function that the child component will call on success
+  const handleChallengeSuccess = () => {
+    setIsChallengeSolved(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -19,7 +34,17 @@ const Index = () => {
         <div id="prizes"><PrizePoolSection /></div>
         <div id="partners"><PartnersSection /></div>
         <div id="contact"><ContactUsSection /></div>
-        <div id="register"><RegistrationForm /></div>
+
+        {/* 5. This is the conditional rendering logic */}
+        <div id="register">
+          {isChallengeSolved ? (
+            // If the challenge is solved, show the real registration form
+            <RegistrationForm />
+          ) : (
+            // Otherwise, show the challenge and pass the success handler to it
+            <CtfChallenge onSuccess={handleChallengeSuccess} />
+          )}
+        </div>
       </main>
       <Footer />
     </div>

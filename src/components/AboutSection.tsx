@@ -90,7 +90,7 @@ export const AboutSection = () => {
                     <CardContent className="p-6 h-full flex flex-col justify-center">
                       <div className={`text-6xl font-orbitron font-black ${highlight.color} text-center mb-4 glow-text animate-pulse`}>
                         {index === 0 && "100+"}
-                        {index === 1 && "50+"}
+                        {index === 1 && "15+"}
                         {index === 2 && "70K+"}
                         {index === 3 && "48H"}
                       </div>

@@ -48,12 +48,8 @@ export const AboutSection = () => {
       
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
- <    div 
-          ref={headerRef}
-          className={`text-center mb-16 transition-all duration-1000 ${
-            headerVisible ? 'animate-slide-up' : 'scroll-hidden'
-          }`}
-        >          <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
+        <div className="text-center mb-16">
+        <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             About the Competition
           </h2>
           <p className="text-xl font-mono text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -120,12 +116,9 @@ export const AboutSection = () => {
         </div>
 
         {/* Competition Categories */}
-        <div 
-          ref={categoriesRef}
-          className={`bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50 transition-all duration-1000 ${
-            categoriesVisible ? 'animate-fade-in-scale' : 'scroll-hidden-scale'
-          }`}
-        >
+                <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50">
+
+
           <h3 className="text-3xl font-orbitron font-bold text-center mb-8 text-primary">
             Challenge Categories
           </h3>

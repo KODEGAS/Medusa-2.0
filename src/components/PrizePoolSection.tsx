@@ -87,12 +87,7 @@ const PrizePoolSection = () => {
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
-        <div 
-          ref={headerRef}
-          className={`text-center mb-16 transition-all duration-1000 ${
-            headerVisible ? 'animate-slide-up' : 'scroll-hidden'
-          }`}
-        >
+        <div className="text-center mb-16">
           <h2 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyber-green via-primary to-cyber-green bg-clip-text text-transparent mb-4">
             PRIZE POOL
           </h2>
@@ -103,12 +98,7 @@ const PrizePoolSection = () => {
         </div>
 
         {/* 3D Podium */}
-        <div 
-          ref={podiumRef}
-          className={`flex items-end justify-center gap-8 mb-16 perspective-1000 transition-all duration-1000 ${
-            podiumVisible ? 'animate-fade-in-scale' : 'scroll-hidden-scale'
-          }`}
-        >
+        <div className="flex items-end justify-center gap-8 mb-16 perspective-1000">
           {prizes.map((prize, index) => {
             const IconComponent = prize.icon;
             return (

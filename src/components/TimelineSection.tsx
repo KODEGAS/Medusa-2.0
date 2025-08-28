@@ -89,12 +89,9 @@ export const TimelineSection = () => {
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
-        <div 
-          ref={headerRef}
-          className={`text-center mb-16 transition-all duration-1000 ${
-            headerVisible ? 'animate-slide-up' : 'scroll-hidden'
-          }`}
-        >
+                <div className="text-center mb-16">
+
+
           <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             Event Timeline
           </h2>
@@ -193,12 +190,9 @@ export const TimelineSection = () => {
         </div>
 
         {/* Call to Action */}
-        <div 
-          ref={ctaRef}
-          className={`text-center mt-16 transition-all duration-1000 ${
-            ctaVisible ? 'animate-fade-in-scale' : 'scroll-hidden-scale'
-          }`}
-        >
+               <div className="text-center mt-16">
+
+
           <div className="bg-card/20 backdrop-blur-sm rounded-2xl p-8 border border-border/50 max-w-2xl mx-auto">
             <h3 className="text-2xl font-orbitron font-bold mb-4 text-primary glow-text">
               Ready to Join the Battle?

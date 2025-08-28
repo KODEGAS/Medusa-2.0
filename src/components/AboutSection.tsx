@@ -110,7 +110,7 @@ export const AboutSection = () => {
 
         {/* Competition Categories */}
         <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50">
-          <h3 className="text-3xl font-orbitron font-bold text-center mb-8 text-primary glow-text">
+          <h3 className="text-3xl font-orbitron font-bold text-center mb-8 text-primary">
             Challenge Categories
           </h3>
           <div className="flex flex-wrap justify-center gap-4">

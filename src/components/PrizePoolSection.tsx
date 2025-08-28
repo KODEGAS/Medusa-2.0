@@ -85,8 +85,8 @@ const PrizePoolSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyber-green via-primary to-cyber-green bg-clip-text text-transparent mb-4">
-            PRIZE POOL
+          <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
+            Prize Pool
           </h2>
           <div className="text-2xl md:text-3xl font-mono text-muted-foreground mb-8">
             Total Worth: LKR <AnimatedNumber target={160000} prefix="" />

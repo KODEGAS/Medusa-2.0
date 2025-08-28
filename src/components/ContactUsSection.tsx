@@ -42,6 +42,14 @@ export const ContactUsSection = () => {
       phone: "+94 70 750 2664",
       icon: Users,
       color: "text-primary"
+    },
+    {
+      position: "Membership Coordinator",
+      name: "Savithi Vihara",
+      email: "vihara-ec22063@stu.kln.ac.lk",
+      phone: "+94 70 750 2664",
+      icon: Users,
+      color: "text-primary"
     }
   ];
 

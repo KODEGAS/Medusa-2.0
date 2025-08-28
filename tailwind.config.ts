@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -109,13 +108,70 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'slide-up': {
+					'0%': { 
+						transform: 'translateY(60px)', 
+						opacity: '0' 
+					},
+					'100%': { 
+						transform: 'translateY(0)', 
+						opacity: '1' 
+					}
+				},
+				'slide-in-left': {
+					'0%': { 
+						transform: 'translateX(-60px)', 
+						opacity: '0' 
+					},
+					'100%': { 
+						transform: 'translateX(0)', 
+						opacity: '1' 
+					}
+				},
+				'slide-in-right': {
+					'0%': { 
+						transform: 'translateX(60px)', 
+						opacity: '0' 
+					},
+					'100%': { 
+						transform: 'translateX(0)', 
+						opacity: '1' 
+					}
+				},
+				'fade-in-scale': {
+					'0%': { 
+						transform: 'scale(0.8)', 
+						opacity: '0' 
+					},
+					'100%': { 
+						transform: 'scale(1)', 
+						opacity: '1' 
+					}
+				},
+				'cyber-reveal': {
+					'0%': { 
+						transform: 'translateY(40px) rotateX(15deg)', 
+						opacity: '0',
+						filter: 'blur(10px)'
+					},
+					'100%': { 
+						transform: 'translateY(0) rotateX(0deg)', 
+						opacity: '1',
+						filter: 'blur(0px)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'slide-up': 'slide-up 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+				'slide-in-left': 'slide-in-left 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+				'slide-in-right': 'slide-in-right 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+				'fade-in-scale': 'fade-in-scale 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+				'cyber-reveal': 'cyber-reveal 1s cubic-bezier(0.4, 0, 0.2, 1) forwards'
 			}
 		}
 	},
-	plugins: [tailwindcssAnimate],
+	plugins: [require("tailwindcss-animate")],
 } satisfies Config;

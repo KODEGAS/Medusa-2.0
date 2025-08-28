@@ -1,20 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Zap } from "lucide-react";
 import medusaLogo from "@/assets/medusa-logo.jpg";
 import heroBackground from "@/assets/hero-background.jpg";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
-export const HeroSection = () => {
+export const HeroSection = memo(() => {
   const [glitchText, setGlitchText] = useState("Medusa 2.0");
-  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation({ delay: 300, threshold: 0.3 });
 
   useEffect(() => {
     const interval = setInterval(() => {
       const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
       const original = "Medusa 2.0";
       let glitched = "";
-      
+
       for (let i = 0; i < original.length; i++) {
         if (Math.random() < 0.1) {
           glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
@@ -22,9 +20,9 @@ export const HeroSection = () => {
           glitched += original[i];
         }
       }
-      
+
       setGlitchText(glitched);
-      
+
       setTimeout(() => setGlitchText(original), 100);
     }, 3000);
 
@@ -34,34 +32,31 @@ export const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
         style={{ backgroundImage: `url(${heroBackground})` }}
       />
-      
+
       {/* Animated Grid Overlay */}
       <div className="absolute inset-0 cyber-grid opacity-30" />
-      
+
       {/* Matrix Rain Effect */}
       <div className="absolute inset-0 matrix-rain opacity-20" />
-      
+
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-hero opacity-90" />
 
       {/* Content */}
-      <div 
-        ref={contentRef}
-        className={`relative z-10 text-center max-w-6xl mx-auto px-4 transition-all duration-1000 ${
-          contentVisible ? 'animate-fade-in-scale' : 'scroll-hidden-scale'
-        }`}
-      >
+      <div className="relative z-10 text-center max-w-6xl mx-auto px-4">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
           <div className="relative">
-            <img 
-              src={medusaLogo} 
-              alt="Medusa 2.0 Logo" 
+            <img
+              src={medusaLogo}
+              alt="Medusa 2.0 Logo"
               className="w-48 h-32 object-contain animate-rotate-3d filter drop-shadow-2xl"
+              loading="eager"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-cyber opacity-50 mix-blend-overlay rounded-lg animate-pulse-glow" />
           </div>
@@ -84,7 +79,7 @@ export const HeroSection = () => {
             Crack the Code. Rule the Game.
           </p>
           <p className="text-lg md:text-xl font-mono text-muted-foreground max-w-2xl mx-auto">
-            The ultimate cybersecurity challenge where universities collide in digital warfare. 
+            The ultimate cybersecurity challenge where universities collide in digital warfare.
             Test your skills, defend your network, and emerge victorious.
           </p>
         </div>
@@ -98,7 +93,7 @@ export const HeroSection = () => {
           </div>
           <div className="holographic-card p-6 rounded-lg">
             <Zap className="w-8 h-8 text-accent mx-auto mb-3" />
-            <div className="text-3xl font-orbitron font-bold text-accent">₹1L+</div>
+            <div className="text-3xl font-orbitron font-bold text-accent">LKR 70K+</div>
             <div className="text-sm font-mono text-muted-foreground">Prize Pool</div>
           </div>
           <div className="holographic-card p-6 rounded-lg">
@@ -128,4 +123,4 @@ export const HeroSection = () => {
       </div>
     </section>
   );
-};
+});

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ interface FormData {
   expectations: string;
 }
 
-export const RegistrationForm = () => {
+export const RegistrationForm = memo(() => {
   const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>({
     teamName: "",
@@ -33,36 +33,44 @@ export const RegistrationForm = () => {
     experience: "",
     expectations: ""
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = useCallback((field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     setIsSubmitting(false);
     setIsSubmitted(true);
-    
+
     toast({
       title: "Registration Successful!",
       description: "Welcome to Medusa 2.0. Check your email for confirmation.",
     });
-  };
+  }, [toast]);
+
+  const handleFocus = useCallback((field: string) => {
+    setFocusedField(field);
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setFocusedField(null);
+  }, []);
 
   if (isSubmitted) {
     return (
       <section className="py-20 px-4 relative">
         <div className="absolute inset-0 cyber-grid opacity-10" />
-        
+
         <div className="max-w-2xl mx-auto text-center">
           <Card className="holographic-card p-12">
             <div className="w-24 h-24 mx-auto mb-6 bg-accent/20 rounded-full flex items-center justify-center animate-pulse-glow">
@@ -99,7 +107,7 @@ export const RegistrationForm = () => {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-hero opacity-30" />
       <div className="absolute inset-0 matrix-rain opacity-5" />
-      
+
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -125,7 +133,7 @@ export const RegistrationForm = () => {
               </Badge>
             </div>
           </CardHeader>
-          
+
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Team Information */}
@@ -141,11 +149,10 @@ export const RegistrationForm = () => {
                       required
                       value={formData.teamName}
                       onChange={(e) => handleInputChange("teamName", e.target.value)}
-                      onFocus={() => setFocusedField("teamName")}
-                      onBlur={() => setFocusedField(null)}
-                      className={`font-mono transition-all duration-300 ${
-                        focusedField === "teamName" ? "neon-border" : ""
-                      }`}
+                      onFocus={() => handleFocus("teamName")}
+                      onBlur={handleBlur}
+                      className={`font-mono transition-all duration-300 ${focusedField === "teamName" ? "neon-border" : ""
+                        }`}
                       placeholder="Enter your team name"
                     />
                   </div>
@@ -161,11 +168,10 @@ export const RegistrationForm = () => {
                     required
                     value={formData.university}
                     onChange={(e) => handleInputChange("university", e.target.value)}
-                    onFocus={() => setFocusedField("university")}
-                    onBlur={() => setFocusedField(null)}
-                    className={`font-mono transition-all duration-300 ${
-                      focusedField === "university" ? "neon-border" : ""
-                    }`}
+                    onFocus={() => handleFocus("university")}
+                    onBlur={handleBlur}
+                    className={`font-mono transition-all duration-300 ${focusedField === "university" ? "neon-border" : ""
+                      }`}
                     placeholder="Your university name"
                   />
                 </div>
@@ -176,7 +182,7 @@ export const RegistrationForm = () => {
                 <h3 className="text-2xl font-orbitron font-bold text-secondary glow-text">
                   Team Leader Details
                 </h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="leaderName" className="text-foreground font-mono">
@@ -188,11 +194,10 @@ export const RegistrationForm = () => {
                       required
                       value={formData.leaderName}
                       onChange={(e) => handleInputChange("leaderName", e.target.value)}
-                      onFocus={() => setFocusedField("leaderName")}
-                      onBlur={() => setFocusedField(null)}
-                      className={`font-mono transition-all duration-300 ${
-                        focusedField === "leaderName" ? "neon-border" : ""
-                      }`}
+                      onFocus={() => handleFocus("leaderName")}
+                      onBlur={handleBlur}
+                      className={`font-mono transition-all duration-300 ${focusedField === "leaderName" ? "neon-border" : ""
+                        }`}
                       placeholder="Leader's full name"
                     />
                   </div>
@@ -207,11 +212,10 @@ export const RegistrationForm = () => {
                       required
                       value={formData.leaderEmail}
                       onChange={(e) => handleInputChange("leaderEmail", e.target.value)}
-                      onFocus={() => setFocusedField("leaderEmail")}
-                      onBlur={() => setFocusedField(null)}
-                      className={`font-mono transition-all duration-300 ${
-                        focusedField === "leaderEmail" ? "neon-border" : ""
-                      }`}
+                      onFocus={() => handleFocus("leaderEmail")}
+                      onBlur={handleBlur}
+                      className={`font-mono transition-all duration-300 ${focusedField === "leaderEmail" ? "neon-border" : ""
+                        }`}
                       placeholder="leader@university.edu"
                     />
                   </div>
@@ -226,11 +230,10 @@ export const RegistrationForm = () => {
                       required
                       value={formData.leaderPhone}
                       onChange={(e) => handleInputChange("leaderPhone", e.target.value)}
-                      onFocus={() => setFocusedField("leaderPhone")}
-                      onBlur={() => setFocusedField(null)}
-                      className={`font-mono transition-all duration-300 ${
-                        focusedField === "leaderPhone" ? "neon-border" : ""
-                      }`}
+                      onFocus={() => handleFocus("leaderPhone")}
+                      onBlur={handleBlur}
+                      className={`font-mono transition-all duration-300 ${focusedField === "leaderPhone" ? "neon-border" : ""
+                        }`}
                       placeholder="+91 9876543210"
                     />
                   </div>
@@ -242,7 +245,7 @@ export const RegistrationForm = () => {
                 <h3 className="text-2xl font-orbitron font-bold text-accent glow-text">
                   Team Members
                 </h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="memberCount" className="text-foreground font-mono">
@@ -270,11 +273,10 @@ export const RegistrationForm = () => {
                       required
                       value={formData.members}
                       onChange={(e) => handleInputChange("members", e.target.value)}
-                      onFocus={() => setFocusedField("members")}
-                      onBlur={() => setFocusedField(null)}
-                      className={`font-mono transition-all duration-300 ${
-                        focusedField === "members" ? "neon-border" : ""
-                      }`}
+                      onFocus={() => handleFocus("members")}
+                      onBlur={handleBlur}
+                      className={`font-mono transition-all duration-300 ${focusedField === "members" ? "neon-border" : ""
+                        }`}
                       placeholder="List all team members with their names and emails"
                       rows={4}
                     />
@@ -287,7 +289,7 @@ export const RegistrationForm = () => {
                 <h3 className="text-2xl font-orbitron font-bold text-primary glow-text">
                   Experience & Expectations
                 </h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="experience" className="text-foreground font-mono">
@@ -297,11 +299,10 @@ export const RegistrationForm = () => {
                       id="experience"
                       value={formData.experience}
                       onChange={(e) => handleInputChange("experience", e.target.value)}
-                      onFocus={() => setFocusedField("experience")}
-                      onBlur={() => setFocusedField(null)}
-                      className={`font-mono transition-all duration-300 ${
-                        focusedField === "experience" ? "neon-border" : ""
-                      }`}
+                      onFocus={() => handleFocus("experience")}
+                      onBlur={handleBlur}
+                      className={`font-mono transition-all duration-300 ${focusedField === "experience" ? "neon-border" : ""
+                        }`}
                       placeholder="Describe your team's cybersecurity background..."
                       rows={4}
                     />
@@ -315,11 +316,10 @@ export const RegistrationForm = () => {
                       id="expectations"
                       value={formData.expectations}
                       onChange={(e) => handleInputChange("expectations", e.target.value)}
-                      onFocus={() => setFocusedField("expectations")}
-                      onBlur={() => setFocusedField(null)}
-                      className={`font-mono transition-all duration-300 ${
-                        focusedField === "expectations" ? "neon-border" : ""
-                      }`}
+                      onFocus={() => handleFocus("expectations")}
+                      onBlur={handleBlur}
+                      className={`font-mono transition-all duration-300 ${focusedField === "expectations" ? "neon-border" : ""
+                        }`}
                       placeholder="Your goals and expectations from Medusa 2.0..."
                       rows={4}
                     />
@@ -355,4 +355,4 @@ export const RegistrationForm = () => {
       </div>
     </section>
   );
-};
+});

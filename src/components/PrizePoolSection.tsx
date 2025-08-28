@@ -40,7 +40,7 @@ const PrizePoolSection = () => {
       }, 16);
 
       return () => clearInterval(timer);
-    }, [animateNumbers, target, duration]);
+    }, [target, duration]);
 
     return <span>{prefix}{count.toLocaleString()}</span>;
   };
@@ -56,7 +56,7 @@ const PrizePoolSection = () => {
       delay: "delay-100"
     },
     {
-      position: "2nd", 
+      position: "2nd",
       amount: 50000,
       icon: Medal,
       color: "from-gray-300 to-gray-500",
@@ -68,7 +68,7 @@ const PrizePoolSection = () => {
       position: "3rd",
       amount: 40000,
       icon: Award,
-      color: "from-orange-400 to-orange-600", 
+      color: "from-orange-400 to-orange-600",
       glow: "shadow-orange-500/50",
       height: "h-28",
       delay: "delay-300"
@@ -104,7 +104,7 @@ const PrizePoolSection = () => {
                 className={`relative group ${prize.delay} ${animateNumbers ? 'animate-scale-in' : 'opacity-0'}`}
               >
                 {/* Podium Base */}
-                <div 
+                <div
                   className={`${prize.height} w-32 bg-gradient-to-t ${prize.color} rounded-t-lg relative transform-gpu transition-all duration-500 group-hover:scale-105 shadow-2xl ${prize.glow}`}
                   style={{
                     background: `linear-gradient(145deg, ${prize.color.split(' ')[1]}, ${prize.color.split(' ')[3]})`
@@ -112,12 +112,12 @@ const PrizePoolSection = () => {
                 >
                   {/* Glowing edges */}
                   <div className="absolute inset-0 rounded-t-lg border-2 border-cyber-green/30 group-hover:border-cyber-green/60 transition-colors duration-300"></div>
-                  
+
                   {/* Position number */}
                   <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-2xl font-bold text-background">
                     {prize.position}
                   </div>
-                  
+
                   {/* Prize amount */}
                   <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
                     <div className="text-lg font-mono font-bold text-background">

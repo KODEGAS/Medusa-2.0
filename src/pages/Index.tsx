@@ -1,5 +1,5 @@
 
-import { useState } from "react"; // 1. Import useState
+import { useState } from "react"; 
 
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";

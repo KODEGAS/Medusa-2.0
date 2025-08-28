@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, Trophy } from "lucide-react";
+import { useScrollAnimation, useStaggeredAnimation } from "@/hooks/useScrollAnimation";
 
 const events = [
   {
@@ -58,6 +59,9 @@ const events = [
 
 export const TimelineSection = () => {
   const [selectedEvent, setSelectedEvent] = useState<number | null>(null);
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation({ delay: 200 });
+  const { setRef: eventRef, visibleItems: eventsVisible } = useStaggeredAnimation(events.length, 200);
+  const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation({ delay: 400 });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -85,7 +89,12 @@ export const TimelineSection = () => {
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div 
+          ref={headerRef}
+          className={`text-center mb-16 transition-all duration-1000 ${
+            headerVisible ? 'animate-slide-up' : 'scroll-hidden'
+          }`}
+        >
           <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             Event Timeline
           </h2>
@@ -106,7 +115,13 @@ export const TimelineSection = () => {
               const isSelected = selectedEvent === event.id;
               
               return (
-                <div key={event.id} className="relative flex flex-col items-center">
+                <div 
+                  key={event.id} 
+                  ref={eventRef(index)}
+                  className={`relative flex flex-col items-center transition-all duration-800 ${
+                    eventsVisible[index] ? 'animate-slide-up' : 'scroll-hidden'
+                  }`}
+                >
                   {/* Timeline Node */}
                   <div 
                     className={`w-16 h-16 rounded-full border-4 ${getStatusColor(event.status)} ${getStatusBg(event.status)} 
@@ -178,9 +193,14 @@ export const TimelineSection = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16">
+        <div 
+          ref={ctaRef}
+          className={`text-center mt-16 transition-all duration-1000 ${
+            ctaVisible ? 'animate-fade-in-scale' : 'scroll-hidden-scale'
+          }`}
+        >
           <div className="bg-card/20 backdrop-blur-sm rounded-2xl p-8 border border-border/50 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-orbitron font-bold mb-4 text-primary">
+            <h3 className="text-2xl font-orbitron font-bold mb-4 text-primary glow-text">
               Ready to Join the Battle?
             </h3>
             <p className="font-mono text-muted-foreground mb-6">

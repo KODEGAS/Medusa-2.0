@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Terminal, Users, Trophy, Clock } from "lucide-react";
+import { useScrollAnimation, useStaggeredAnimation } from "@/hooks/useScrollAnimation";
 
 const highlights = [
   {
@@ -36,6 +37,9 @@ const highlights = [
 
 export const AboutSection = () => {
   const [flippedCard, setFlippedCard] = useState<number | null>(null);
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation({ delay: 200 });
+  const { setRef: cardRef, visibleItems: cardsVisible } = useStaggeredAnimation(highlights.length, 150);
+  const { ref: categoriesRef, isVisible: categoriesVisible } = useScrollAnimation({ delay: 400 });
 
   return (
     <section className="py-20 px-4 relative">
@@ -44,8 +48,12 @@ export const AboutSection = () => {
       
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
+ <    div 
+          ref={headerRef}
+          className={`text-center mb-16 transition-all duration-1000 ${
+            headerVisible ? 'animate-slide-up' : 'scroll-hidden'
+          }`}
+        >          <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             About the Competition
           </h2>
           <p className="text-xl font-mono text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -63,7 +71,10 @@ export const AboutSection = () => {
             return (
               <div
                 key={index}
-                className="group perspective-1000 cursor-pointer"
+                 ref={cardRef(index)}
+                className={`group perspective-1000 cursor-pointer transition-all duration-800 ${
+                  cardsVisible[index] ? 'animate-cyber-reveal' : 'scroll-hidden-cyber'
+                }`}
                 onMouseEnter={() => setFlippedCard(index)}
                 onMouseLeave={() => setFlippedCard(null)}
               >
@@ -109,7 +120,12 @@ export const AboutSection = () => {
         </div>
 
         {/* Competition Categories */}
-        <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50">
+        <div 
+          ref={categoriesRef}
+          className={`bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50 transition-all duration-1000 ${
+            categoriesVisible ? 'animate-fade-in-scale' : 'scroll-hidden-scale'
+          }`}
+        >
           <h3 className="text-3xl font-orbitron font-bold text-center mb-8 text-primary">
             Challenge Categories
           </h3>

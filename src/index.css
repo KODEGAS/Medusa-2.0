@@ -147,10 +147,10 @@ animation: matrix-fall 10s linear infinite;
 
 /* Glowing Text */
 .glow-text {
-text-shadow: 
-0 0 5px currentColor,
-0 0 10px currentColor,
-0 0 15px currentColor;
+text-shadow:
+  0 0 2px currentColor,
+  0 0 4px currentColor,
+  0 0 8px currentColor;
 }
 
 /* Neon Border */

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Zap } from "lucide-react";
 import medusaLogo from "@/assets/medusa-logo.jpg";
 import heroBackground from "@/assets/hero-background.jpg";
+import { Separator } from "@radix-ui/react-context-menu";
 
 export const HeroSection = memo(() => {
   const [glitchText, setGlitchText] = useState("Medusa 2.0");
@@ -54,7 +55,7 @@ export const HeroSection = memo(() => {
             <img
               src={medusaLogo}
               alt="Medusa 2.0 Logo"
-              className="w-48 h-32 object-contain animate-rotate-3d filter drop-shadow-2xl"
+              className="w-48 h-32 object-contain animate-float filter drop-shadow-2xl"
               loading="eager"
               decoding="async"
             />
@@ -88,17 +89,17 @@ export const HeroSection = memo(() => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
           <div className="holographic-card p-6 rounded-lg">
             <Shield className="w-8 h-8 text-primary mx-auto mb-3" />
-            <div className="text-3xl font-orbitron font-bold text-primary">50+</div>
+            <div className="text-3xl font-orbitron font-bold text-primary">15+</div>
             <div className="text-sm font-mono text-muted-foreground">Universities</div>
           </div>
           <div className="holographic-card p-6 rounded-lg">
             <Zap className="w-8 h-8 text-accent mx-auto mb-3" />
-            <div className="text-3xl font-orbitron font-bold text-accent">LKR 70K+</div>
+            <div className="text-3xl font-orbitron font-bold text-accent">LKR 160K+</div>
             <div className="text-sm font-mono text-muted-foreground">Prize Pool</div>
           </div>
           <div className="holographic-card p-6 rounded-lg">
             <div className="w-8 h-8 bg-gradient-cyber rounded-full mx-auto mb-3 animate-pulse-glow" />
-            <div className="text-3xl font-orbitron font-bold text-secondary">48hrs</div>
+            <div className="text-3xl font-orbitron font-bold text-secondary">24hrs</div>
             <div className="text-sm font-mono text-muted-foreground">Competition</div>
           </div>
         </div>
@@ -113,7 +114,7 @@ export const HeroSection = memo(() => {
             View Timeline
           </Button>
         </div>
-
+        <div className="mb-8" />
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-primary rounded-full flex justify-center">

@@ -1,59 +1,61 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, Trophy } from "lucide-react";
 import { useScrollAnimation, useStaggeredAnimation } from "@/hooks/useScrollAnimation";
 
 const events = [
-  {
-    id: 1,
-    title: "Awareness Session",
-    date: "March 15, 2024",
-    time: "2:00 PM",
-    description: "Introduction to CTF challenges and cybersecurity fundamentals",
-    icon: Users,
-    status: "completed",
-    details: "Interactive session covering CTF basics, team formation, and competition rules"
-  },
+ 
   {
     id: 2,
-    title: "Registration Opens",
-    date: "March 20, 2024",
-    time: "12:00 PM",
-    description: "Team registration and verification process begins",
+    title: "Close Registration",
+    date: "October 12, 2025",
+    time: "12:00 AM",
+    description: "Team registration and verification process ends",
     icon: Calendar,
-    status: "active",
-    details: "Universities can register teams of 3-4 members with verification documents"
-  },
-  {
-    id: 3,
-    title: "Round 1: Qualifiers",
-    date: "April 1-2, 2024",
-    time: "48 Hours",
-    description: "Online qualifying round for top university teams",
-    icon: Clock,
     status: "upcoming",
-    details: "24-hour online CTF with challenges across multiple categories"
+    details: "Final deadline for team registration. No late entries will be accepted. Ensure all documents are submitted and verified before this date."
+  },
+   {
+    id: 3,
+    title: "Awareness Session",
+    date: "October 17, 2024",
+    time: "7:00 PM",
+    description: "Introduction to CTF challenges and Compition Rules",
+    icon: Users,
+    status: "upcoming",
+    details: "Interactive session covering CTF basics, team formation, and competition rules. Participants will learn about the event structure, rules, and get tips from previous winners."
   },
   {
     id: 4,
-    title: "Round 2: Semi-Finals",
-    date: "April 15, 2024",
-    time: "8 Hours",
-    description: "Advanced challenges for qualified teams",
-    icon: Trophy,
-    status: "upcoming",
-    details: "On-site competition with advanced web exploitation and crypto challenges"
+    title: "Round 1: Qualifiers",
+    date: "October 25, 2024",
+    time: "6 Hours",
+    description: "Online qualifying round for top university teams",
+    icon: Clock,
+    status: "Online",
+    details: "6-hour online CTF with challenges across multiple categories including web, crypto, and reverse engineering. Top scoring teams will advance to the semi-finals."
   },
   {
     id: 5,
-    title: "Grand Finale",
-    date: "April 22, 2024",
-    time: "6 Hours",
-    description: "Final showdown with live challenges and prize distribution",
+    title: "Round 2: Semi-Finals",
+    date: "November 08, 2025",
+    time: "8 Hours",
+    description: "Advanced challenges for qualified teams to secure a spot",
     icon: Trophy,
-    status: "upcoming",
-    details: "Live hacking competition with real-time scoring and audience engagement"
+    status: "Online",
+    details: "On-site competition with advanced web exploitation and crypto challenges. Teams will face real-world scenarios and compete for a spot in the grand finale."
+  },
+  {
+    id: 6,
+    title: "Grand Finale",
+    date: "November 22, 2025",
+    time: "10 Hours",
+    description: "Final showdown with live challenges and prize distribution ceremony",
+    icon: Trophy,
+    status: "Physical",
+    details: "Live hacking competition with real-time scoring and audience engagement. Winners will be announced and prizes awarded during the closing ceremony."
   }
 ];
 
@@ -82,16 +84,14 @@ export const TimelineSection = () => {
   };
 
   return (
-    <section className="py-20 px-4 relative">
+  <section className="py-5 px-4 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-hero opacity-50" />
       <div className="absolute inset-0 cyber-grid opacity-5" />
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
-                <div className="text-center mb-16">
-
-
+          <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             Event Timeline
           </h2>
@@ -190,20 +190,18 @@ export const TimelineSection = () => {
         </div>
 
         {/* Call to Action */}
-               <div className="text-center mt-16">
-
-
+          <div className="text-center mt-16">
           <div className="bg-card/20 backdrop-blur-sm rounded-2xl p-8 border border-border/50 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-orbitron font-bold mb-4 text-primary glow-text">
+            <h3 className="text-2xl font-orbitron font-bold mb-4 text-primary">
               Ready to Join the Battle?
             </h3>
             <p className="font-mono text-muted-foreground mb-6">
               Registration is now open! Form your team and prepare for the ultimate cybersecurity challenge.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-3 bg-primary text-primary-foreground font-orbitron font-bold rounded-lg hover:shadow-neon transition-all duration-300 animate-pulse-glow">
+              <Link to="/register" className="px-8 py-3 bg-primary text-primary-foreground font-orbitron font-bold rounded-lg hover:shadow-neon transition-all duration-300 animate-pulse-glow">
                 Register Team
-              </button>
+              </Link>
               <button className="px-8 py-3 border-2 border-accent text-accent font-mono rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-300">
                 Download Rules
               </button>

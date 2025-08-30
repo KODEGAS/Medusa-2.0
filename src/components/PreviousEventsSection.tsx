@@ -11,7 +11,7 @@ const highlights = [
     name: "Team YAKUZA",
     winner: "University of Sri Jayewardenepura",
     stats: [
-      { label: "Prize", value: "LKR 40 000", icon: Trophy },
+      { label: "Prize", value: "LKR 40,000", icon: Trophy },
       
     ],
     image: "🏆",
@@ -24,7 +24,7 @@ const highlights = [
     name: "Team CHILL GUYS  ",
     winner: "SLIIT",
     stats: [
-      { label: "Prize", value: "LKR 30 000", icon: Trophy },
+      { label: "Prize", value: "LKR 30,000", icon: Trophy },
       
     ],
     image: "🛡️",
@@ -37,7 +37,7 @@ const highlights = [
     name: "Team CIPHERTECH",
     winner: "NSBM  Green University",
     stats: [
-      { label: "Prize", value: "LKR 20 000", icon: Trophy },
+      { label: "Prize", value: "LKR 20,000", icon: Trophy },
      
     ],
     image: "🚀",
@@ -68,10 +68,9 @@ export const PreviousEventsSection = () => {
           <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             Medusa 1.0
           </h2>
-          
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Celebrating our journey of empowering cybersecurity professionals and fostering innovation through competitive programming.
-          </p>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Last year's Medusa 1.0 was a remarkable event that united the academic cybersecurity community, inspired collaboration, and celebrated outstanding achievements. The competition provided a platform for participants to demonstrate their skills, connect with peers, and contribute to the advancement of cybersecurity awareness.
+            </p>
         </div>
 
         {/* Overall Statistics */}
@@ -82,7 +81,7 @@ export const PreviousEventsSection = () => {
               <Card key={index} className="group hover:scale-105 transition-all duration-300 border-border/50 hover:border-cyber-green/50 bg-card/50 backdrop-blur-sm">
                 <CardContent className="p-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyber-green to-primary flex items-center justify-center">
-                    <IconComponent className="w-6 h-6 text-background" />
+                    <IconComponent className="w-6 h-6 text-muted-foreground" />
                   </div>
                   <div className="text-3xl font-bold text-cyber-green mb-2">{stat.value}</div>
                   <div className="font-semibold text-foreground mb-1">{stat.label}</div>

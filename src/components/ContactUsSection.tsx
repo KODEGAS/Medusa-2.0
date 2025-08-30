@@ -28,6 +28,14 @@ export const ContactUsSection = () => {
       color: "text-accent"
     },
     {
+      position: "Technical Coordinator",
+      name: "Thivina Chandunu",
+      email: "vihara-ec22063@stu.kln.ac.lk",
+      phone: "+94 70 750 2664",
+      icon: Users,
+      color: "text-accent"
+    },
+    {
       position: "Public Relation Coordinator",
       name: "Kavishka Gayan",
       email: "wijesur-ec22036@stu.kln.ac.lk",
@@ -41,20 +49,13 @@ export const ContactUsSection = () => {
       email: "vihara-ec22063@stu.kln.ac.lk",
       phone: "+94 70 750 2664",
       icon: Users,
-      color: "text-primary"
+      color: "text-accent"
     },
-    {
-      position: "Membership Coordinator",
-      name: "Savithi Vihara",
-      email: "vihara-ec22063@stu.kln.ac.lk",
-      phone: "+94 70 750 2664",
-      icon: Users,
-      color: "text-primary"
-    }
+    
   ];
 
   return (
-    <section className="py-20 bg-card relative overflow-hidden">
+    <section className="py-5 bg-card relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 matrix-rain opacity-5" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />

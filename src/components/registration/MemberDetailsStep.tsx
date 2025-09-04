@@ -40,18 +40,44 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
+    // Prepare team data for API
+    const teamData = {
+      teamName: teamInfo.teamName,
+      university: teamInfo.university,
+      members: members.map(m => ({
+        name: m.name,
+        email: m.email,
+        phone: m.phone,
+        course: m.course,
+        year: m.year
+      }))
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/team", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(teamData)
+      });
+      if (!response.ok) throw new Error("Failed to register team");
+      const result = await response.json();
+
+      toast({
+        title: "Registration Successful!",
+        description: "Welcome to Medusa 2.0. Check your email for confirmation.",
+      });
+      onComplete(members);
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description: error.message || "An error occurred. Please try again.",
+        variant: "destructive"
+      });
+    }
     setIsSubmitting(false);
-    
-    toast({
-      title: "Registration Successful!",
-      description: "Welcome to Medusa 2.0. Check your email for confirmation.",
-    });
-    
-    onComplete(members);
   };
 
   return (

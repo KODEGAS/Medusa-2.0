@@ -38,7 +38,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
   return (
     <Card className="holographic-card backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-3xl font-orbitron text-center text-primary glow-text">
+        <CardTitle className="text-3xl font-orbitron text-center text-primary">
           Team Information
         </CardTitle>
         <div className="flex justify-center gap-2 mt-4">
@@ -96,7 +96,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
 
           {/* Team Leader Information */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-orbitron font-bold text-secondary glow-text">
+            <h3 className="text-2xl font-orbitron font-bold text-secondary">
               Team Leader Details
             </h3>
             
@@ -162,7 +162,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
 
           {/* Team Size */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-orbitron font-bold text-accent glow-text">
+            <h3 className="text-2xl font-orbitron font-bold text-accent">
               Team Configuration
             </h3>
             
@@ -189,7 +189,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
 
           {/* Experience & Expectations */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-orbitron font-bold text-primary glow-text">
+            <h3 className="text-2xl font-orbitron font-bold text-primary">
               Experience & Expectations
             </h3>
             

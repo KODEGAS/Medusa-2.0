@@ -2,6 +2,7 @@ import { useState } from "react";
 import { TeamInfoStep } from "./registration/TeamInfoStep";
 import { MemberDetailsStep } from "./registration/MemberDetailsStep";
 import { RegistrationSuccess } from "./registration/RegistrationSuccess";
+import { RegistrationCountdown } from "./RegistrationCountdown";
 
 export interface TeamInfo {
   teamName: string;
@@ -62,7 +63,8 @@ export const RegistrationForm = () => {
             Register your team for Medusa 2.0 and prepare for the ultimate cybersecurity challenge.
           </p>
         </div>
-
+        {/* Registration Countdown */}
+        <RegistrationCountdown />
         {currentStep === 1 && (
           <TeamInfoStep onComplete={handleTeamInfoComplete} />
         )}

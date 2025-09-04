@@ -18,7 +18,7 @@ export const RegistrationSuccess = ({ teamInfo, members }: RegistrationSuccessPr
             <CheckCircle className="w-12 h-12 text-accent" />
           </div>
           
-          <h2 className="text-4xl font-orbitron font-bold text-accent mb-4 glow-text">
+          <h2 className="text-4xl font-orbitron font-bold text-accent mb-4">
             Registration Complete!
           </h2>
           

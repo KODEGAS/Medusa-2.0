@@ -23,16 +23,26 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
     experience: "",
     expectations: ""
   });
-  
+  const [otherUniversity, setOtherUniversity] = useState("");
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleInputChange = (field: keyof TeamInfo, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleOtherUniversityChange = (value: string) => {
+    setOtherUniversity(value);
+    setFormData(prev => ({ ...prev, university: value }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onComplete(formData);
+    // If 'Other' is selected, use the custom university name
+    const payload = {
+      ...formData,
+      university: formData.university === "Other" ? otherUniversity : formData.university
+    };
+    onComplete(payload);
   };
 
   return (
@@ -78,19 +88,46 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
               <Label htmlFor="university" className="text-foreground font-mono">
                 University *
               </Label>
-              <Input
+              <select
                 id="university"
-                type="text"
                 required
                 value={formData.university}
                 onChange={(e) => handleInputChange("university", e.target.value)}
+                className={`w-full px-3 py-2 bg-input border border-border rounded-md font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary ${focusedField === "university" ? "neon-border" : ""}`}
                 onFocus={() => setFocusedField("university")}
                 onBlur={() => setFocusedField(null)}
-                className={`font-mono transition-all duration-300 ${
-                  focusedField === "university" ? "neon-border" : ""
-                }`}
-                placeholder="Your university name"
-              />
+              >
+                <option value="">Select your university</option>
+                <option value="University of Kelaniya">University of Kelaniya</option>
+                <option value="University of Colombo">University of Colombo</option>
+                <option value="University of Moratuwa">University of Moratuwa</option>
+                <option value="University of Peradeniya">University of Peradeniya</option>
+                <option value="University of Sri Jayawardenapura">University of Sri Jayawardenapura</option>
+                <option value="University of Ruhuna">University of Ruhuna</option>
+                <option value="University of Jaffna">University of Jaffna</option>
+                <option value="Sabaragamuwa University of Sri Lanka">Sabaragamuwa University of Sri Lanka</option>
+                <option value="SLTC">SLTC</option>
+                <option value="SLIIT">SLIIT</option>
+                <option value="IIT">IIT</option>
+                <option value="APIIT">APIIT</option>
+                <option value="The Open University of Sri Lanka">The Open University of Sri Lanka</option>
+                <option value="Other">Other</option>
+              </select>
+              {formData.university === "Other" && (
+                <Input
+                  id="other-university"
+                  type="text"
+                  required
+                  value={otherUniversity}
+                  onChange={(e) => handleOtherUniversityChange(e.target.value)}
+                  onFocus={() => setFocusedField("other-university")}
+                  onBlur={() => setFocusedField(null)}
+                  className={`font-mono transition-all duration-300 mt-2 ${
+                    focusedField === "other-university" ? "neon-border" : ""
+                  }`}
+                  placeholder="Enter your university name"
+                />
+              )}
             </div>
           </div>
 
@@ -180,6 +217,8 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                 <option value={2}>2 Members</option>
                 <option value={3}>3 Members</option>
                 <option value={4}>4 Members</option>
+                <option value={5}>5 Members</option>
+
               </select>
               <p className="text-sm text-muted-foreground font-mono">
                 You will provide details for {formData.memberCount - 1} additional team member{formData.memberCount !== 2 ? 's' : ''} in the next step.

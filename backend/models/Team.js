@@ -13,6 +13,9 @@ const teamSchema = new mongoose.Schema({
   teamName: { type: String, required: true },
   university: String,
   members: [memberSchema], // Array of member subdocuments
+  payment: {
+    slip: String // filename of uploaded payment slip
+  },
   createdAt: { type: Date, default: Date.now }
 });
 

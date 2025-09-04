@@ -2,6 +2,7 @@ import { useState } from "react";
 import { TeamInfoStep } from "./registration/TeamInfoStep";
 import { MemberDetailsStep } from "./registration/MemberDetailsStep";
 import { RegistrationSuccess } from "./registration/RegistrationSuccess";
+import { PaymentStep } from "./registration/PaymentStep";
 import { RegistrationCountdown } from "./RegistrationCountdown";
 
 export interface TeamInfo {
@@ -27,6 +28,7 @@ export const RegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [teamInfo, setTeamInfo] = useState<TeamInfo | null>(null);
   const [members, setMembers] = useState<MemberInfo[]>([]);
+  const [paymentInfo, setPaymentInfo] = useState<any>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleTeamInfoComplete = (data: TeamInfo) => {
@@ -36,6 +38,11 @@ export const RegistrationForm = () => {
 
   const handleMembersComplete = (memberData: MemberInfo[]) => {
     setMembers(memberData);
+    setCurrentStep(3);
+  };
+
+  const handlePaymentComplete = (paymentData: any) => {
+    setPaymentInfo(paymentData);
     setIsSubmitted(true);
   };
 
@@ -44,7 +51,7 @@ export const RegistrationForm = () => {
   };
 
   if (isSubmitted && teamInfo) {
-    return <RegistrationSuccess teamInfo={teamInfo} members={members} />;
+    return <RegistrationSuccess teamInfo={teamInfo} members={members} paymentInfo={paymentInfo} />;
   }
 
   return (
@@ -74,6 +81,15 @@ export const RegistrationForm = () => {
             teamInfo={teamInfo}
             onComplete={handleMembersComplete}
             onBack={handleBackToTeamInfo}
+          />
+        )}
+
+        {currentStep === 3 && teamInfo && members.length > 0 && (
+          <PaymentStep 
+            teamInfo={teamInfo} 
+            members={members} 
+            onComplete={handlePaymentComplete}
+            onBack={() => setCurrentStep(2)}
           />
         )}
       </div>

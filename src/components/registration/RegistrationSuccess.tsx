@@ -5,9 +5,10 @@ import { TeamInfo, MemberInfo } from "../RegistrationForm";
 interface RegistrationSuccessProps {
   teamInfo: TeamInfo;
   members: MemberInfo[];
+  paymentInfo?: any;
 }
 
-export const RegistrationSuccess = ({ teamInfo, members }: RegistrationSuccessProps) => {
+export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: RegistrationSuccessProps) => {
   return (
     <section className="py-20 px-4 relative">
       <div className="absolute inset-0 cyber-grid opacity-10" />
@@ -68,6 +69,17 @@ export const RegistrationSuccess = ({ teamInfo, members }: RegistrationSuccessPr
             </div>
           </div>
 
+          {/* Payment Info */}
+          {paymentInfo && (
+            <div className="mt-8 p-4 bg-accent/10 border border-accent/20 rounded-lg">
+              <h3 className="text-lg font-orbitron font-bold text-accent mb-2">Payment Details</h3>
+              {paymentInfo.method === "receipt" ? (
+                <p className="text-sm font-mono text-muted-foreground">Receipt uploaded: <span className="text-accent font-bold">{paymentInfo.receipt?.name || "(file)"}</span></p>
+              ) : (
+                <p className="text-sm font-mono text-muted-foreground">Paid via Stripe</p>
+              )}
+            </div>
+          )}
           <div className="mt-8 p-4 bg-primary/10 border border-primary/20 rounded-lg">
             <p className="text-sm font-mono text-muted-foreground">
               <strong className="text-primary">Next Steps:</strong> Check your email for further instructions and event details. 

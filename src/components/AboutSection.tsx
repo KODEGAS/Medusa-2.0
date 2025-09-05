@@ -53,8 +53,9 @@ export const AboutSection = () => {
             About the Competition
           </h2>
           <p className="text-xl font-mono text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Medusa 2.0 is the ultimate cybersecurity battleground where the brightest minds 
+            Medusa 2.0 is the ultimate cybersecurity battleground where the brightest minds
             from universities across the nation compete in advanced Capture The Flag challenges.
+            This year, we are excited to introduce ICS pentesting, integrating <span className="font-bold">hardware hacking</span> into the competition for the first time.
           </p>
         </div>
 
@@ -67,7 +68,7 @@ export const AboutSection = () => {
             return (
               <div
                 key={index}
-                 ref={cardRef(index)}
+                  ref={cardRef(index)}
                 className={`group perspective-1000 cursor-pointer transition-all duration-800 ${
                   cardsVisible[index] ? 'animate-cyber-reveal' : 'scroll-hidden-cyber'
                 }`}
@@ -98,8 +99,8 @@ export const AboutSection = () => {
                       <div className={`text-6xl font-orbitron font-black ${highlight.color} text-center mb-4 glow-text animate-pulse`}>
                         {index === 0 && "100+"}
                         {index === 1 && "15+"}
-                        {index === 2 && "70K+"}
-                        {index === 3 && "48H"}
+                        {index === 2 && "160K+"}
+                        {index === 3 && "24H"}
                       </div>
                       <p className="font-mono text-sm text-muted-foreground text-center">
                         {index === 0 && "Unique challenges across multiple categories"}
@@ -125,6 +126,8 @@ export const AboutSection = () => {
           <div className="flex flex-wrap justify-center gap-4">
             {[
               "Web Exploitation",
+              "Hardware Exploitation",
+              "Mobile Exploitation",
               "Cryptography", 
               "Reverse Engineering",
               "Binary Exploitation",

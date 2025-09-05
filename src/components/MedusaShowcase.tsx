@@ -60,7 +60,7 @@ export const MedusaShowcase = () => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-background via-muted/20 to-cyber-green/5 relative overflow-hidden">
+    <section className="px-4 bg-gradient-to-br from-background via-muted/20 to-cyber-green/5 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 left-1/3 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>

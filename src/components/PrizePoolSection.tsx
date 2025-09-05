@@ -79,7 +79,7 @@ const PrizePoolSection = () => {
   ];
 
   return (
-    <section id="prize-pool" className="py-20 px-6 relative overflow-hidden">
+    <section id="prize-pool" className="px-6 relative overflow-hidden">
       {/* Background Grid */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_24%,rgba(34,197,94,0.1)_25%,rgba(34,197,94,0.1)_26%,transparent_27%,transparent_74%,rgba(34,197,94,0.1)_75%,rgba(34,197,94,0.1)_76%,transparent_77%),linear-gradient(rgba(34,197,94,0.1)_24%,transparent_25%,transparent_26%,rgba(34,197,94,0.1)_27%,rgba(34,197,94,0.1)_74%,transparent_75%,transparent_76%,rgba(34,197,94,0.1)_77%)] bg-[size:75px_75px]"></div>

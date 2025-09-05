@@ -11,11 +11,9 @@ const RegistrationPage = () => {
 
   return (
     <div className="min-h-screen bg-background pt-16">
-      {isChallengeSolved ? (
+      {
         <RegistrationForm />
-      ) : (
-        <CtfChallenge onSuccess={handleChallengeSuccess} />
-      )}
+      }
     </div>
   );
 };

@@ -1,5 +1,14 @@
 import { Mail, Phone, MapPin, User, Shield, Zap, Users, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+// Import profile images
+import anuka from "@/assets/profiles/anuka.jpeg";
+import maleesha from "@/assets/profiles/maleesha.jpg";
+import kavindu from "@/assets/profiles/kavindu.jpg";
+import thivina from "@/assets/profiles/thivina.jpg";
+import kavishka from "@/assets/profiles/kavishka.jpg";
+import savithi from "@/assets/profiles/savithi.jpg";
 
 export const ContactUsSection = () => {
   const committeeMembers = [
@@ -8,7 +17,8 @@ export const ContactUsSection = () => {
       name: "Anuka Akshana",
       email: "akshana-ec21053@stu.kln.ac.lk",
       phone: "+94 76 285 5861",
-      icon: Shield,
+      image: anuka,
+      fallback: "AR",
       color: "text-primary"
     },
     {
@@ -16,7 +26,8 @@ export const ContactUsSection = () => {
       name: "Maleesha Indunil",
       email: "indunil-ec22042@stu.kln.ac.lk",
       phone: "+94 71 721 8184",
-      icon: User,
+      image: maleesha,
+      fallback: "JS",
       color: "text-accent"
     },
     {
@@ -24,7 +35,17 @@ export const ContactUsSection = () => {
       name: "Kavindu Sachinthe",
       email: "galkotu-ec22053@stu.kln.ac.lk",
       phone: "+94 72 66 77 555",
-      icon: User,
+      image: kavindu,
+      fallback: "CJ",
+      color: "text-accent"
+    },
+    {
+      position: "Technical Coordinator",
+      name: "Thivina Chandunu",
+      email: "vihara-ec22063@stu.kln.ac.lk",
+      phone: "+94 70 750 2664",
+      image: thivina,
+      fallback: "MC",
       color: "text-accent"
     },
     {
@@ -32,7 +53,8 @@ export const ContactUsSection = () => {
       name: "Kavishka Gayan",
       email: "wijesur-ec22036@stu.kln.ac.lk",
       phone: "+94 70 260 4306",
-      icon: MessageSquare,
+      image: kavishka,
+      fallback: "TW",     
       color: "text-accent"
     },
     {
@@ -40,21 +62,15 @@ export const ContactUsSection = () => {
       name: "Savithi Vihara",
       email: "vihara-ec22063@stu.kln.ac.lk",
       phone: "+94 70 750 2664",
-      icon: Users,
-      color: "text-primary"
+      image: savithi,
+      fallback: "AB",
+      color: "text-accent"
     },
-    {
-      position: "Membership Coordinator",
-      name: "Savithi Vihara",
-      email: "vihara-ec22063@stu.kln.ac.lk",
-      phone: "+94 70 750 2664",
-      icon: Users,
-      color: "text-primary"
-    }
+    
   ];
 
   return (
-    <section className="py-20 bg-card relative overflow-hidden">
+    <section className="py-5 bg-card relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 matrix-rain opacity-5" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
@@ -79,9 +95,18 @@ export const ContactUsSection = () => {
               className="holographic-card p-6 rounded-lg group hover:scale-105 transition-all duration-300"
             >
               <div className="text-center">
-                {/* Icon */}
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-cyber p-4 flex items-center justify-center group-hover:animate-pulse-glow transition-all duration-300`}>
-                  <member.icon className={`w-8 h-8 ${member.color}`} />
+                {/* Profile Image */}
+                <div className="w-20 h-20 mx-auto mb-4 group-hover:scale-110 transition-all duration-300">
+                  <Avatar className="w-full h-full border-2 border-primary/30 group-hover:border-primary/60 transition-all duration-300 shadow-lg group-hover:shadow-primary/20">
+                    <AvatarImage 
+                      src={member.image} 
+                      alt={member.name}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="bg-gradient-cyber text-foreground font-mono font-bold text-lg">
+                      {member.fallback}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
 
                 {/* Position */}
@@ -154,7 +179,7 @@ export const ContactUsSection = () => {
             </p>
           </div>
         </div>
-
+ 
         {/* Call to Action */}
         <div className="text-center mt-16">
           <p className="text-lg font-mono text-muted-foreground mb-6">

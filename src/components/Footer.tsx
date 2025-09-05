@@ -1,9 +1,9 @@
-import { Shield, Mail, Phone, MapPin, Github, Twitter, Linkedin, ExternalLink } from "lucide-react";
+import { Shield, Mail, Phone, MapPin, Github, Twitter, Linkedin, ExternalLink, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
   const socialLinks = [
-    { name: "WhatsApp", icon: Twitter, href: "#" },
+    { name: "Facebook", icon: Facebook, href: "#" },
     { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/medusaecs/" },
   ];
 
@@ -16,8 +16,8 @@ export const Footer = () => {
   ];
 
   const contactInfo = [
-    { icon: Mail, text: "info@medusa.com", href: "mailto:contact@ecsc-uok.com" },
-    { icon: Phone, text: "+94 (72) 66 77 555", href: "tel:+94726677555" },
+    { icon: Mail, text: "contact@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
+    { icon: Phone, text: "+94 76 30 74 621", href: "tel:+94763074621" },
     { icon: MapPin, text: "University of Kaleniya", href: "#" },
   ];
 

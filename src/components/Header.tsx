@@ -33,7 +33,7 @@ export const Header = () => {
             </div>
             <div>
               <h1 className="text-xl font-orbitron font-bold text-transparent bg-gradient-neon bg-clip-text">
-                Medusa 2.0
+                MEDUSA 2.0
               </h1>
               <p className="text-xs font-mono text-muted-foreground">CTF Competition</p>
             </div>

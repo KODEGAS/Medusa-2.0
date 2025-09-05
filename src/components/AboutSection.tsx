@@ -45,15 +45,15 @@ export const AboutSection = () => {
     <section className="py-20 px-4 relative">
       {/* Background Elements */}
       <div className="absolute inset-0 cyber-grid opacity-10" />
-      
+
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-        <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
+          <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             About the Competition
           </h2>
           <p className="text-xl font-mono text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Medusa 2.0 is the ultimate cybersecurity battleground where the brightest minds
+            MEDUSA 2.0 is the ultimate cybersecurity battleground where the brightest minds
             from universities across the nation compete in advanced Capture The Flag challenges.
             This year, we are excited to introduce ICS pentesting, integrating <span className="font-bold">hardware hacking</span> into the competition for the first time.
           </p>
@@ -64,14 +64,13 @@ export const AboutSection = () => {
           {highlights.map((highlight, index) => {
             const Icon = highlight.icon;
             const isFlipped = flippedCard === index;
-            
+
             return (
               <div
                 key={index}
-                  ref={cardRef(index)}
-                className={`group perspective-1000 cursor-pointer transition-all duration-800 ${
-                  cardsVisible[index] ? 'animate-cyber-reveal' : 'scroll-hidden-cyber'
-                }`}
+                ref={cardRef(index)}
+                className={`group perspective-1000 cursor-pointer transition-all duration-800 ${cardsVisible[index] ? 'animate-cyber-reveal' : 'scroll-hidden-cyber'
+                  }`}
                 onMouseEnter={() => setFlippedCard(index)}
                 onMouseLeave={() => setFlippedCard(null)}
               >
@@ -117,7 +116,7 @@ export const AboutSection = () => {
         </div>
 
         {/* Competition Categories */}
-                <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50">
+        <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50">
 
 
           <h3 className="text-3xl font-orbitron font-bold text-center mb-8 text-primary">
@@ -128,7 +127,7 @@ export const AboutSection = () => {
               "Web Exploitation",
               "Hardware Exploitation",
               "Mobile Exploitation",
-              "Cryptography", 
+              "Cryptography",
               "Reverse Engineering",
               "Binary Exploitation",
               "Forensics",
@@ -136,9 +135,9 @@ export const AboutSection = () => {
               "Steganography",
               "Network Security"
             ].map((category, index) => (
-              <Badge 
+              <Badge
                 key={index}
-                variant="outline" 
+                variant="outline"
                 className="text-lg px-6 py-3 font-mono hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:shadow-neon cursor-pointer"
               >
                 {category}

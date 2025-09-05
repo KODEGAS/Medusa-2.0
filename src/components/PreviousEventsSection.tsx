@@ -3,44 +3,45 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Users, Calendar, Target, Award, Zap } from "lucide-react";
 
+import championImg from "@/assets/highlights/champion.jpg";
+import runnerUpImg from "@/assets/highlights/runnerup.jpg";
+import secondRunnerUpImg from "@/assets/highlights/secondrunnerup.jpg";
+
 const highlights = [
   {
     id: 1,
-    year: "2024",
+    year: "2025",
     title: "Champion",
     name: "Team YAKUZA",
     winner: "University of Sri Jayewardenepura",
     stats: [
       { label: "Prize", value: "LKR 40,000", icon: Trophy },
-      
     ],
-    image: "🏆",
+    image: championImg,
     color: "from-yellow-400 to-orange-500"
   },
   {
     id: 2,
-    year: "2024",
+    year: "2025",
     title: "1st Runner-Up",
-    name: "Team CHILL GUYS  ",
+    name: "Team CHILL GUYS",
     winner: "SLIIT",
     stats: [
       { label: "Prize", value: "LKR 30,000", icon: Trophy },
-      
     ],
-    image: "🛡️",
+    image: runnerUpImg,
     color: "from-blue-400 to-purple-500"
   },
   {
     id: 3,
-    year: "2024",
+    year: "2025",
     title: "2nd Runner-Up",
     name: "Team CIPHERTECH",
-    winner: "NSBM  Green University",
+    winner: "NSBM Green University",
     stats: [
       { label: "Prize", value: "LKR 20,000", icon: Trophy },
-     
     ],
-    image: "🚀",
+    image: secondRunnerUpImg,
     color: "from-green-400 to-cyan-500"
   }
 ];
@@ -105,7 +106,7 @@ export const PreviousEventsSection = () => {
               <CardContent className="p-0">
                 {/* Event Header */}
                 <div className={`p-6 bg-gradient-to-r ${event.color} text-white relative overflow-hidden`}>
-                  <div className="absolute top-0 right-0 text-6xl opacity-20">{event.image}</div>
+                  <img src={event.image} alt={event.title} className="absolute top-2 right-2 w-20 h-20 object-cover rounded-xl opacity-80 shadow-lg" />
                   <div className="relative z-10">
                     <Badge variant="secondary" className="mb-2 bg-white/20 text-white border-white/30">
                       {event.year}

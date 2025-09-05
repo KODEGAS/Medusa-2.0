@@ -42,8 +42,8 @@ export const ContactUsSection = () => {
     {
       position: "Technical Coordinator",
       name: "Thivina Chandunu",
-      email: "vihara-ec22063@stu.kln.ac.lk",
-      phone: "+94 70 750 2664",
+      email: "chandun-ec22058@stu.kln.ac.lk",
+      phone: "+94 76 30 74 621",
       image: thivina,
       fallback: "MC",
       color: "text-accent"
@@ -164,7 +164,7 @@ export const ContactUsSection = () => {
               Emergency Support
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              +94 (72) 66 77 555
+              +94 76 30 74 621
             </p>
           </div>
 

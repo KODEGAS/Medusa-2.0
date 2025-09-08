@@ -107,8 +107,8 @@ export const MedusaShowcase = () => {
                   key={image.id}
                   onClick={() => setSelectedImage(index)}
                   className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${selectedImage === index
-                      ? 'border-cyber-green shadow-lg shadow-cyber-green/25'
-                      : 'border-border/50 hover:border-cyber-green/50'
+                    ? 'border-cyber-green shadow-lg shadow-cyber-green/25'
+                    : 'border-border/50 hover:border-cyber-green/50'
                     }`}
                 >
                   <img
@@ -135,23 +135,23 @@ export const MedusaShowcase = () => {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" className="bg-gradient-to-r from-cyber-green to-primary text-background font-semibold hover:shadow-lg hover:shadow-cyber-green/25"
-                 onClick={() =>
-                  window.open(
-                              "https://www.facebook.com/story.php?story_fbid=540689512302924&id=100090856394738&mibextid=wwXIfr&rdid=iOpgcpdVlesCnHvJ#",
-                              "_blank"
-                )
-              }
+                  onClick={() =>
+                    window.open(
+                      "https://www.facebook.com/story.php?story_fbid=540689512302924&id=100090856394738&mibextid=wwXIfr&rdid=iOpgcpdVlesCnHvJ#",
+                      "_blank"
+                    )
+                  }
                 >
                   Medusa 1.0 Album
                   <ChevronRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button size="lg" variant="outline" className="border-cyber-green/30 text-cyber-green hover:bg-cyber-green/10"
-                 onClick={() =>
-                  window.open(
-                              "https://www.facebook.com/watch/?mibextid=wwXIfr&v=1806505730109125&rdid=sjSEaFCjyglqMBQz",
-                              "_blank"
-                )
-              }
+                  onClick={() =>
+                    window.open(
+                      "https://www.facebook.com/watch/?mibextid=wwXIfr&v=1806505730109125&rdid=sjSEaFCjyglqMBQz",
+                      "_blank"
+                    )
+                  }
                 >
                   View Documentation
                   <ChevronRight className="w-5 h-5 ml-2" />

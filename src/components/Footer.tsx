@@ -5,7 +5,7 @@ export const Footer = () => {
   const socialLinks = [
     { name: "Facebook", icon: Facebook, href: "https://www.facebook.com/people/MEDUSA/61561933005641/" },
     { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/medusaecs/" },
-    { name: "WhatsApp", icon: MessageCircle, href: "https://wa.https://whatsapp.com/channel/0029Vb6vhSBKrWQv83bWfR3q/94726677555" },
+    { name: "WhatsApp", icon: MessageCircle, href: "https://whatsapp.com/channel/0029Vb6vhSBKrWQv83bWfR3q/94726677555" },
   ];
 
   const quickLinks = [
@@ -19,7 +19,7 @@ export const Footer = () => {
   const contactInfo = [
     { icon: Mail, text: "contact@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
     { icon: Phone, text: "+94 (72) 66 77 555", href: "tel:+94726677555" },
-    { icon: MapPin, text: "University of Kaleniya", href: "kln.ac.lk" },
+    { icon: MapPin, text: "University of Kaleniya", href: "https://www.kln.ac.lk" },
 
   ];
 

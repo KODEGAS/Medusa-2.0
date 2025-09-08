@@ -32,9 +32,7 @@ const Index = () => {
         <div id="partners"><PartnersSection /></div>
         <div id="contact"><ContactUsSection /></div>
         <div id="register" className="flex justify-center py-8">
-          <Link to="/register">
-            <Button>Register Now</Button>
-          </Link>
+         
         </div>
       </main>
       <Footer />

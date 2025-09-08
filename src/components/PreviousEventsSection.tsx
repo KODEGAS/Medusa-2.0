@@ -52,8 +52,7 @@ const overallStats = [
   { label: "Prize Money Distributed", value: "LKR 80,000", icon: Trophy, description: "Rewarded to talented participants" },
   { label: "Universities Represented", value: "15+", icon: Target, description: "Institutions showcasing talent" }
 ];
-
-export const PreviousEventsSection = () => {
+      export const PreviousEventsSection = () => {
   const [selectedEvent, setSelectedEvent] = useState<number | null>(null);
 
   return (
@@ -69,9 +68,9 @@ export const PreviousEventsSection = () => {
           <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
             Medusa 1.0
           </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Last year's Medusa 1.0 was a remarkable event that united the academic cybersecurity community, inspired collaboration, and celebrated outstanding achievements. The competition provided a platform for participants to demonstrate their skills, connect with peers, and contribute to the advancement of cybersecurity awareness.
-            </p>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Celebrating our journey of empowering cybersecurity professionals and fostering innovation through competitive programming.
+          </p>
         </div>
 
         {/* Overall Statistics */}
@@ -105,14 +104,18 @@ export const PreviousEventsSection = () => {
             >
               <CardContent className="p-0">
                 {/* Event Header */}
-                <div className={`p-6 bg-gradient-to-r ${event.color} text-white relative overflow-hidden`}>
-                  <img src={event.image} alt={event.title} className="absolute top-2 right-2 w-20 h-20 object-cover rounded-xl opacity-80 shadow-lg" />
-                  <div className="relative z-10">
-                    <Badge variant="secondary" className="mb-2 bg-white/20 text-white border-white/30">
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src={event.image} 
+                    alt={event.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-r ${event.color} opacity-40`}></div>
+                  <div className="relative z-10 p-6 h-full flex flex-col justify-end text-white">
+                    <Badge variant="secondary" className="mb-2 bg-white/20 text-white border-white/30 w-fit">
                       {event.year}
                     </Badge>
                     <h3 className="text-xl font-bold mb-2">{event.title}</h3>
-                    <p className="text-sm text-white/90">{event.name}</p>
                   </div>
                 </div>
 
@@ -138,8 +141,9 @@ export const PreviousEventsSection = () => {
                     })}
                   </div>
 
-                  {/* Winner Badge */}
+                  {/* University Badge */}
                   <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-cyber-green/10 to-primary/10 rounded-lg">
+                    <Award className="w-5 h-5 text-cyber-green" />
                     <div>
                       <div className="text-sm font-semibold">University</div>
                       <div className="text-sm text-muted-foreground">{event.winner}</div>
@@ -166,6 +170,7 @@ export const PreviousEventsSection = () => {
             </Card>
           ))}
         </div>
+
       </div>
     </section>
   );

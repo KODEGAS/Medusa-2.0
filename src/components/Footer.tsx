@@ -16,9 +16,15 @@ export const Footer = () => {
   ];
 
   const contactInfo = [
+
     { icon: Mail, text: "contact@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
     { icon: Phone, text: "+94 76 30 74 621", href: "tel:+94763074621" },
     { icon: MapPin, text: "University of Kaleniya", href: "#" },
+
+    { icon: Mail, text: "contatc@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
+    { icon: Phone, text: "+94 (72) 66 77 555", href: "tel:+94726677555" },
+    { icon: MapPin, text: "University of Kaleniya", href: "kln.ac.lk" },
+
   ];
 
   const scrollToSection = (href: string) => {
@@ -46,7 +52,7 @@ export const Footer = () => {
                 </div>
                 <div>
                   <h3 className="text-2xl font-orbitron font-bold text-transparent bg-gradient-neon bg-clip-text">
-                    Medusa 2.0
+                    MEDUSA 2.0
                   </h3>
                   <p className="text-sm font-mono text-muted-foreground">CTF Competition</p>
                 </div>
@@ -114,7 +120,7 @@ export const Footer = () => {
                 Stay Updated
               </h4>
               <p className="text-sm text-muted-foreground font-mono mb-4">
-                Get the latest updates about Medusa 2.0 and future CTF events.
+                Get the latest updates about MEDUSA 2.0 and future CTF events.
               </p>
               <div className="space-y-3">
                 <input
@@ -134,7 +140,7 @@ export const Footer = () => {
         <div className="py-6 border-t border-border">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-sm font-mono text-muted-foreground">
-              © 2025 Medusa 2.0 CTF. All rights reserved.
+              © 2025 MEDUSA 2.0 CTF. All rights reserved.
             </div>
             <div className="flex items-center gap-6 text-sm font-mono text-muted-foreground">
               <a href="#" className="hover:text-primary transition-colors">

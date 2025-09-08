@@ -9,13 +9,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { 
-  Shield, 
-  Zap, 
-  Eye, 
-  Lock, 
-  Cpu, 
-  Network, 
+import {
+  Shield,
+  Zap,
+  Eye,
+  Lock,
+  Cpu,
+  Network,
   ChevronRight,
   Star,
   Download,
@@ -32,7 +32,7 @@ const galleryImages = [
   },
   {
     id: 2,
-    src: medusaLogo, 
+    src: medusaLogo,
     title: "",
     description: ""
   },
@@ -68,7 +68,7 @@ export const MedusaShowcase = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <h3 className="text-3xl font-bold mb-4 text-foreground text-center">
-          Highlights of Medusa 1.0
+          Highlights of MEDUSA 1.0
         </h3>
         {/* Image Gallery */}
         <div className="mb-16">
@@ -99,18 +99,17 @@ export const MedusaShowcase = () => {
               <CarouselPrevious className="left-4" />
               <CarouselNext className="right-4" />
             </Carousel>
-            
+
             {/* Gallery Thumbnails */}
             <div className="flex justify-center gap-2 mt-6">
               {galleryImages.map((image, index) => (
                 <button
                   key={image.id}
                   onClick={() => setSelectedImage(index)}
-                  className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                    selectedImage === index 
-                      ? 'border-cyber-green shadow-lg shadow-cyber-green/25' 
+                  className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${selectedImage === index
+                      ? 'border-cyber-green shadow-lg shadow-cyber-green/25'
                       : 'border-border/50 hover:border-cyber-green/50'
-                  }`}
+                    }`}
                 >
                   <img
                     src={image.src}
@@ -133,8 +132,9 @@ export const MedusaShowcase = () => {
                 Explore memorable moments from our previous event, including photos and videos of competitions, workshops, and celebrations.
                 Relive the excitement and achievements of our cybersecurity community.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
                 <Button size="lg" className="bg-gradient-to-r from-cyber-green to-primary text-background font-semibold hover:shadow-lg hover:shadow-cyber-green/25"
                  onClick={() =>
                   window.open(
@@ -145,6 +145,11 @@ export const MedusaShowcase = () => {
                 >
                   Medusa 1.0 Album
                 <ChevronRight className="w-5 h-5 ml-2" />
+
+                <Button size="lg" className="bg-gradient-to-r from-cyber-green to-primary text-background font-semibold hover:shadow-lg hover:shadow-cyber-green/25">
+                  MEDUSA 1.0 Album
+                  <ChevronRight className="w-5 h-5 ml-2" />
+
                 </Button>
                 <Button size="lg" variant="outline" className="border-cyber-green/30 text-cyber-green hover:bg-cyber-green/10"
                  onClick={() =>
@@ -158,7 +163,7 @@ export const MedusaShowcase = () => {
                   <ChevronRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
-            
+
             </CardContent>
           </Card>
         </div>

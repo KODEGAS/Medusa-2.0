@@ -6,12 +6,12 @@ import heroBackground from "@/assets/hero-background.jpg";
 import { Separator } from "@radix-ui/react-context-menu";
 
 export const HeroSection = memo(() => {
-  const [glitchText, setGlitchText] = useState("Medusa 2.0");
+  const [glitchText, setGlitchText] = useState("MEDUSA 2.0");
 
   useEffect(() => {
     const interval = setInterval(() => {
       const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-      const original = "Medusa 2.0";
+      const original = "MEDUSA 2.0";
       let glitched = "";
 
       for (let i = 0; i < original.length; i++) {

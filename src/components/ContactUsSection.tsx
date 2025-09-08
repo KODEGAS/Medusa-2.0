@@ -1,6 +1,8 @@
+
 import { Mail, Phone, MapPin, User, Shield, Zap, Users, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 // Import profile images
 import anuka from "@/assets/profiles/anuka.jpeg";
@@ -11,6 +13,7 @@ import kavishka from "@/assets/profiles/kavishka.jpg";
 import savithi from "@/assets/profiles/savithi.jpg";
 
 export const ContactUsSection = () => {
+  const navigate = useNavigate();
   const committeeMembers = [
     {
       position: "President (ECSC)",
@@ -136,6 +139,10 @@ export const ContactUsSection = () => {
                   variant="outline"
                   size="sm"
                   className="mt-4 border-primary/50 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+                  onClick={() => {
+                    const phone = member.phone.replace(/[^\d]/g, "");
+                    window.open(`https://wa.me/${phone}`, "_blank");
+                  }}
                 >
                   Contact
                 </Button>
@@ -185,7 +192,13 @@ export const ContactUsSection = () => {
           <p className="text-lg font-mono text-muted-foreground mb-6">
             Ready to join the ultimate cybersecurity challenge?
           </p>
-          <Button variant="cyber" size="lg" className="text-lg px-8 py-6">
+          
+          <Button
+            variant="cyber"
+            size="lg"
+            className="text-lg px-8 py-6"
+            onClick={() => navigate("/register")}
+          >
             Get Started Now
           </Button>
         </div>

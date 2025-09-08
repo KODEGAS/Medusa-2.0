@@ -55,7 +55,7 @@ export const HeroSection = memo(() => {
             <img
               src={medusaLogo}
               alt="Medusa 2.0 Logo"
-              className="w-48 h-32 object-contain animate-float filter drop-shadow-2xl"
+              className="w-48 h-32 object-contain filter drop-shadow-2xl"
               loading="eager"
               decoding="async"
             />
@@ -98,7 +98,7 @@ export const HeroSection = memo(() => {
             <div className="text-sm font-mono text-muted-foreground">Prize Pool</div>
           </div>
           <div className="holographic-card p-6 rounded-lg">
-            <div className="w-8 h-8 bg-gradient-cyber rounded-full mx-auto mb-3 animate-pulse-glow" />
+            <div className="w-8 h-8 bg-gradient-cyber rounded-full mx-auto mb-3" />
             <div className="text-3xl font-orbitron font-bold text-secondary">24hrs</div>
             <div className="text-sm font-mono text-muted-foreground">Competition</div>
           </div>

@@ -55,7 +55,7 @@ export const AboutSection = () => {
           <p className="text-xl font-mono text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Medusa 2.0 is the ultimate cybersecurity battleground where the brightest minds
             from universities across the nation compete in advanced Capture The Flag challenges.
-            This year, we are excited to introduce ICS pentesting, integrating <span className="font-bold">hardware hacking</span> into the competition for the first time.
+            This year, we are excited to introduce ICS pentesting, integrating <span className="font-bold">ICS Pentesting</span> into the competition for the first time.
           </p>
         </div>
 

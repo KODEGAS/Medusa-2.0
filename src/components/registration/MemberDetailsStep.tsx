@@ -55,7 +55,7 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/team", {
+      const response = await fetch("https://medusa-2-0-backend.onrender.com/api/team", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

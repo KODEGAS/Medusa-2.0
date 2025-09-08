@@ -72,7 +72,7 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
     formData.append("teamName", teamInfo.teamName);
 
     try {
-      const response = await fetch("http://localhost:5000/api/payment/upload", {
+      const response = await fetch("https://medusa-2-0-backend.onrender.com/api/payment/upload", {
         method: "POST",
         body: formData
       });

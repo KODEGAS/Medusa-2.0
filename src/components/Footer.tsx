@@ -1,10 +1,11 @@
-import { Shield, Mail, Phone, MapPin, Github, Twitter, Linkedin, ExternalLink, Facebook } from "lucide-react";
+import { Shield, Mail, Phone, MapPin, Github, Twitter, Linkedin, ExternalLink, Facebook, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
   const socialLinks = [
-    { name: "Facebook", icon: Facebook, href: "#" },
+    { name: "Facebook", icon: Facebook, href: "https://www.facebook.com/people/MEDUSA/61561933005641/" },
     { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/medusaecs/" },
+    { name: "WhatsApp", icon: MessageCircle, href: "https://wa.https://whatsapp.com/channel/0029Vb6vhSBKrWQv83bWfR3q/94726677555" },
   ];
 
   const quickLinks = [
@@ -16,12 +17,7 @@ export const Footer = () => {
   ];
 
   const contactInfo = [
-
     { icon: Mail, text: "contact@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
-    { icon: Phone, text: "+94 76 30 74 621", href: "tel:+94763074621" },
-    { icon: MapPin, text: "University of Kaleniya", href: "#" },
-
-    { icon: Mail, text: "contatc@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
     { icon: Phone, text: "+94 (72) 66 77 555", href: "tel:+94726677555" },
     { icon: MapPin, text: "University of Kaleniya", href: "kln.ac.lk" },
 

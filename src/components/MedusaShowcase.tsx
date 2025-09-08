@@ -134,7 +134,6 @@ export const MedusaShowcase = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-
                 <Button size="lg" className="bg-gradient-to-r from-cyber-green to-primary text-background font-semibold hover:shadow-lg hover:shadow-cyber-green/25"
                  onClick={() =>
                   window.open(
@@ -144,12 +143,7 @@ export const MedusaShowcase = () => {
               }
                 >
                   Medusa 1.0 Album
-                <ChevronRight className="w-5 h-5 ml-2" />
-
-                <Button size="lg" className="bg-gradient-to-r from-cyber-green to-primary text-background font-semibold hover:shadow-lg hover:shadow-cyber-green/25">
-                  MEDUSA 1.0 Album
                   <ChevronRight className="w-5 h-5 ml-2" />
-
                 </Button>
                 <Button size="lg" variant="outline" className="border-cyber-green/30 text-cyber-green hover:bg-cyber-green/10"
                  onClick={() =>

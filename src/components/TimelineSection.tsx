@@ -84,7 +84,7 @@ export const TimelineSection = () => {
   };
 
   return (
-  <section className="py-5 px-4 relative">
+  <section id="timeline-section" className="py-5 px-4 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-hero opacity-50" />
       <div className="absolute inset-0 cyber-grid opacity-5" />

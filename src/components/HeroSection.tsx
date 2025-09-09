@@ -4,10 +4,12 @@ import { ArrowRight, Shield, Zap } from "lucide-react";
 import medusaLogo from "@/assets/medusa-logo.jpg";
 import heroBackground from "@/assets/hero-background.jpg";
 import { Separator } from "@radix-ui/react-context-menu";
+import { useNavigate } from "react-router-dom";
+
 
 export const HeroSection = memo(() => {
   const [glitchText, setGlitchText] = useState("MEDUSA 2.0");
-
+  const navigate = useNavigate();
   useEffect(() => {
     const interval = setInterval(() => {
       const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
@@ -106,11 +108,22 @@ export const HeroSection = memo(() => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button variant="cyber" size="lg" className="text-lg px-8 py-6">
+          <Button variant="cyber" size="lg" className="text-lg px-8 py-6"
+          onClick={() => navigate("/register")}
+
+          >
             Register Now
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-          <Button variant="neon" size="lg" className="text-lg px-8 py-6">
+          <Button 
+            variant="neon" 
+            size="lg" 
+            className="text-lg px-8 py-6 hover:text-white"
+            onClick={() => {
+              const el = document.getElementById("timeline-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
             View Timeline
           </Button>
         </div>

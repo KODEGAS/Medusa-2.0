@@ -1,7 +1,6 @@
 import { useState, useEffect, memo, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Zap } from "lucide-react";
-import heroBackground from "@/assets/hero-background.jpg";
 import { Separator } from "@radix-ui/react-context-menu";
 import { useNavigate } from "react-router-dom";
 
@@ -70,7 +69,7 @@ const HeroSection = memo(() => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden" style={{ backgroundImage: `url(${heroBackground})` }}>
+    <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden">
       {/* Strong black overlay for darker background */}
       <div className="absolute inset-0 bg-black opacity-80 z-0 pointer-events-none" />
       {/* Loader overlay while model is loading */}

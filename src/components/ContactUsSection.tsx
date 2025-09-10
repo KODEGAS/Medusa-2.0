@@ -5,12 +5,12 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 
 //profile images
-const anuka = "https://res.cloudinary.com/du5tkpcut/image/upload/w_200,q_auto/v1757483245/anuka_f0fcxu.webp";
-const maleesha = "https://res.cloudinary.com/du5tkpcut/image/upload/w_200,q_auto/v1757483272/maleesha_mrb9xs.webp";
-const kavindu = "https://res.cloudinary.com/du5tkpcut/image/upload/v1757483268/kavindu_vms68i.webp";
-const thivina = "https://res.cloudinary.com/du5tkpcut/image/upload/v1757483274/thivina_eiemsn.webp";
-const kavishka = "https://res.cloudinary.com/du5tkpcut/image/upload/v1757483263/kavishka_xru4ev.webp";
-const savithi = "https://res.cloudinary.com/du5tkpcut/image/upload/v1757483273/savithi_axapnj.webp";
+const anuka = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483245/anuka_f0fcxu.webp";
+const maleesha = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483272/maleesha_mrb9xs.webp";
+const kavindu = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483268/kavindu_vms68i.webp";
+const thivina = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483274/thivina_eiemsn.webp";
+const kavishka = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483263/kavishka_xru4ev.webp";
+const savithi = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483273/savithi_axapnj.webp";
 
 export const ContactUsSection = () => {
   const navigate = useNavigate();

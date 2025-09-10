@@ -29,8 +29,7 @@ const galleryImages = [
 
   "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1366_hjfzkc.jpg",
   "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484399/1_qg4ion.jpg",
-    "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484403/2_kvxjpf.jpg",
-
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484403/2_kvxjpf.jpg",
   "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1368_xnnnbk.jpg",
   "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484400/4_ziyikj.jpg",
 

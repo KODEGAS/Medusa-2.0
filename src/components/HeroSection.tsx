@@ -90,7 +90,7 @@ const HeroSection = memo(() => {
         <div className="flex flex-col items-center justify-center">
           <div style={{ width: 560, height: 460, position: 'relative' }}>
             <Suspense fallback={null}>
-              <Canvas camera={{ position: [0, -1.1, 5.1], fov: 60 }}>
+              <Canvas camera={{ position: [0, -1.0, 5.1], fov: 60 }}>
                 <pointLight position={[0, 0, -2]} intensity={2.5} color="#39FF14" distance={8} decay={2} />
                 <ambientLight intensity={0.8} />
                 <directionalLight position={[5, 5, 5]} intensity={0.7} />

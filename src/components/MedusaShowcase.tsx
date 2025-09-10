@@ -25,9 +25,15 @@ import medusaLogo from "@/assets/medusa-logo.jpg";
 
 const galleryImages = [
   "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1365_xvwnum.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484399/3_kh0t0k.jpg",
+
   "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1366_hjfzkc.jpg",
-  "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1367_v6wqrf.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484399/1_qg4ion.jpg",
+    "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484403/2_kvxjpf.jpg",
+
   "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1368_xnnnbk.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484400/4_ziyikj.jpg",
+
 ];
 
 export const MedusaShowcase = () => {

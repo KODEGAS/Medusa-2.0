@@ -28,13 +28,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

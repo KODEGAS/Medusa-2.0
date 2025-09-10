@@ -24,36 +24,15 @@ import {
 import medusaLogo from "@/assets/medusa-logo.jpg";
 
 const galleryImages = [
-  {
-    id: 1,
-    src: medusaLogo,
-    title: "",
-    description: ""
-  },
-  {
-    id: 2,
-    src: medusaLogo,
-    title: "",
-    description: ""
-  },
-  {
-    id: 3,
-    src: medusaLogo,
-    title: "",
-    description: ""
-  },
-  {
-    id: 4,
-    src: medusaLogo,
-    title: "",
-    description: ""
-  },
-  {
-    id: 5,
-    src: medusaLogo,
-    title: "",
-    description: ""
-  }
+  "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1365_xvwnum.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484399/3_kh0t0k.jpg",
+
+  "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1366_hjfzkc.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484399/1_qg4ion.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484403/2_kvxjpf.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1368_xnnnbk.jpg",
+  "https://res.cloudinary.com/du5tkpcut/image/upload/v1757484400/4_ziyikj.jpg",
+
 ];
 
 export const MedusaShowcase = () => {
@@ -75,21 +54,18 @@ export const MedusaShowcase = () => {
           <div className="max-w-4xl mx-auto">
             <Carousel className="w-full">
               <CarouselContent>
-                {galleryImages.map((image, index) => (
-                  <CarouselItem key={image.id}>
+                {galleryImages.map((url, index) => (
+                  <CarouselItem key={index}>
                     <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
                       <CardContent className="p-0">
                         <div className="relative group">
                           <img
-                            src={image.src}
-                            alt={image.title}
+                            src={url}
+                            alt={`Gallery Image ${index + 1}`}
                             className="w-full h-96 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-t-lg"></div>
-                          <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                            <h3 className="text-xl font-bold mb-2">{image.title}</h3>
-                            <p className="text-sm text-white/90">{image.description}</p>
-                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -102,9 +78,9 @@ export const MedusaShowcase = () => {
 
             {/* Gallery Thumbnails */}
             <div className="flex justify-center gap-2 mt-6">
-              {galleryImages.map((image, index) => (
+              {galleryImages.map((url, index) => (
                 <button
-                  key={image.id}
+                  key={index}
                   onClick={() => setSelectedImage(index)}
                   className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${selectedImage === index
                     ? 'border-cyber-green shadow-lg shadow-cyber-green/25'
@@ -112,9 +88,10 @@ export const MedusaShowcase = () => {
                     }`}
                 >
                   <img
-                    src={image.src}
-                    alt={image.title}
+                    src={url}
+                    alt={`Gallery Image ${index + 1}`}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </button>
               ))}

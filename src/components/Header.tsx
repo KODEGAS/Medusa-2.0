@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Shield, Zap, Users, Calendar, Award, Phone } from "lucide-react";
+import { Menu, X, Zap, Users, Calendar, Award, Phone } from "lucide-react";
+import logoWhite from "@/assets/logowhite.png";
 import { Link } from "react-router-dom";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
-    { name: "About", href: "#about", icon: Shield },
+    { name: "About", href: "#about", icon: Award },
     { name: "Timeline", href: "#timeline", icon: Calendar },
     { name: "Partners", href: "#partners", icon: Users },
     { name: "Contact", href: "#contact", icon: Phone },
@@ -28,15 +29,7 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-cyber rounded-lg flex items-center justify-center animate-pulse-glow">
-              <Shield className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-xl font-orbitron font-bold text-transparent bg-gradient-neon bg-clip-text">
-                MEDUSA 2.0
-              </h1>
-              <p className="text-xs font-mono text-muted-foreground">CTF Competition</p>
-            </div>
+            <img src={logoWhite} alt="Medusa Logo" className="w-24 h-24 object-contain" />
           </div>
 
           {/* Desktop Navigation */}

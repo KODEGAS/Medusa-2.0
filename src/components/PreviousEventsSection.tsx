@@ -110,7 +110,8 @@ const overallStats = [
                     alt={event.title}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-r ${event.color} opacity-40`}></div>
+                  {/* Bottom gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   <div className="relative z-10 p-6 h-full flex flex-col justify-end text-white">
                     <Badge variant="secondary" className="mb-2 bg-white/20 text-white border-white/30 w-fit">
                       {event.year}

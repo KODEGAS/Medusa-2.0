@@ -233,6 +233,22 @@
   <link rel="modulepreload" href="/src/App.tsx" />
   <link rel="modulepreload" href="/src/main.tsx" />
 
+
+  <style>
+    /* Example critical CSS: Replace with output from a critical CSS tool */
+    body { margin: 0; font-family: 'Orbitron', 'Roboto Mono', Arial, sans-serif; background: #000; color: #fff; }
+    #root { min-height: 100vh; }
+    .glow-text { text-shadow: 0 0 8px #39FF14, 0 0 2px #fff; }
+    .bg-gradient-neon { background: linear-gradient(90deg, #39FF14 0%, #00fff7 100%); }
+    /* ...add more above-the-fold critical styles as needed... */
+  </style>
+
+  <!-- 2. Lazy-load the main stylesheet -->
+  <link rel="preload" href="/index-BnvFgqgX.css" as="style" onload="this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="/index-BnvFgqgX.css">
+  </noscript>
+
 </head>
 
 <body>

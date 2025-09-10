@@ -95,4 +95,6 @@ export const PartnersSection = () => {
       </div>
     </section>
   );
-};
+  }
+
+  export default PartnersSection;

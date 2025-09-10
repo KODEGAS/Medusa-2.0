@@ -1,5 +1,5 @@
 
-import { Mail, Phone, MapPin, User, Shield, Zap, Users, MessageSquare } from "lucide-react";
+import { Mail, Phone, MapPin, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
@@ -105,6 +105,7 @@ export const ContactUsSection = () => {
                       src={member.image}
                       alt={member.name}
                       className="object-cover"
+                      loading="lazy"
                     />
                     <AvatarFallback className="bg-gradient-cyber text-foreground font-mono font-bold text-lg">
                       {member.fallback}
@@ -182,7 +183,7 @@ export const ContactUsSection = () => {
               Event Location
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              University of Kaleniya
+              University of Kelaniya
             </p>
           </div>
         </div>
@@ -206,3 +207,5 @@ export const ContactUsSection = () => {
     </section>
   );
 };
+
+export default ContactUsSection;

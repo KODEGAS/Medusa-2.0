@@ -176,3 +176,4 @@ const overallStats = [
     </section>
   );
 };
+export default PreviousEventsSection;

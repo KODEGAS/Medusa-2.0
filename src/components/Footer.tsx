@@ -1,4 +1,4 @@
-import { Shield, Mail, Phone, MapPin, Github, Twitter, Linkedin, ExternalLink, Facebook, MessageCircle } from "lucide-react";
+import { Shield, Mail, Phone, MapPin, Linkedin, ExternalLink, Facebook, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Footer = () => {

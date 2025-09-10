@@ -1,45 +1,11 @@
-import { useState, useEffect, memo, Suspense } from "react";
+import { useState, useEffect, memo, Suspense, lazy } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Zap } from "lucide-react";
-import { Separator } from "@radix-ui/react-context-menu";
 import { useNavigate } from "react-router-dom";
 
-// 3D Model imports
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
-import { useRef } from "react";
+// Dynamically import the 3D model canvas
+const Medusa3DCanvas = lazy(() => import("./Medusa3DModel"));
 
-// 3D Model component
-import * as THREE from "three";
-
-// 3D Model component
-const Medusa3DModel = ({ onLoaded }: { onLoaded?: () => void }) => {
-  const gltf = useGLTF("/model.glb", true);
-  const ref = useRef<THREE.Object3D>(null);
-  const direction = useRef(1); // 1 for forward, -1 for backward
-  useFrame((_, delta) => {
-    if (ref.current) {
-      // Rotate between 0 and ~2.44 radians (140deg) at a slower speed
-      const maxRotation = (140 * Math.PI) / 180;
-      ref.current.rotation.y += direction.current * delta * 0.005;
-      if (ref.current.rotation.y >= maxRotation) {
-        ref.current.rotation.y = maxRotation;
-        direction.current = -1;
-      } else if (ref.current.rotation.y <= 0) {
-        ref.current.rotation.y = 0;
-        direction.current = 1;
-      }
-    }
-  });
-  // Notify parent when loaded
-  useEffect(() => {
-    if (gltf && gltf.scene && onLoaded) {
-      onLoaded();
-    }
-    // eslint-disable-next-line
-  }, [gltf, onLoaded]);
-  return <primitive ref={ref} object={gltf.scene} scale={2.2} position={[0, 0.55, 0]} />;
-};
 
 const HeroSection = memo(() => {
   const [modelLoaded, setModelLoaded] = useState(false);
@@ -90,13 +56,7 @@ const HeroSection = memo(() => {
         <div className="flex flex-col items-center justify-center">
           <div style={{ width: 560, height: 460, position: 'relative' }}>
             <Suspense fallback={null}>
-              <Canvas camera={{ position: [0, -1.0, 5.1], fov: 60 }}>
-                <pointLight position={[0, 0, -2]} intensity={2.5} color="#39FF14" distance={8} decay={2} />
-                <ambientLight intensity={0.8} />
-                <directionalLight position={[5, 5, 5]} intensity={0.7} />
-                <Medusa3DModel onLoaded={() => setModelLoaded(true)} />
-                <OrbitControls enablePan={false} enableZoom={false} />
-              </Canvas>
+              <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} />
             </Suspense>
             {/* Hologram effect below the model */}
             <div

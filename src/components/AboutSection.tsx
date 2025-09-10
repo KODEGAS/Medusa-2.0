@@ -151,3 +151,5 @@ export const AboutSection = () => {
     </section>
   );
 };
+
+export default AboutSection;

@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { Trophy, Medal, Award } from "lucide-react";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-
 const PrizePoolSection = () => {
   const [animateNumbers, setAnimateNumbers] = useState(false);
-  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation({ delay: 200 });
-  const { ref: podiumRef, isVisible: podiumVisible } = useScrollAnimation({ delay: 400 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -100,7 +96,6 @@ const PrizePoolSection = () => {
         {/* 3D Podium */}
         <div className="flex items-end justify-center gap-8 mb-16 perspective-1000">
           {prizes.map((prize, index) => {
-            const IconComponent = prize.icon;
             return (
               <div
                 key={prize.position}

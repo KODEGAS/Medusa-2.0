@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-// No CSS import is needed when using Tailwind utility classes
-
 interface CtfChallengeProps {
     onSuccess: () => void;
 }

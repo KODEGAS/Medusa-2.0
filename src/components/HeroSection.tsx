@@ -20,10 +20,11 @@ const Medusa3DModel = ({ onLoaded }: { onLoaded?: () => void }) => {
   const direction = useRef(1); // 1 for forward, -1 for backward
   useFrame((_, delta) => {
     if (ref.current) {
-      // Rotate between 0 and PI (180deg) at a slower speed
+      // Rotate between 0 and ~2.44 radians (140deg) at a slower speed
+      const maxRotation = (140 * Math.PI) / 180;
       ref.current.rotation.y += direction.current * delta * 0.005;
-      if (ref.current.rotation.y >= Math.PI) {
-        ref.current.rotation.y = Math.PI;
+      if (ref.current.rotation.y >= maxRotation) {
+        ref.current.rotation.y = maxRotation;
         direction.current = -1;
       } else if (ref.current.rotation.y <= 0) {
         ref.current.rotation.y = 0;

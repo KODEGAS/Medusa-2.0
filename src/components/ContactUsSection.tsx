@@ -5,12 +5,13 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 
 // Import profile images
-import anuka from "@/assets/profiles/anuka.jpeg";
-import maleesha from "@/assets/profiles/maleesha.jpg";
-import kavindu from "@/assets/profiles/kavindu.jpg";
-import thivina from "@/assets/profiles/thivina.jpg";
-import kavishka from "@/assets/profiles/kavishka.jpg";
-import savithi from "@/assets/profiles/savithi.jpg";
+// Use Cloudinary URLs with reduced resolution for profile images
+const anuka = "https://res.cloudinary.com/dqg7u3r3n/image/upload/w_200,q_auto/v1694250000/profiles/anuka.webp";
+const maleesha = "https://res.cloudinary.com/dqg7u3r3n/image/upload/w_200,q_auto/v1694250000/profiles/maleesha.webp";
+const kavindu = "https://res.cloudinary.com/dqg7u3r3n/image/upload/w_200,q_auto/v1694250000/profiles/kavindu.webp";
+const thivina = "https://res.cloudinary.com/dqg7u3r3n/image/upload/w_200,q_auto/v1694250000/profiles/thivina.webp";
+const kavishka = "https://res.cloudinary.com/dqg7u3r3n/image/upload/w_200,q_auto/v1694250000/profiles/kavishka.webp";
+const savithi = "https://res.cloudinary.com/dqg7u3r3n/image/upload/w_200,q_auto/v1694250000/profiles/savithi.webp";
 
 export const ContactUsSection = () => {
   const navigate = useNavigate();

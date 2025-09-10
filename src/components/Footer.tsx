@@ -19,10 +19,6 @@ export const Footer = () => {
 
     { icon: Mail, text: "contact@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
     { icon: Phone, text: "+94 76 30 74 621", href: "tel:+94763074621" },
-    { icon: MapPin, text: "University of Kaleniya", href: "#" },
-
-    { icon: Mail, text: "contatc@ecsc-uok.com", href: "mailto:contact@ecsc-uok.com" },
-    { icon: Phone, text: "+94 (72) 66 77 555", href: "tel:+94726677555" },
     { icon: MapPin, text: "University of Kaleniya", href: "kln.ac.lk" },
 
   ];

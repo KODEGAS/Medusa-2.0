@@ -45,8 +45,6 @@ const HeroSection = memo(() => {
           <p className="text-muted-foreground font-mono mt-6">Loading...</p>
         </div>
       )}
-      {/* Animated Grid Overlay */}
-      <div className="absolute inset-0 cyber-grid opacity-30" />
       {/* Matrix Rain Effect */}
       <div className="absolute inset-0 matrix-rain opacity-20" />
       {/* Gradient Overlay */}

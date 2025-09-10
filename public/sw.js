@@ -4,8 +4,7 @@ const urlsToCache = [
     '/register',
     '/src/main.tsx',
     '/src/index.css',
-    '/assets/medusa-logo-C098qZm6.jpg',
-    '/assets/hero-background-dqq7KKet.jpg',
+    '/assets/logowhite.png',
     '/assets/favicon.ico'
 ];
 

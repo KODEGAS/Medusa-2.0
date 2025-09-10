@@ -57,7 +57,7 @@ export const ContactUsSection = () => {
       email: "wijesur-ec22036@stu.kln.ac.lk",
       phone: "+94 70 260 4306",
       image: kavishka,
-      fallback: "TW",     
+      fallback: "TW",
       color: "text-accent"
     },
     {
@@ -69,7 +69,7 @@ export const ContactUsSection = () => {
       fallback: "AB",
       color: "text-accent"
     },
-    
+
   ];
 
   return (
@@ -101,8 +101,8 @@ export const ContactUsSection = () => {
                 {/* Profile Image */}
                 <div className="w-20 h-20 mx-auto mb-4 group-hover:scale-110 transition-all duration-300">
                   <Avatar className="w-full h-full border-2 border-primary/30 group-hover:border-primary/60 transition-all duration-300 shadow-lg group-hover:shadow-primary/20">
-                    <AvatarImage 
-                      src={member.image} 
+                    <AvatarImage
+                      src={member.image}
                       alt={member.name}
                       className="object-cover"
                     />
@@ -171,7 +171,7 @@ export const ContactUsSection = () => {
               Emergency Support
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              +94 76 30 74 621
+              +94 72 66 77 555
             </p>
           </div>
 
@@ -186,7 +186,7 @@ export const ContactUsSection = () => {
             </p>
           </div>
         </div>
- 
+
         {/* Call to Action */}
         <div className="text-center mt-16">
           <p className="text-lg font-mono text-muted-foreground mb-6">

@@ -103,7 +103,7 @@ const PrizePoolSection = () => {
               >
                 {/* Podium Base */}
                 <div 
-                  className={`${prize.height} w-32 bg-gradient-to-t ${prize.color} rounded-t-lg relative transform-gpu transition-all duration-500 group-hover:scale-105 shadow-2xl ${prize.glow}`}
+                  className={`${prize.height} w-24 sm:w-32 bg-gradient-to-t ${prize.color} rounded-t-lg relative transform-gpu transition-all duration-500 group-hover:scale-105 shadow-2xl ${prize.glow}`}
                   style={{
                     background: `linear-gradient(145deg, ${prize.color.split(' ')[1]}, ${prize.color.split(' ')[3]})`
                   }}
@@ -125,14 +125,14 @@ const PrizePoolSection = () => {
                 </div>
 
                 {/* 3D Trophy Cup */}
-                  <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 group-hover:-translate-y-2 transition-transform duration-300">
+                  <div className="absolute -top-20 left-1/2 w-24 sm:w-32 transform -translate-x-1/2 group-hover:-translate-y-2 transition-transform duration-300 flex justify-center">
                   <div className="relative">
                     {/* Contrast BG for silver cup */}
                     {index === 1 && (
                       <div className="absolute -inset-2 rounded-full bg-black/10 z-0" style={{ filter: 'blur(2px)' }}></div>
                     )}
                     {/* Cup Bowl */}
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${
+                    <div className={`w-12 h-12 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${
                       index === 0 ? 'from-yellow-400 to-yellow-600' : 
                       index === 1 ? 'from-gray-300 to-gray-500' : 
                       'from-orange-400 to-orange-600'

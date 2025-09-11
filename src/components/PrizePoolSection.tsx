@@ -76,11 +76,7 @@ const PrizePoolSection = () => {
 
   return (
     <section id="prize-pool" className="px-6 relative overflow-hidden">
-      {/* Background Grid */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_24%,rgba(34,197,94,0.1)_25%,rgba(34,197,94,0.1)_26%,transparent_27%,transparent_74%,rgba(34,197,94,0.1)_75%,rgba(34,197,94,0.1)_76%,transparent_77%),linear-gradient(rgba(34,197,94,0.1)_24%,transparent_25%,transparent_26%,rgba(34,197,94,0.1)_27%,rgba(34,197,94,0.1)_74%,transparent_75%,transparent_76%,rgba(34,197,94,0.1)_77%)] bg-[size:75px_75px]"></div>
-      </div>
-
+     
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -94,12 +90,16 @@ const PrizePoolSection = () => {
         </div>
 
         {/* 3D Podium */}
-        <div className="flex items-end justify-center gap-8 mb-16 perspective-1000">
+          <div
+            className="flex items-end justify-center gap-4 sm:gap-8 mb-16 perspective-1000 overflow-x-auto scrollbar-none w-full pt-32 md:pt-12 min-h-[18rem] md:min-h-[20rem]"
+            style={{ WebkitOverflowScrolling: 'touch', overflow: 'visible' }}
+          >
           {prizes.map((prize, index) => {
             return (
               <div
                 key={prize.position}
-                className={`relative group ${prize.delay} ${animateNumbers ? 'animate-scale-in' : 'opacity-0'}`}
+                className={`relative group ${prize.delay} ${animateNumbers ? 'animate-scale-in' : 'opacity-0'} min-w-[7.5rem] sm:min-w-0`}
+                style={{ maxWidth: 140 }}
               >
                 {/* Podium Base */}
                 <div 
@@ -125,59 +125,62 @@ const PrizePoolSection = () => {
                 </div>
 
                 {/* 3D Trophy Cup */}
-                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 group-hover:-translate-y-2 transition-transform duration-300">
+                  <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 group-hover:-translate-y-2 transition-transform duration-300">
                   <div className="relative">
+                    {/* Contrast BG for silver cup */}
+                    {index === 1 && (
+                      <div className="absolute -inset-2 rounded-full bg-black/10 z-0" style={{ filter: 'blur(2px)' }}></div>
+                    )}
                     {/* Cup Bowl */}
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${
                       index === 0 ? 'from-yellow-400 to-yellow-600' : 
                       index === 1 ? 'from-gray-300 to-gray-500' : 
                       'from-orange-400 to-orange-600'
-                    } shadow-xl relative`}>
+                    } shadow-xl relative z-10`}>
                       <div className="absolute inset-1 rounded-full bg-gradient-to-t from-white/20 to-white/40"></div>
                       <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-white/60"></div>
+                      {/* Extra border for silver cup */}
+                      {index === 1 && (
+                        <div className="absolute inset-0 rounded-full border-2 border-gray-500/70"></div>
+                      )}
                     </div>
-                    
                     {/* Cup Handles */}
-                    <div className={`absolute top-2 -left-2 w-4 h-8 border-2 rounded-full border-${
-                      index === 0 ? 'yellow-500' : 
-                      index === 1 ? 'gray-400' : 
-                      'orange-500'
-                    }`}></div>
-                    <div className={`absolute top-2 -right-2 w-4 h-8 border-2 rounded-full border-${
-                      index === 0 ? 'yellow-500' : 
-                      index === 1 ? 'gray-400' : 
-                      'orange-500'
-                    }`}></div>
-                    
+                    <div className={`absolute top-2 -left-2 w-4 h-8 border-2 rounded-full ${
+                      index === 0 ? 'border-yellow-500' : 
+                      index === 1 ? 'border-gray-500' : 
+                      'border-orange-500'
+                    } bg-transparent`}></div>
+                    <div className={`absolute top-2 -right-2 w-4 h-8 border-2 rounded-full ${
+                      index === 0 ? 'border-yellow-500' : 
+                      index === 1 ? 'border-gray-500' : 
+                      'border-orange-500'
+                    } bg-transparent`}></div>
                     {/* Cup Base */}
                     <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-4 bg-gradient-to-b ${
                       index === 0 ? 'from-yellow-500 to-yellow-700' : 
                       index === 1 ? 'from-gray-400 to-gray-600' : 
                       'from-orange-500 to-orange-700'
-                    } rounded-b-lg shadow-lg`}>
+                    } rounded-b-lg shadow-lg z-10`}>
                       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
                     </div>
-                    
                     {/* Trophy Stem */}
                     <div className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-2 h-4 bg-gradient-to-b ${
                       index === 0 ? 'from-yellow-600 to-yellow-800' : 
                       index === 1 ? 'from-gray-500 to-gray-700' : 
                       'from-orange-600 to-orange-800'
-                    }`}></div>
-                    
+                    } z-10`}></div>
                     {/* Trophy Pedestal */}
                     <div className={`absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-gradient-to-b ${
                       index === 0 ? 'from-yellow-500 to-yellow-700' : 
                       index === 1 ? 'from-gray-400 to-gray-600' : 
                       'from-orange-500 to-orange-700'
-                    } rounded shadow-lg`}></div>
-                    
+                    } rounded shadow-lg z-10`}></div>
                     {/* Glowing Effect */}
                     <div className={`absolute inset-0 rounded-full ${
                       index === 0 ? 'shadow-yellow-400/50' : 
                       index === 1 ? 'shadow-gray-400/50' : 
                       'shadow-orange-400/50'
-                    } shadow-2xl group-hover:shadow-3xl transition-shadow duration-300`}></div>
+                    } shadow-2xl group-hover:shadow-3xl transition-shadow duration-300 z-10`}></div>
                   </div>
                 </div>
 

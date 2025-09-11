@@ -80,43 +80,79 @@ const HeroSection = memo(() => {
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-hero opacity-90" />
       {/* 3D Model above Main Heading (always show) */}
-      <div className="relative z-10 text-center max-w-6xl mx-auto px-4">
+      <div className="relative z-10 text-center max-w-6xl mx-auto px-2 sm:px-4">
         <div className="flex flex-col items-center justify-center">
-          <div style={{ width: 560, height: 460, position: 'relative' }}>
-            <Suspense fallback={null}>
-              <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} />
-            </Suspense>
-            {/* Hologram effect below the model */}
+          <div
+            className="w-full flex justify-center"
+            style={{ minHeight: 0 }}
+          >
             <div
+              className="relative"
               style={{
-                position: 'absolute',
-                left: '50%',
-                bottom: '55px',
-                transform: 'translateX(-50%)',
-                width: '260px',
-                height: '40px',
-                background: 'radial-gradient(ellipse at center, rgba(57,255,20,0.45) 0%, rgba(57,255,20,0.18) 60%, rgba(57,255,20,0.05) 100%)',
-                filter: 'blur(6px)',
-                opacity: 0.85,
-                zIndex: 2,
-                pointerEvents: 'none',
-                animation: 'holoPulse 2s infinite alternate',
+                width: '90vw',
+                maxWidth: 560,
+                height: '55vw',
+                maxHeight: 460,
+                minWidth: 220,
+                minHeight: 180,
               }}
-            />
-            <style>{`
-              @keyframes holoPulse {
-                0% { opacity: 0.7; filter: blur(6px); }
-                100% { opacity: 1; filter: blur(12px); }
-              }
-            `}</style>
+            >
+              <Suspense fallback={null}>
+                <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} />
+              </Suspense>
+              {/* Hologram effect below the model */}
+              <div
+                className="hidden sm:block"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '55px',
+                  transform: 'translateX(-50%)',
+                  width: '260px',
+                  height: '40px',
+                  background: 'radial-gradient(ellipse at center, rgba(57,255,20,0.45) 0%, rgba(57,255,20,0.18) 60%, rgba(57,255,20,0.05) 100%)',
+                  filter: 'blur(6px)',
+                  opacity: 0.85,
+                  zIndex: 2,
+                  pointerEvents: 'none',
+                  animation: 'holoPulse 2s infinite alternate',
+                }}
+              />
+              <div
+                className="block sm:hidden"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: '20px',
+                  transform: 'translateX(-50%)',
+                  width: '120px',
+                  height: '20px',
+                  background: 'radial-gradient(ellipse at center, rgba(57,255,20,0.35) 0%, rgba(57,255,20,0.12) 60%, rgba(57,255,20,0.03) 100%)',
+                  filter: 'blur(4px)',
+                  opacity: 0.7,
+                  zIndex: 2,
+                  pointerEvents: 'none',
+                  animation: 'holoPulse 2s infinite alternate',
+                }}
+              />
+              <style>{`
+                @keyframes holoPulse {
+                  0% { opacity: 0.7; filter: blur(6px); }
+                  100% { opacity: 1; filter: blur(12px); }
+                }
+              `}</style>
+            </div>
           </div>
         </div>
         {/* Main Heading and subtitle: always render for best LCP */}
-        <div>
-          <h1 className="text-6xl md:text-8xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-4 glow-text" style={{ marginTop: '-68px' }}>
+        <div className="px-1">
+          <h1
+            className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-3 sm:mb-4 glow-text"
+            style={{ marginTop: '-38px', lineHeight: 1.1, wordBreak: 'break-word' }}
+          >
             {glitchText}
           </h1>
-          <div className="text-xl md:text-2xl font-mono text-primary animate-fade-in" style={{ marginTop: '-13px' }}>
+          <div className="text-base xs:text-lg sm:text-xl md:text-2xl font-mono text-primary animate-fade-in" style={{ marginTop: '-8px' }}>
             <span className="text-accent">Inter-University </span>{' '}
             <span className="text-secondary">CTF Competition</span>
           </div>
@@ -135,7 +171,7 @@ const HeroSection = memo(() => {
               </p>
             </div>
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 max-w-2xl sm:max-w-4xl mx-auto w-full">
               <div className="holographic-card p-6 rounded-lg">
                 {showHeavy && icons.Shield ? (
                   <icons.Shield className="w-8 h-8 text-primary mx-auto mb-3" />
@@ -161,13 +197,12 @@ const HeroSection = memo(() => {
               </div>
             </div>
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full px-1">
               {showHeavy && Button && icons.ArrowRight ? (
                 <Button variant="cyber" size="lg" className="text-lg px-8 py-6"
                   onClick={() => navigate("/register")}
                 >
                   Register Now
-                  <icons.ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               ) : (
                 <button className="text-lg px-8 py-6 rounded-lg bg-primary/60 text-white font-bold opacity-70 cursor-wait" disabled>
@@ -193,12 +228,7 @@ const HeroSection = memo(() => {
               )}
             </div>
             <div className="mb-8" />
-            {/* Scroll Indicator */}
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-              <div className="w-6 h-10 border-2 border-primary rounded-full flex justify-center">
-                <div className="w-1 h-3 bg-primary rounded-full mt-2 animate-pulse" />
-              </div>
-            </div>
+           
           </>
         )}
       </div>

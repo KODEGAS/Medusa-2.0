@@ -3,10 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Users, Calendar, Target, Award, Zap } from "lucide-react";
 
-import championImg from "@/assets/highlights/champion.jpg";
-import runnerUpImg from "@/assets/highlights/runnerup.jpg";
-import secondRunnerUpImg from "@/assets/highlights/secondrunnerup.jpg";
-
+const championImg = "https://res.cloudinary.com/du5tkpcut/image/upload/w_1000,q_70/v1757615641/champion_qe9qf6.jpg";
+const runnerUpImg = "https://res.cloudinary.com/du5tkpcut/image/upload/w_1000,q_70/v1757615606/runnerup_wvxonh.jpg";
+const secondRunnerUpImg = "https://res.cloudinary.com/du5tkpcut/image/upload/w_1000,q_70/v1757615676/secondrunnerup_ec3xbn.jpg";
 const highlights = [
   {
     id: 1,

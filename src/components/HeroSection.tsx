@@ -1,14 +1,9 @@
 import { useState, useEffect, memo, Suspense, lazy } from "react";
-import poster from "../assets/poster.webp";
-// Defer heavy imports until after LCP
-// import { Button } from "@/components/ui/button";
-// import { ArrowRight, Shield, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import PosterOverlay from "./PosterOverlay";
 
 // Dynamically import the 3D model canvas
 const Medusa3DCanvas = lazy(() => import("./Medusa3DModel"));
-
-
 
 const HeroSection = memo(() => {
   const [modelLoaded, setModelLoaded] = useState(false);
@@ -94,26 +89,9 @@ const HeroSection = memo(() => {
                 <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} />
               </Suspense>
               {!modelLoaded && (
-                <img
-                  src={poster}
-                  alt="Medusa Poster"
-                  style={{
-                    width: 590,
-                    maxWidth: '110vw',
-                    borderRadius: 24,
-                    boxShadow: '0 8px 48px #000c',
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    top: -110,
-                    bottom: 0,
-                    margin: 'auto',
-                    zIndex: 3,
-                    background: '#111',
-                  }}
-                />
+                <PosterOverlay />
               )}
-              {/* Hologram effect below the model */}
+              {/* Hologram effect below the model (single instance) */}
               <div
                 className="hidden sm:block"
                 style={{
@@ -121,28 +99,11 @@ const HeroSection = memo(() => {
                   left: '50%',
                   bottom: '55px',
                   transform: 'translateX(-50%)',
-                  width: '260px',
-                  height: '40px',
+                  width: '250px',
+                  height: '24px',
                   background: 'radial-gradient(ellipse at center, rgba(57,255,20,0.45) 0%, rgba(57,255,20,0.18) 60%, rgba(57,255,20,0.05) 100%)',
                   filter: 'blur(6px)',
                   opacity: 0.85,
-                  zIndex: 2,
-                  pointerEvents: 'none',
-                  animation: 'holoPulse 2s infinite alternate',
-                }}
-              />
-              <div
-                className="block sm:hidden"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  bottom: '20px',
-                  transform: 'translateX(-50%)',
-                  width: '120px',
-                  height: '20px',
-                  background: 'radial-gradient(ellipse at center, rgba(57,255,20,0.35) 0%, rgba(57,255,20,0.12) 60%, rgba(57,255,20,0.03) 100%)',
-                  filter: 'blur(4px)',
-                  opacity: 0.7,
                   zIndex: 2,
                   pointerEvents: 'none',
                   animation: 'holoPulse 2s infinite alternate',

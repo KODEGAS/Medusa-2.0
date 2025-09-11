@@ -75,7 +75,7 @@ export const ContactUsSection = () => {
   return (
     <section className="py-5 bg-card relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 matrix-rain opacity-5" />
+  {/* <div className="absolute inset-0 matrix-rain opacity-5" /> */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
 
       <div className="container mx-auto px-4 relative z-10">

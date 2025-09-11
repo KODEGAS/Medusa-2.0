@@ -44,7 +44,7 @@ export const AboutSection = () => {
   return (
     <section className="py-20 px-4 relative">
       {/* Background Elements */}
-      <div className="absolute inset-0 cyber-grid opacity-10" />
+  {/* <div className="absolute inset-0 cyber-grid opacity-10" /> */}
 
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}

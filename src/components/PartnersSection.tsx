@@ -36,7 +36,7 @@ export const PartnersSection = () => {
   return (
     <section className="py-20 bg-background relative overflow-hidden">
       {/* Background Effect */}
-      <div className="absolute inset-0 cyber-grid opacity-10" />
+  {/* <div className="absolute inset-0 cyber-grid opacity-10" /> */}
       
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}

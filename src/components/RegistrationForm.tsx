@@ -58,7 +58,7 @@ export const RegistrationForm = () => {
     <section className="py-20 px-4 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-hero opacity-30" />
-      <div className="absolute inset-0 matrix-rain opacity-5" />
+  {/* <div className="absolute inset-0 matrix-rain opacity-5" /> */}
       
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Section Header */}

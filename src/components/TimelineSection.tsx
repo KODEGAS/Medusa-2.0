@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, Trophy } from "lucide-react";
-import { useScrollAnimation, useStaggeredAnimation } from "@/hooks/useScrollAnimation";
+import { useStaggeredAnimation } from "@/hooks/useScrollAnimation";
 
 const events = [
 
@@ -85,7 +85,7 @@ const TimelineSection = () => {
   <section id="timeline-section" className="py-5 px-4 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-hero opacity-50" />
-      <div className="absolute inset-0 cyber-grid opacity-5" />
+  {/* <div className="absolute inset-0 cyber-grid opacity-5" /> */}
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}

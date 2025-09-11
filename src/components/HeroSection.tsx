@@ -46,7 +46,7 @@ const HeroSection = memo(() => {
         </div>
       )}
       {/* Matrix Rain Effect */}
-      <div className="absolute inset-0 matrix-rain opacity-20" />
+  {/* <div className="absolute inset-0 matrix-rain opacity-20" /> */}
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-hero opacity-90" />
       {/* 3D Model above Main Heading (always show) */}

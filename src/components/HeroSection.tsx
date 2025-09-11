@@ -13,25 +13,30 @@ const HeroSection = memo(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-      const original = "MEDUSA 2.0";
-      let glitched = "";
-
-      for (let i = 0; i < original.length; i++) {
-        if (Math.random() < 0.1) {
-          glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
-        } else {
-          glitched += original[i];
+    // Show static heading for LCP, then start glitch effect after 2s
+    const original = "MEDUSA 2.0";
+    setGlitchText(original);
+    const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    let glitchInterval: NodeJS.Timeout;
+    const startGlitch = () => {
+      glitchInterval = setInterval(() => {
+        let glitched = "";
+        for (let i = 0; i < original.length; i++) {
+          if (Math.random() < 0.1) {
+            glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
+          } else {
+            glitched += original[i];
+          }
         }
-      }
-
-      setGlitchText(glitched);
-
-      setTimeout(() => setGlitchText(original), 100);
-    }, 3000);
-
-    return () => clearInterval(interval);
+        setGlitchText(glitched);
+        setTimeout(() => setGlitchText(original), 100);
+      }, 3000);
+    };
+    const glitchTimeout = setTimeout(startGlitch, 2000); // Wait 2s before glitching
+    return () => {
+      clearTimeout(glitchTimeout);
+      if (glitchInterval) clearInterval(glitchInterval);
+    };
   }, []);
 
   return (
@@ -81,19 +86,19 @@ const HeroSection = memo(() => {
             `}</style>
           </div>
         </div>
+        {/* Main Heading and subtitle: always render for best LCP */}
+        <div>
+          <h1 className="text-6xl md:text-8xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-4 glow-text" style={{ marginTop: '-68px' }}>
+            {glitchText}
+          </h1>
+          <div className="text-xl md:text-2xl font-mono text-primary animate-fade-in" style={{ marginTop: '-13px' }}>
+            <span className="text-accent">Inter-University </span>{' '}
+            <span className="text-secondary">CTF Competition</span>
+          </div>
+        </div>
         {/* Show the rest of the content only after model is loaded */}
         {modelLoaded && (
           <>
-            {/* Main Heading */}
-            <div>
-              <h1 className="text-6xl md:text-8xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-4 glow-text" style={{ marginTop: '-68px' }}>
-                {glitchText}
-              </h1>
-              <div className="text-xl md:text-2xl font-mono text-primary animate-fade-in" style={{ marginTop: '-13px' }}>
-                <span className="text-accent">Inter-University </span>{' '}
-                <span className="text-secondary">CTF Competition</span>
-              </div>
-            </div>
             {/* Tagline */}
             <div className="mb-8">
               <p className="text-2xl md:text-4xl font-orbitron font-bold text-foreground mb-4 animate-float">

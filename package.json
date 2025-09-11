@@ -56,9 +56,9 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.462.0",
-    "next-themes": "^0.3.0",
+    "next-themes": "^1.0.0-beta.0",
     "react": "^19.0.0",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.9.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.61.1",
     "react-intersection-observer": "^9.16.0",
@@ -69,7 +69,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.179.1",
-    "vaul": "^0.9.9",
+    "vaul": "^1.1.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -85,6 +85,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "postcss": "^8.5.6",
+    "rollup-plugin-critical": "^1.0.15",
     "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "^3.4.17",
     "terser": "^5.43.1",
@@ -93,7 +94,12 @@
     "vite": "^5.4.19"
   },
   "findUnusedExports": {
-    "include": [ "./src/**/*.d.ts", "src/**/*.svelte" ],
-    "exclude": [ "./src/**/*.stories.@(js|jsx|ts|tsx)" ]
+    "include": [
+      "./src/**/*.d.ts",
+      "src/**/*.svelte"
+    ],
+    "exclude": [
+      "./src/**/*.stories.@(js|jsx|ts|tsx)"
+    ]
   }
 }

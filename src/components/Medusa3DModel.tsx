@@ -31,7 +31,7 @@ const Medusa3DModel = ({ onLoaded, showPoster }: { onLoaded?: () => void; showPo
     // Show poster image as fallback
     return (
       <Html center style={{ pointerEvents: 'none' }}>
-        <img src={poster} alt="Medusa Poster" style={{ width: 240, maxWidth: '80vw', borderRadius: 16, boxShadow: '0 4px 32px #0008' }} />
+        <img src={poster} alt="Medusa Poster" style={{ width: 340, maxWidth: '95vw', borderRadius: 20, boxShadow: '0 6px 40px #000b' }} />
       </Html>
     );
   }

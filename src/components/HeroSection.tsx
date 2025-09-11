@@ -68,15 +68,6 @@ const HeroSection = memo(() => {
     <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden">
       {/* Strong black overlay for darker background */}
       <div className="absolute inset-0 bg-black opacity-80 z-0 pointer-events-none" />
-      {/* Loader overlay while model is loading */}
-      {!modelLoaded && (
-  <div className="absolute inset-0 flex flex-col items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.85)' }}>
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mx-auto" />
-          <p className="text-muted-foreground font-mono mt-6">Loading...</p>
-        </div>
-      )}
-      {/* Matrix Rain Effect */}
-  {/* <div className="absolute inset-0 matrix-rain opacity-20" /> */}
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-hero opacity-90" />
       {/* 3D Model above Main Heading (always show) */}

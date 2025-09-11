@@ -1,4 +1,5 @@
 import { useState, useEffect, memo, Suspense, lazy } from "react";
+import poster from "../assets/poster.webp";
 // Defer heavy imports until after LCP
 // import { Button } from "@/components/ui/button";
 // import { ArrowRight, Shield, Zap } from "lucide-react";
@@ -88,9 +89,30 @@ const HeroSection = memo(() => {
                 minHeight: 180,
               }}
             >
+              {/* Always mount the 3D model, overlay poster absolutely until modelLoaded */}
               <Suspense fallback={null}>
-                <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} showPoster={!modelLoaded} />
+                <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} />
               </Suspense>
+              {!modelLoaded && (
+                <img
+                  src={poster}
+                  alt="Medusa Poster"
+                  style={{
+                    width: 590,
+                    maxWidth: '110vw',
+                    borderRadius: 24,
+                    boxShadow: '0 8px 48px #000c',
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: -110,
+                    bottom: 0,
+                    margin: 'auto',
+                    zIndex: 3,
+                    background: '#111',
+                  }}
+                />
+              )}
               {/* Hologram effect below the model */}
               <div
                 className="hidden sm:block"

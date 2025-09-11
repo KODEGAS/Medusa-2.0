@@ -56,13 +56,26 @@ function CodeRain() {
 }
 
 const PosterOverlay: React.FC = () => {
+  // Responsive: Only set width/height inline for desktop, let CSS handle mobile
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
+  const overlayStyle = {
+    background: '#111',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    zIndex: 3,
+    position: 'absolute',
+    left: 0, right: 0, bottom: 0, margin: 'auto',
+    top: '0px',
+    maxWidth: '90vw',
+    borderRadius: 14,
+    boxShadow: '0 2px 12px #000a',
+    ...(isMobile ? {} : { width: 560, height: 340, top: '-40px' }),
+  };
   return (
-    <div style={{
-      position: 'absolute',
-      left: 0, right: 0, top: -30, bottom: 0, margin: 'auto',
-      width: 480, height: 320, maxWidth: '92vw', borderRadius: 16, boxShadow: '0 4px 24px #000a',
-      zIndex: 3, background: '#111', overflow: 'hidden', pointerEvents: 'none'
-    }}>
+    <div
+      className="poster-overlay-responsive"
+  style={overlayStyle as React.CSSProperties}
+    >
       <img
         src={poster}
         alt="Medusa Poster"
@@ -70,7 +83,6 @@ const PosterOverlay: React.FC = () => {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          borderRadius: 16,
           display: 'block',
           filter: 'brightness(1.08) contrast(1.08)'
         }}

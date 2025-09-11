@@ -1,41 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Terminal, Users, Trophy, Clock } from "lucide-react";
 import { useScrollAnimation, useStaggeredAnimation } from "@/hooks/useScrollAnimation";
 
-const highlights = [
-  {
-    icon: Terminal,
-    title: "Advanced CTF Challenges",
-    description: "Web exploitation, cryptography, reverse engineering, and more",
-    color: "text-primary",
-    gradient: "from-primary/20 to-primary/5"
-  },
-  {
-    icon: Users,
-    title: "Inter-University Scale",
-    description: "Teams from 50+ universities competing nationwide",
-    color: "text-secondary",
-    gradient: "from-secondary/20 to-secondary/5"
-  },
-  {
-    icon: Trophy,
-    title: "Massive Prize Pool",
-    description: "LKR 70,000+ in prizes and recognition for winners",
-    color: "text-accent",
-    gradient: "from-accent/20 to-accent/5"
-  },
-  {
-    icon: Clock,
-    title: "48-Hour Marathon",
-    description: "Non-stop cybersecurity challenges and learning",
-    color: "text-primary",
-    gradient: "from-primary/20 to-primary/5"
-  }
-];
+const AboutSection = () => {
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-export const AboutSection = () => {
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const highlights = [
+    {
+      icon: Terminal,
+      title: "Advanced CTF Challenges",
+      description: "Web exploitation, cryptography, reverse engineering, and more",
+      color: "text-primary",
+      gradient: "from-primary/20 to-primary/5"
+    },
+    {
+      icon: Users,
+      title: "Inter-University Scale",
+      description: "Teams from 50+ universities competing nationwide",
+      color: "text-secondary",
+      gradient: "from-secondary/20 to-secondary/5"
+    },
+    {
+      icon: Trophy,
+      title: "Massive Prize Pool",
+      description: "LKR 70,000+ in prizes and recognition for winners",
+      color: "text-accent",
+      gradient: "from-accent/20 to-accent/5"
+    },
+    {
+      icon: Clock,
+      title: "48-Hour Marathon",
+      description: "Non-stop cybersecurity challenges and learning",
+      color: "text-primary",
+      gradient: "from-primary/20 to-primary/5"
+    }
+  ];
   const [flippedCard, setFlippedCard] = useState<number | null>(null);
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation({ delay: 200 });
   const { setRef: cardRef, visibleItems: cardsVisible } = useStaggeredAnimation(highlights.length, 150);
@@ -116,40 +125,52 @@ export const AboutSection = () => {
         </div>
 
         {/* Competition Categories */}
-        <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-border/50">
+  <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-4 sm:p-8 border border-border/50">
 
 
-          <h3 className="text-3xl font-orbitron font-bold text-center mb-8 text-primary">
+          <h3 className="text-2xl sm:text-3xl font-orbitron font-bold text-center mb-4 sm:mb-8 text-primary">
             Challenge Categories
           </h3>
-          <div className="flex flex-wrap justify-center gap-4">
-            {[
-              "Web Exploitation",
-              "ICS Pentesting",
-              "AI Chatbot Injection",
-              "ML CTF",
-              "Mobile Exploitation",
-              "Cryptogrphya",
-              "Reverse Engineering",
-              "Binary Exploitation",
-              "Forensics",
-              "OSINT",
-              "Steganography",
-              "Network Security"
-            ].map((category, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="text-lg px-6 py-3 font-mono hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:shadow-neon cursor-pointer"
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-2 sm:gap-4">
+            {(() => {
+              const categories = [
+                "Web Exploitation",
+                "ICS Pentesting",
+                "AI Chatbot Injection",
+                "ML CTF",
+                "Mobile Exploitation",
+                "Cryptogrphya",
+                "Reverse Engineering",
+                "Binary Exploitation",
+                "Forensics",
+                "OSINT",
+                "Steganography",
+                "Network Security"
+              ];
+              const visible = isMobile && !showAllCategories ? categories.slice(0, 4) : categories;
+              return visible.map((category, index) => (
+                <Badge
+                  key={category}
+                  variant="outline"
+                  className="font-mono hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:shadow-neon cursor-pointer w-full sm:w-auto text-center text-sm xs:text-base sm:text-lg px-3 xs:px-4 sm:px-6 py-1.5 xs:py-2 sm:py-3"
+                >
+                  {category}
+                </Badge>
+              ));
+            })()}
+            {isMobile && !showAllCategories && (
+              <button
+                className="mt-2 text-primary underline text-sm font-mono w-full"
+                onClick={() => setShowAllCategories(true)}
               >
-                {category}
-              </Badge>
-            ))}
+                See more
+              </button>
+            )}
           </div>
         </div>
       </div>
     </section>
   );
-};
+}
 
 export default AboutSection;

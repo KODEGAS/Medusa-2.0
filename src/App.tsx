@@ -12,12 +12,10 @@ const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
 
 // Loading component
 const PageLoader = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="text-center">
-      <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-      <p className="text-muted-foreground font-mono">Loading...</p>
-    </div>
-  </div>
+  <div className="absolute inset-0 flex flex-col items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.85)' }}>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mx-auto" />
+          <p className="text-muted-foreground font-mono mt-6">Loading...</p>
+        </div>
 );
 
 const queryClient = new QueryClient();

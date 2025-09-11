@@ -66,7 +66,7 @@ const overallStats = [
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
-            Medusa 1.0
+            MEDUSA 1.0
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Celebrating our journey of empowering cybersecurity professionals and fostering innovation through competitive programming.

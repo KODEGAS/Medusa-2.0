@@ -98,7 +98,7 @@ const HeroSection = memo(() => {
               }}
             >
               <Suspense fallback={null}>
-                <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} />
+                <Medusa3DCanvas onLoaded={() => setModelLoaded(true)} showPoster={!modelLoaded} />
               </Suspense>
               {/* Hologram effect below the model */}
               <div

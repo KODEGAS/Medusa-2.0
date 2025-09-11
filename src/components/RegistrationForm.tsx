@@ -20,7 +20,6 @@ export interface MemberInfo {
   name: string;
   email: string;
   phone: string;
-  course: string;
   year: string;
 }
 
@@ -55,7 +54,7 @@ export const RegistrationForm = () => {
   }
 
   return (
-    <section className="py-20 px-4 relative">
+    <section className="py-2 px-4 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-hero opacity-30" />
   {/* <div className="absolute inset-0 matrix-rain opacity-5" /> */}

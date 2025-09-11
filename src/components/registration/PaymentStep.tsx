@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, CreditCard, ArrowLeft, CheckCircle } from "lucide-react";
+import { Upload, ArrowLeft, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { TeamInfo, MemberInfo } from "../RegistrationForm";
 
@@ -16,7 +15,7 @@ interface PaymentStepProps {
 }
 
 export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentStepProps) => {
-  const [paymentMethod, setPaymentMethod] = useState<"upload" | "stripe">("upload");
+  // Only upload method is available now
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -92,34 +91,7 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
     setIsProcessing(false);
   };
 
-  const handleStripePayment = async () => {
-    setIsProcessing(true);
-    
-    try {
-     
-      toast({
-        title: "Redirecting to payment",
-        description: "You will be redirected to Stripe checkout",
-      });
-      
-      // Simulate Stripe redirect
-      setTimeout(() => {
-        setIsProcessing(false);
-        toast({
-          title: "Payment successful",
-          description: "Your registration has been completed",
-        });
-        onComplete({ method: "stripe", amount: registrationFee });
-      }, 3000);
-    } catch (error) {
-      setIsProcessing(false);
-      toast({
-        title: "Payment failed",
-        description: "Please try again or contact support",
-        variant: "destructive",
-      });
-    }
-  };
+
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -129,24 +101,13 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
             Complete Your Registration
           </CardTitle>
           <CardDescription className="text-lg">
-            Team: {teamInfo.teamName} • {members.length + 1} members • ${registrationFee} total
+            Team: {teamInfo.teamName} • {members.length + 1} members • LKR {registrationFee} total
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          <Tabs value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as "upload" | "stripe")}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="upload" className="flex items-center gap-2">
-                <Upload size={18} />
-                Upload Payment Slip
-              </TabsTrigger>
-              <TabsTrigger value="stripe" className="flex items-center gap-2">
-                <CreditCard size={18} />
-                Pay with Stripe
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="upload" className="space-y-6">
+          {/* Only upload payment slip option remains */}
+          <div className="space-y-6">
               <div className="border-2 border-dashed border-primary/30 rounded-lg p-8 text-center">
                 <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <div className="space-y-2">
@@ -190,36 +151,7 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
               >
                 {isProcessing ? "Processing..." : "Submit Payment Slip"}
               </Button>
-            </TabsContent>
-
-            <TabsContent value="stripe" className="space-y-6">
-              <div className="text-center p-8 border rounded-lg bg-gradient-to-br from-primary/5 to-secondary/5">
-                <CreditCard className="mx-auto h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Secure Online Payment</h3>
-                <p className="text-muted-foreground mb-4">
-                  Pay securely with your credit or debit card through Stripe
-                </p>
-                <div className="text-3xl font-bold text-primary mb-2">LKR {registrationFee}</div>
-                <p className="text-sm text-muted-foreground">
-                  One-time registration fee for {members.length + 1} team members
-                </p>
-              </div>
-
-              <Button 
-                onClick={handleStripePayment}
-                disabled={isProcessing}
-                className="w-full"
-                size="lg"
-                variant="default"
-              >
-                {isProcessing ? "Processing..." : `Pay $${registrationFee} with Stripe`}
-              </Button>
-
-              <div className="text-xs text-center text-muted-foreground">
-                <p>Secured by Stripe • Your payment information is encrypted</p>
-              </div>
-            </TabsContent>
-          </Tabs>
+            </div>
 
           <div className="flex gap-4">
             <Button

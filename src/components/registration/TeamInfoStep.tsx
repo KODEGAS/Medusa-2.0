@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Users, Shield } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { TeamInfo } from "../RegistrationForm";
 
 interface TeamInfoStepProps {
@@ -47,11 +47,11 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
 
   return (
     <Card className="holographic-card backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="text-3xl font-orbitron text-center text-primary">
+      <CardHeader className="pt-4 sm:pt-8">
+        <CardTitle className="text-3xl font-orbitron text-center text-primary mt-0 sm:mt-2">
           Team Information
         </CardTitle>
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-2 mt-2 sm:mt-4">
           <Badge variant="outline" className="text-primary border-primary bg-primary/10">
             Step 1 of 2
           </Badge>
@@ -277,10 +277,10 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
               type="submit"
               variant="cyber"
               size="lg"
-              className="text-xl px-12 py-6"
+              className="text-base sm:text-xl px-6 py-4 sm:px-12 sm:py-6 w-full max-w-xs sm:max-w-none"
             >
               Continue to Member Details
-              <ArrowRight className="w-6 h-6 ml-3" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3" />
             </Button>
           </div>
         </form>

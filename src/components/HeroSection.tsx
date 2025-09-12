@@ -36,7 +36,6 @@ const Medusa3DModel = ({ onLoaded }: { onLoaded?: () => void }) => {
     if (gltf && gltf.scene && onLoaded) {
       onLoaded();
     }
-    // eslint-disable-next-line
   }, [gltf, onLoaded]);
   return <primitive ref={ref} object={gltf.scene} scale={2.2} position={[0, 0.55, 0]} />;
 };

@@ -6,12 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, CreditCard, ArrowLeft, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { TeamInfo, MemberInfo } from "../RegistrationForm";
+import type { TeamInfo, MemberInfo, PaymentInfo } from "../RegistrationForm";
 
 interface PaymentStepProps {
   teamInfo: TeamInfo;
   members: MemberInfo[];
-  onComplete: (paymentData: any) => void;
+  onComplete: (paymentData: PaymentInfo) => void;
   onBack: () => void;
 }
 

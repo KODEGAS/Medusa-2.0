@@ -1,11 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { CheckCircle, Users, Shield, Upload, User } from "lucide-react";
-import { TeamInfo, MemberInfo } from "../RegistrationForm";
+import { TeamInfo, MemberInfo, PaymentInfo } from "../RegistrationForm";
 
 interface RegistrationSuccessProps {
   teamInfo: TeamInfo;
   members: MemberInfo[];
-  paymentInfo?: any;
+  paymentInfo?: PaymentInfo;
 }
 
 export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: RegistrationSuccessProps) => {

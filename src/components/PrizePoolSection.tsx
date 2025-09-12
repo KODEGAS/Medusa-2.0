@@ -27,6 +27,10 @@ const PrizePoolSection = () => {
     const [count, setCount] = useState(0);
 
     useEffect(() => {
+      setCount(0); // Reset count when animation should start
+    }, [animateNumbers]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
       if (!animateNumbers) return;
 
       const increment = target / (duration / 16);
@@ -43,7 +47,7 @@ const PrizePoolSection = () => {
       }, 16);
 
       return () => clearInterval(timer);
-    }, [animateNumbers, target, duration]);
+    }, [target, duration]);
 
     return <span>{prefix}{count.toLocaleString()}</span>;
   };

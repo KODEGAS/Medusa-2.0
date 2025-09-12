@@ -126,7 +126,7 @@ const HeroSection = memo(() => {
           >
             {glitchText}
           </h1>
-          <div className="text-base xs:text-lg sm:text-xl md:text-2xl font-mono text-primary animate-fade-in" style={{ marginTop: '-23px', marginBottom: '20px' }}>
+          <div className="text-base xs:text-lg sm:text-xl md:text-2xl font-mono text-primary animate-fade-in" style={{ marginTop: '-8px', marginBottom: '20px' }}>
             <span className="text-accent">Inter-University </span>{' '}
             <span className="text-secondary">CTF Competition</span>
           </div>

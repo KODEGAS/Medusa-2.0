@@ -1,3 +1,4 @@
+---
 name: Manual Deploy
 
 on:
@@ -30,14 +31,16 @@ jobs:
 
     steps:
       - name: Validate confirmation
-        if: github.event.inputs.confirm_deployment != 'yes'
+        if: |
+          github.event.inputs.confirm_deployment != 'yes'
         run: |
           echo "❌ Deployment not confirmed. Please type 'yes' to confirm."
           exit 1
 
       - name: Validate environment
         run: |
-          if [ "${{ github.event.inputs.environment }}" != "staging" ] && [ "${{ github.event.inputs.environment }}" != "production" ]; then
+          if [ "${{ github.event.inputs.environment }}" != "staging" ] && 
+             [ "${{ github.event.inputs.environment }}" != "production" ]; then
             echo "❌ Invalid environment: ${{ github.event.inputs.environment }}"
             exit 1
           fi

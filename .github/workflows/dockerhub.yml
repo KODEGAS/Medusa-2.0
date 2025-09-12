@@ -1,9 +1,10 @@
+---
 name: Docker Hub Build & Push
 
 on:
   push:
-    branches: [ main, develop ]
-    tags: [ 'v*' ]
+    branches: [main, develop]
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       tag:

@@ -29,33 +29,98 @@
             background: #00ffff;
             color: #000;
         }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #004400; color: #00ff00; }
+        .error { background: #440000; color: #ff0000; }
+        .warning { background: #444400; color: #ffff00; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔍 Medusa 2.0 Debug Page</h1>
-        <p>Build Time: <span id="buildTime"></span></p>
-        <p>Current URL: <span id="currentUrl"></span></p>
+        <div class="status success">
+            <strong>✅ Static files are loading correctly</strong><br>
+            If you can see this page, your web server is serving static files properly.
+        </div>
         
-        <h2>Route Tests:</h2>
-        <a href="/" class="test-link">Home (/)</a>
-        <a href="/7458c148293e2f70830e369ace8d3b9c" class="test-link">Registration Form</a>
-        <a href="/nonexistent" class="test-link">404 Test</a>
+        <p><strong>Build Time:</strong> <span id="buildTime"></span></p>
+        <p><strong>Current URL:</strong> <span id="currentUrl"></span></p>
+        <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
         
-        <h2>External Links:</h2>
-        <a href="https://medusa-ctf-production.azurewebsites.net/" class="test-link" target="_blank">External Registration</a>
+        <h2>📋 Route Tests:</h2>
+        <a href="/" class="test-link">🏠 Home (/)</a>
+        <a href="/7458c148293e2f70830e369ace8d3b9c" class="test-link">📝 Registration Form</a>
+        <a href="/nonexistent" class="test-link">❌ 404 Test</a>
         
-        <h2>Information:</h2>
-        <ul>
-            <li>If this page loads on production, the server is working</li>
-            <li>If the registration route gives 404, there's a routing issue</li>
-            <li>Check browser developer tools for console errors</li>
-        </ul>
+        <h2>🔗 External Links:</h2>
+        <a href="https://medusa-ctf-production.azurewebsites.net/" class="test-link" target="_blank">🌐 External Registration</a>
+        
+        <h2>🔧 Diagnostics:</h2>
+        <div id="diagnostics">
+            <p>Testing React Router functionality...</p>
+        </div>
+        
+        <h2>📚 Troubleshooting Guide:</h2>
+        <div class="status warning">
+            <strong>⚠️ If registration route gives 404:</strong>
+            <ul>
+                <li>1. Verify latest build is deployed to production</li>
+                <li>2. Check nginx/server configuration has SPA fallback</li>
+                <li>3. Clear browser cache and CDN cache</li>
+                <li>4. Ensure Docker container is rebuilt with latest code</li>
+                <li>5. Check server logs for detailed error messages</li>
+            </ul>
+        </div>
+        
+        <h2>📄 Build Information:</h2>
+        <div class="status">
+            <p><strong>Expected files in build:</strong></p>
+            <ul>
+                <li>✅ index.html (this page works)</li>
+                <li>🔄 React bundle with RegistrationPage</li>
+                <li>🔄 Router configuration</li>
+            </ul>
+        </div>
     </div>
     
     <script>
+        // Populate basic info
         document.getElementById('buildTime').textContent = new Date().toISOString();
         document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        
+        // Test if we can detect React
+        setTimeout(() => {
+            const diagnostics = document.getElementById('diagnostics');
+            let html = '<p>Testing React Router functionality...</p>';
+            
+            // Check if React is available
+            if (typeof window.React !== 'undefined') {
+                html += '<div class="status success">✅ React is loaded</div>';
+            } else {
+                html += '<div class="status error">❌ React not detected</div>';
+            }
+            
+            // Test fetch to the problematic route
+            fetch('/7458c148293e2f70830e369ace8d3b9c')
+                .then(response => {
+                    if (response.ok) {
+                        html += '<div class="status success">✅ Registration route responds (Status: ' + response.status + ')</div>';
+                    } else {
+                        html += '<div class="status error">❌ Registration route fails (Status: ' + response.status + ')</div>';
+                    }
+                })
+                .catch(error => {
+                    html += '<div class="status error">❌ Registration route error: ' + error.message + '</div>';
+                })
+                .finally(() => {
+                    diagnostics.innerHTML = html;
+                });
+        }, 1000);
     </script>
 </body>
 </html>

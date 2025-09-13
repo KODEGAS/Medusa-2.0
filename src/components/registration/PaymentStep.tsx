@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, ArrowLeft, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { sanitizeFileName, checkRateLimit } from "@/lib/sanitization";
 import type { TeamInfo, MemberInfo, PaymentInfo } from "../RegistrationForm";
 
 interface PaymentStepProps {
@@ -25,12 +26,36 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type
+      // Sanitize filename
+      const sanitizedName = sanitizeFileName(file.name);
+      if (!sanitizedName || sanitizedName.length === 0) {
+        toast({
+          title: "Invalid file name",
+          description: "Please use a file with a valid name containing only letters, numbers, and safe characters",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type (strict checking)
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+      const allowedExtensions = ['.jpg', '.jpeg', '.png', '.pdf'];
+      
       if (!allowedTypes.includes(file.type)) {
         toast({
           title: "Invalid file type",
           description: "Please upload a JPEG, PNG, or PDF file",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Double-check file extension
+      const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+      if (!allowedExtensions.includes(fileExtension)) {
+        toast({
+          title: "Invalid file extension",
+          description: "File extension must be .jpg, .jpeg, .png, or .pdf",
           variant: "destructive",
         });
         return;
@@ -46,7 +71,20 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
         return;
       }
 
-      setUploadedFile(file);
+      // Validate minimum file size (to prevent empty files)
+      if (file.size < 1024) { // 1KB minimum
+        toast({
+          title: "File too small",
+          description: "File appears to be empty or corrupted",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create a new File object with sanitized name
+      const sanitizedFile = new File([file], sanitizedName, { type: file.type });
+      setUploadedFile(sanitizedFile);
+      
       toast({
         title: "File uploaded successfully",
         description: `${file.name} has been uploaded`,
@@ -60,6 +98,17 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
         title: "No file selected",
         description: "Please upload your payment slip",
         variant: "destructive",
+      });
+      return;
+    }
+
+    // Rate limiting check
+    const clientId = teamInfo.leaderEmail + teamInfo.teamName;
+    if (!checkRateLimit(clientId, 2, 600000)) { // 10 minute window for payment
+      toast({
+        title: "Too Many Attempts",
+        description: "Please wait 10 minutes before submitting payment again.",
+        variant: "destructive"
       });
       return;
     }

@@ -7,6 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Shield, User } from "lucide-react";
 import { TeamInfo, MemberInfo } from "../RegistrationForm";
+import {
+  sanitizeMemberInfo,
+  validateEmail,
+  validatePhone,
+  validateName,
+  checkRateLimit,
+  getSecurityHeaders
+} from "@/lib/sanitization";
 
 interface MemberDetailsStepProps {
   teamInfo: TeamInfo;
@@ -18,6 +26,7 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   const [members, setMembers] = useState<MemberInfo[]>(
     Array.from({ length: teamInfo.memberCount - 1 }, () => ({
@@ -34,17 +43,70 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
         i === index ? { ...member, [field]: value } : member
       )
     );
+    
+    // Clear validation error when user starts typing
+    const errorKey = `${field}-${index}`;
+    if (validationErrors[errorKey]) {
+      setValidationErrors(prev => ({ ...prev, [errorKey]: '' }));
+    }
+  };
+
+  const validateMembers = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    members.forEach((member, index) => {
+      if (!validateName(member.name)) {
+        errors[`name-${index}`] = 'Name must be 2-100 characters with only letters, spaces, hyphens, periods, and apostrophes';
+      }
+      if (!validateEmail(member.email)) {
+        errors[`email-${index}`] = 'Please enter a valid email address';
+      }
+      if (!validatePhone(member.phone)) {
+        errors[`phone-${index}`] = 'Please enter a valid phone number (8-15 digits)';
+      }
+      if (!member.year || member.year.trim().length === 0) {
+        errors[`year-${index}`] = 'Please select a year of study';
+      }
+    });
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Rate limiting check
+    const clientId = navigator.userAgent + teamInfo.leaderEmail;
+    if (!checkRateLimit(clientId, 3, 300000)) { // 5 minute window for member details
+      toast({
+        title: "Too Many Attempts",
+        description: "Please wait 5 minutes before submitting again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Sanitize member data
+    const sanitizedMembers = members.map(member => sanitizeMemberInfo(member));
+    
+    // Validate sanitized data
+    if (!validateMembers()) {
+      toast({
+        title: "Validation Error",
+        description: "Please correct the highlighted fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Prepare team data for API
+    // Prepare team data for API with sanitized inputs
     const teamData = {
       teamName: teamInfo.teamName,
       university: teamInfo.university,
-      members: members.map(m => ({
+      members: sanitizedMembers.map(m => ({
         name: m.name,
         email: m.email,
         phone: m.phone,
@@ -55,27 +117,32 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
     try {
       const response = await fetch("https://medusa-2-0-backend.onrender.com/api/team", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: getSecurityHeaders(),
         body: JSON.stringify(teamData)
       });
-      if (!response.ok) throw new Error("Failed to register team");
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to register team");
+      }
+      
       const result = await response.json();
 
       toast({
         title: "Registration Successful!",
         description: "Welcome to Medusa 2.0. Check your email for confirmation.",
       });
-      onComplete(members);
+      onComplete(sanitizedMembers);
     } catch (error) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
-        description: error.message || "An error occurred. Please try again.",
+        description: error instanceof Error ? error.message : "An error occurred. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   return (
@@ -127,9 +194,12 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                     onBlur={() => setFocusedField(null)}
                     className={`font-mono transition-all duration-300 ${
                       focusedField === `name-${index}` ? "neon-border" : ""
-                    }`}
+                    } ${validationErrors[`name-${index}`] ? "border-destructive" : ""}`}
                     placeholder="Member's full name"
                   />
+                  {validationErrors[`name-${index}`] && (
+                    <p className="text-sm text-destructive font-mono">{validationErrors[`name-${index}`]}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -146,9 +216,12 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                     onBlur={() => setFocusedField(null)}
                     className={`font-mono transition-all duration-300 ${
                       focusedField === `email-${index}` ? "neon-border" : ""
-                    }`}
+                    } ${validationErrors[`email-${index}`] ? "border-destructive" : ""}`}
                     placeholder="member@university.edu"
                   />
+                  {validationErrors[`email-${index}`] && (
+                    <p className="text-sm text-destructive font-mono">{validationErrors[`email-${index}`]}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -165,9 +238,12 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                     onBlur={() => setFocusedField(null)}
                     className={`font-mono transition-all duration-300 ${
                       focusedField === `phone-${index}` ? "neon-border" : ""
-                    }`}
+                    } ${validationErrors[`phone-${index}`] ? "border-destructive" : ""}`}
                     placeholder="+91 9876543210"
                   />
+                  {validationErrors[`phone-${index}`] && (
+                    <p className="text-sm text-destructive font-mono">{validationErrors[`phone-${index}`]}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2 md:col-span-2">

@@ -7,12 +7,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight } from "lucide-react";
 import { TeamInfo } from "../RegistrationForm";
+import {
+  sanitizeTeamInfo,
+  validateEmail,
+  validatePhone,
+  validateName,
+  validateTeamName,
+  checkRateLimit
+} from "@/lib/sanitization";
+import { useToast } from "@/hooks/use-toast";
 
 interface TeamInfoStepProps {
   onComplete: (data: TeamInfo) => void;
 }
 
 export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<TeamInfo>({
     teamName: "",
     university: "",
@@ -25,9 +35,15 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
   });
   const [otherUniversity, setOtherUniversity] = useState("");
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (field: keyof TeamInfo, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleOtherUniversityChange = (value: string) => {
@@ -35,14 +51,69 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
     setFormData(prev => ({ ...prev, university: value }));
   };
 
+  const validateForm = (data: TeamInfo): boolean => {
+    const errors: Record<string, string> = {};
+
+    // Validate team name
+    if (!validateTeamName(data.teamName)) {
+      errors.teamName = 'Team name must be 2-50 characters with only letters, numbers, spaces, hyphens, underscores, and periods';
+    }
+
+    // Validate leader name
+    if (!validateName(data.leaderName)) {
+      errors.leaderName = 'Name must be 2-100 characters with only letters, spaces, hyphens, periods, and apostrophes';
+    }
+
+    // Validate email
+    if (!validateEmail(data.leaderEmail)) {
+      errors.leaderEmail = 'Please enter a valid email address';
+    }
+
+    // Validate phone
+    if (!validatePhone(data.leaderPhone)) {
+      errors.leaderPhone = 'Please enter a valid phone number (8-15 digits)';
+    }
+
+    // Validate university
+    if (!data.university || data.university.trim().length < 2) {
+      errors.university = 'Please select or enter a valid university';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // If 'Other' is selected, use the custom university name
-    const payload = {
+    
+    // Rate limiting check
+    const clientId = navigator.userAgent + Date.now().toString().slice(0, 10);
+    if (!checkRateLimit(clientId, 3, 60000)) {
+      toast({
+        title: "Too Many Attempts",
+        description: "Please wait a moment before submitting again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Sanitize form data
+    const sanitizedData = sanitizeTeamInfo({
       ...formData,
       university: formData.university === "Other" ? otherUniversity : formData.university
-    };
-    onComplete(payload);
+    });
+
+    // Validate sanitized data
+    if (!validateForm(sanitizedData)) {
+      toast({
+        title: "Validation Error",
+        description: "Please correct the highlighted fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    onComplete(sanitizedData);
   };
 
   return (
@@ -79,9 +150,12 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                 onBlur={() => setFocusedField(null)}
                 className={`font-mono transition-all duration-300 ${
                   focusedField === "teamName" ? "neon-border" : ""
-                }`}
+                } ${validationErrors.teamName ? "border-destructive" : ""}`}
                 placeholder="Enter your team name"
               />
+              {validationErrors.teamName && (
+                <p className="text-sm text-destructive font-mono">{validationErrors.teamName}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -152,9 +226,12 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                   onBlur={() => setFocusedField(null)}
                   className={`font-mono transition-all duration-300 ${
                     focusedField === "leaderName" ? "neon-border" : ""
-                  }`}
+                  } ${validationErrors.leaderName ? "border-destructive" : ""}`}
                   placeholder="Leader's full name"
                 />
+                {validationErrors.leaderName && (
+                  <p className="text-sm text-destructive font-mono">{validationErrors.leaderName}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -171,9 +248,12 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                   onBlur={() => setFocusedField(null)}
                   className={`font-mono transition-all duration-300 ${
                     focusedField === "leaderEmail" ? "neon-border" : ""
-                  }`}
+                  } ${validationErrors.leaderEmail ? "border-destructive" : ""}`}
                   placeholder="leader@university.edu"
                 />
+                {validationErrors.leaderEmail && (
+                  <p className="text-sm text-destructive font-mono">{validationErrors.leaderEmail}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -190,9 +270,12 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                   onBlur={() => setFocusedField(null)}
                   className={`font-mono transition-all duration-300 ${
                     focusedField === "leaderPhone" ? "neon-border" : ""
-                  }`}
+                  } ${validationErrors.leaderPhone ? "border-destructive" : ""}`}
                   placeholder="+91 9876543210"
                 />
+                {validationErrors.leaderPhone && (
+                  <p className="text-sm text-destructive font-mono">{validationErrors.leaderPhone}</p>
+                )}
               </div>
             </div>
           </div>

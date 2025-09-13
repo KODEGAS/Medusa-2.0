@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, Trophy } from "lucide-react";
-import { useScrollAnimation, useStaggeredAnimation } from "@/hooks/useScrollAnimation";
+import { useStaggeredAnimation } from "@/hooks/useScrollAnimation";
 
 const events = [
- 
+
   {
     id: 2,
     title: "Close Registration",
     date: "October 12, 2025",
     time: "12:00 AM",
     description: "Team registration and verification process ends",
-    icon: Calendar,
     status: "upcoming",
-    details: "Final deadline for team registration. No late entries will be accepted. Ensure all documents are submitted and verified before this date."
+    details: "Final deadline for team registration. No late entries will be accepted. Ensure all documents are submitted and verified before this date.",
+    icon: Calendar
   },
    {
     id: 3,
@@ -59,11 +58,9 @@ const events = [
   }
 ];
 
-export const TimelineSection = () => {
+const TimelineSection = () => {
   const [selectedEvent, setSelectedEvent] = useState<number | null>(null);
-  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation({ delay: 200 });
   const { setRef: eventRef, visibleItems: eventsVisible } = useStaggeredAnimation(events.length, 200);
-  const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation({ delay: 400 });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -87,7 +84,7 @@ export const TimelineSection = () => {
   <section id="timeline-section" className="py-5 px-4 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-hero opacity-50" />
-      <div className="absolute inset-0 cyber-grid opacity-5" />
+  {/* <div className="absolute inset-0 cyber-grid opacity-5" /> */}
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Section Header */}
@@ -165,7 +162,6 @@ export const TimelineSection = () => {
                       <p className="text-sm font-mono text-muted-foreground mb-4">
                         {event.description}
                       </p>
-                      
                       {/* Expanded Details */}
                       <div className={`overflow-hidden transition-all duration-500 ${
                         isSelected ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
@@ -199,9 +195,9 @@ export const TimelineSection = () => {
               Registration is now open! Form your team and prepare for the ultimate cybersecurity challenge.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/register" className="px-8 py-3 bg-primary text-primary-foreground font-orbitron font-bold rounded-lg hover:shadow-neon transition-all duration-300 animate-pulse-glow">
+              <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-primary text-primary-foreground font-orbitron font-bold rounded-lg hover:shadow-neon transition-all duration-300 animate-pulse-glow">
                 Register Team
-              </Link>
+              </a>
               <button className="px-8 py-3 border-2 border-accent text-accent font-mono rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-300">
                 Download Rules
               </button>
@@ -212,3 +208,4 @@ export const TimelineSection = () => {
     </section>
   );
 };
+export default TimelineSection;

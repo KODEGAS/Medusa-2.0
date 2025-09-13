@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -10,18 +9,10 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import {
-  Shield,
-  Zap,
-  Eye,
-  Lock,
-  Cpu,
-  Network,
+ 
   ChevronRight,
-  Star,
-  Download,
-  Play
+ 
 } from "lucide-react";
-import medusaLogo from "@/assets/medusa-logo.jpg";
 
 const galleryImages = [
   "https://res.cloudinary.com/du5tkpcut/image/upload/IMG_1365_xvwnum.jpg",

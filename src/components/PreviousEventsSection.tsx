@@ -3,10 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Users, Calendar, Target, Award, Zap } from "lucide-react";
 
-import championImg from "@/assets/highlights/champion.jpg";
-import runnerUpImg from "@/assets/highlights/runnerup.jpg";
-import secondRunnerUpImg from "@/assets/highlights/secondrunnerup.jpg";
-
+const championImg = "https://res.cloudinary.com/du5tkpcut/image/upload/w_1000,q_70/v1757615641/champion_qe9qf6.jpg";
+const runnerUpImg = "https://res.cloudinary.com/du5tkpcut/image/upload/w_1000,q_70/v1757615606/runnerup_wvxonh.jpg";
+const secondRunnerUpImg = "https://res.cloudinary.com/du5tkpcut/image/upload/w_1000,q_70/v1757615676/secondrunnerup_ec3xbn.jpg";
 const highlights = [
   {
     id: 1,
@@ -66,7 +65,7 @@ const overallStats = [
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-orbitron font-black text-transparent bg-gradient-neon bg-clip-text mb-6 glow-text">
-            Medusa 1.0
+            MEDUSA 1.0
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Celebrating our journey of empowering cybersecurity professionals and fostering innovation through competitive programming.
@@ -176,3 +175,4 @@ const overallStats = [
     </section>
   );
 };
+export default PreviousEventsSection;

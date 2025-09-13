@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap, Users, Calendar, Award, Phone } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
-import { Link } from "react-router-dom";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,7 +11,7 @@ export const Header = () => {
     { name: "Timeline", href: "#timeline", icon: Calendar },
     { name: "Partners", href: "#partners", icon: Users },
     { name: "Contact", href: "#contact", icon: Phone },
-    { name: "Register", href: "/register", icon: Zap, isRoute: true },
+    { name: "Register", href: "https://medusa-ctf-production.azurewebsites.net/", icon: Zap, isExternal: true },
   ];
 
   const scrollToSection = (href: string) => {
@@ -35,15 +34,17 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              item.isRoute ? (
-                <Link
+              item.isExternal ? (
+                <a
                   key={item.name}
-                  to={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
                 >
                   <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
                   {item.name}
-                </Link>
+                </a>
               ) : (
                 <button
                   key={item.name}
@@ -60,7 +61,7 @@ export const Header = () => {
           {/* CTA Button */}
           <div className="hidden md:block">
             <Button variant="cyber" size="sm" asChild>
-              <Link to="/register">Join CTF</Link>
+              <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">Join CTF</a>
             </Button>
           </div>
 
@@ -78,16 +79,18 @@ export const Header = () => {
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-4">
               {navItems.map((item) => (
-                item.isRoute ? (
-                  <Link
+                item.isExternal ? (
+                  <a
                     key={item.name}
-                    to={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-3 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-card"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <item.icon className="w-4 h-4" />
                     {item.name}
-                  </Link>
+                  </a>
                 ) : (
                   <button
                     key={item.name}

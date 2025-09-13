@@ -25,15 +25,15 @@ Crawl-delay: 1
 # Social media crawlers
 User-agent: Twitterbot
 Allow: /
-Allow: /register
+Allow: /7458c148293e2f70830e369ace8d3b9c
 
 User-agent: facebookexternalhit
 Allow: /
-Allow: /register
+Allow: /7458c148293e2f70830e369ace8d3b9c
 
 User-agent: LinkedInBot
 Allow: /
-Allow: /register
+Allow: /7458c148293e2f70830e369ace8d3b9c
 
 # Block access to sensitive/development files
 Disallow: /admin/

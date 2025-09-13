@@ -1,21 +1,22 @@
 
-import { useState } from "react"; 
-
+import { Suspense, lazy } from "react";
+import { useInView } from "react-intersection-observer";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
-import { AboutSection } from "@/components/AboutSection";
-import { TimelineSection } from "@/components/TimelineSection";
-import { PartnersSection } from "@/components/PartnersSection";
-import { ContactUsSection } from "@/components/ContactUsSection";
 import { Footer } from "@/components/Footer";
-import PrizePoolSection from "@/components/PrizePoolSection";
 
-import { CtfChallenge } from "@/components/CTFChallenge";
-import { PreviousEventsSection } from "@/components/PreviousEventsSection";
-import { MedusaShowcase } from "@/components/MedusaShowcase";
+const AboutSection = lazy(() => import("@/components/AboutSection"));
+const TimelineSection = lazy(() => import("@/components/TimelineSection"));
+const PrizePoolSection = lazy(() => import("@/components/PrizePoolSection"));
+const PreviousEventsSection = lazy(() => import("@/components/PreviousEventsSection"));
+const MedusaShowcase = lazy(() => import("@/components/MedusaShowcase"));
+const PartnersSection = lazy(() => import("@/components/PartnersSection"));
+const ContactUsSection = lazy(() => import("@/components/ContactUsSection"));
 
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+function VirtualSection({ children, rootMargin = "200px 0px" }) {
+  const { ref, inView } = useInView({ triggerOnce: true, rootMargin });
+  return <div ref={ref}>{inView ? children : null}</div>;
+}
 
 
 const Index = () => {
@@ -24,15 +25,17 @@ const Index = () => {
       <Header />
       <main className="pt-16">
         <HeroSection />
-        <div id="about"><AboutSection /></div>
-        <div id="timeline"><TimelineSection /></div>
-        <div id="prizes"><PrizePoolSection /></div>
-        <div id="previous-events"><PreviousEventsSection /></div>
-        <div id="medusa"><MedusaShowcase /></div>
-        <div id="partners"><PartnersSection /></div>
-        <div id="contact"><ContactUsSection /></div>
+        <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
+          <VirtualSection><div id="about"><AboutSection /></div></VirtualSection>
+          <VirtualSection><div id="timeline"><TimelineSection /></div></VirtualSection>
+          <VirtualSection><div id="prizes"><PrizePoolSection /></div></VirtualSection>
+          <VirtualSection><div id="previous-events"><PreviousEventsSection /></div></VirtualSection>
+          <VirtualSection><div id="medusa"><MedusaShowcase /></div></VirtualSection>
+          <VirtualSection><div id="partners"><PartnersSection /></div></VirtualSection>
+          <VirtualSection><div id="contact"><ContactUsSection /></div></VirtualSection>
+        </Suspense>
         <div id="register" className="flex justify-center py-8">
-         
+          {/* Registration CTA or form can go here */}
         </div>
       </main>
       <Footer />

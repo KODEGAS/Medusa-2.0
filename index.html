@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" itemscope itemtype="https://schema.org/WebSite">
-
 <head>
+    <!-- Theme color for mobile browsers -->
+  <meta name="theme-color" content="#101c1c" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -52,13 +53,13 @@
   <meta property="og:phone_number" content="+94-11-1234567" />
 
   <!-- Favicon and Icons -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
 
+  <!-- Preload main heading font for LCP -->
+  <link rel="preload" href="https://fonts.gstatic.com/s/orbitron/v30/yMJRMIlzdpvBhQQL_Qq7dys.woff2" as="font" type="font/woff2" crossorigin>
   <!-- Preconnect to external domains for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -232,6 +233,22 @@
   <link rel="preload" href="/src/main.tsx" as="script" crossorigin />
   <link rel="modulepreload" href="/src/App.tsx" />
   <link rel="modulepreload" href="/src/main.tsx" />
+
+
+  <style>
+    /* Example critical CSS: Replace with output from a critical CSS tool */
+    body { margin: 0; font-family: 'Orbitron', 'Roboto Mono', Arial, sans-serif; background: #000; color: #fff; }
+    #root { min-height: 100vh; }
+    .glow-text { text-shadow: 0 0 8px #39FF14, 0 0 2px #fff; }
+    .bg-gradient-neon { background: linear-gradient(90deg, #39FF14 0%, #00fff7 100%); }
+    /* ...add more above-the-fold critical styles as needed... */
+  </style>
+
+  <!-- 2. Lazy-load the main stylesheet -->
+  <link rel="preload" href="/index-BnvFgqgX.css" as="style" onload="this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="/index-BnvFgqgX.css">
+  </noscript>
 
 </head>
 

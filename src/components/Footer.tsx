@@ -1,4 +1,4 @@
-import { Shield, Mail, Phone, MapPin, Github, Twitter, Linkedin, ExternalLink, Facebook, MessageCircle } from "lucide-react";
+import { Shield, Mail, Phone, MapPin, Linkedin, ExternalLink, Facebook, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
@@ -34,8 +34,8 @@ export const Footer = () => {
   return (
     <footer className="bg-card border-t border-border relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 cyber-grid opacity-5" />
-      <div className="absolute inset-0 matrix-rain opacity-3" />
+  {/* <div className="absolute inset-0 cyber-grid opacity-5" /> */}
+  {/* <div className="absolute inset-0 matrix-rain opacity-3" /> */}
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Main Footer Content */}

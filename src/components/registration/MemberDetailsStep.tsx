@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Shield, User, Users } from "lucide-react";
+import { ArrowLeft, Shield, User } from "lucide-react";
 import { TeamInfo, MemberInfo } from "../RegistrationForm";
 
 interface MemberDetailsStepProps {
@@ -24,7 +24,6 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
       name: "",
       email: "",
       phone: "",
-      course: "",
       year: ""
     }))
   );
@@ -49,7 +48,6 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
         name: m.name,
         email: m.email,
         phone: m.phone,
-        course: m.course,
         year: m.year
       }))
     };
@@ -172,25 +170,6 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor={`course-${index}`} className="text-foreground font-mono">
-                    Course/Program *
-                  </Label>
-                  <Input
-                    id={`course-${index}`}
-                    type="text"
-                    required
-                    value={member.course}
-                    onChange={(e) => handleMemberChange(index, "course", e.target.value)}
-                    onFocus={() => setFocusedField(`course-${index}`)}
-                    onBlur={() => setFocusedField(null)}
-                    className={`font-mono transition-all duration-300 ${
-                      focusedField === `course-${index}` ? "neon-border" : ""
-                    }`}
-                    placeholder="e.g., Computer Science"
-                  />
-                </div>
-
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor={`year-${index}`} className="text-foreground font-mono">
                     Year of Study *
@@ -207,8 +186,6 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                     <option value="2nd Year">2nd Year</option>
                     <option value="3rd Year">3rd Year</option>
                     <option value="4th Year">4th Year</option>
-                    <option value="Graduate">Graduate</option>
-                    <option value="Post Graduate">Post Graduate</option>
                   </select>
                 </div>
               </div>

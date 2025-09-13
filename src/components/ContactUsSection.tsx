@@ -1,5 +1,5 @@
 
-import { Mail, Phone, MapPin, User, Shield, Zap, Users, MessageSquare } from "lucide-react";
+import { Mail, Phone, MapPin, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
@@ -75,7 +75,7 @@ export const ContactUsSection = () => {
   return (
     <section className="py-5 bg-card relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 matrix-rain opacity-5" />
+  {/* <div className="absolute inset-0 matrix-rain opacity-5" /> */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
 
       <div className="container mx-auto px-4 relative z-10">
@@ -105,6 +105,7 @@ export const ContactUsSection = () => {
                       src={member.image}
                       alt={member.name}
                       className="object-cover"
+                      loading="lazy"
                     />
                     <AvatarFallback className="bg-gradient-cyber text-foreground font-mono font-bold text-lg">
                       {member.fallback}
@@ -182,7 +183,7 @@ export const ContactUsSection = () => {
               Event Location
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              University of Kaleniya
+              University of Kelaniya
             </p>
           </div>
         </div>
@@ -197,12 +198,16 @@ export const ContactUsSection = () => {
             variant="cyber"
             size="lg"
             className="text-lg px-8 py-6"
-            onClick={() => navigate("/register")}
+            asChild
           >
-            Get Started Now
+            <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">
+              Get Started Now
+            </a>
           </Button>
         </div>
       </div>
     </section>
   );
 };
+
+export default ContactUsSection;

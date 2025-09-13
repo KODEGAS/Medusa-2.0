@@ -73,8 +73,8 @@ export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: Registra
           {paymentInfo && (
             <div className="mt-8 p-4 bg-accent/10 border border-accent/20 rounded-lg">
               <h3 className="text-lg font-orbitron font-bold text-accent mb-2">Payment Details</h3>
-              {paymentInfo.method === "receipt" ? (
-                <p className="text-sm font-mono text-muted-foreground">Receipt uploaded: <span className="text-accent font-bold">{paymentInfo.receipt?.name || "(file)"}</span></p>
+              {paymentInfo.method === "upload" ? (
+                <p className="text-sm font-mono text-muted-foreground">Receipt uploaded: <span className="text-accent font-bold">{paymentInfo.file?.name || "(file)"}</span></p>
               ) : (
                 <p className="text-sm font-mono text-muted-foreground">Paid via Stripe</p>
               )}

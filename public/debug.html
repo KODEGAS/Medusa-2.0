@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Medusa 2.0</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            border: 1px solid #00ffff;
+            padding: 10px 20px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .test-link:hover {
+            background: #00ffff;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Medusa 2.0 Debug Page</h1>
+        <p>Build Time: <span id="buildTime"></span></p>
+        <p>Current URL: <span id="currentUrl"></span></p>
+        
+        <h2>Route Tests:</h2>
+        <a href="/" class="test-link">Home (/)</a>
+        <a href="/7458c148293e2f70830e369ace8d3b9c" class="test-link">Registration Form</a>
+        <a href="/nonexistent" class="test-link">404 Test</a>
+        
+        <h2>External Links:</h2>
+        <a href="https://medusa-ctf-production.azurewebsites.net/" class="test-link" target="_blank">External Registration</a>
+        
+        <h2>Information:</h2>
+        <ul>
+            <li>If this page loads on production, the server is working</li>
+            <li>If the registration route gives 404, there's a routing issue</li>
+            <li>Check browser developer tools for console errors</li>
+        </ul>
+    </div>
+    
+    <script>
+        document.getElementById('buildTime').textContent = new Date().toISOString();
+        document.getElementById('currentUrl').textContent = window.location.href;
+    </script>
+</body>
+</html>
+</content>
+</invoke>

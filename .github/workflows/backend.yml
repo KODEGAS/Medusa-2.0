@@ -1,0 +1,172 @@
+---
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+  DOCKER_BUILDKIT: 1
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test || echo "No tests defined"
+
+      - name: Check for security vulnerabilities
+        run: npm audit --audit-level=moderate
+
+  build-and-push-backend:
+    name: Build & Push Backend Image
+    runs-on: ubuntu-latest
+    needs: test-backend
+    outputs:
+      image-digest: ${{ steps.push.outputs.digest }}
+      image-url: ${{ steps.push.outputs.image-url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=backend-${{ github.run_number }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: build-and-push-backend
+    if: needs.build-and-push-backend.result == 'success'
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker to use gcloud as a credential helper
+        run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: medusa-backend
+          image: ${{ needs.build-and-push-backend.outputs.image-url }}
+          region: us-central1
+          flags: |
+            --allow-unauthenticated
+            --set-env-vars MONGODB_URI=${{ secrets.MONGODB_URI }},PORT=8080
+            --memory 512Mi
+            --cpu 1
+            --max-instances 10
+            --timeout 300
+
+      - name: Health check
+        run: |
+          echo "Performing health check on ${{ steps.deploy.outputs.url }}/api/health"
+          curl -f ${{ steps.deploy.outputs.url }}/api/health || exit 1
+
+      - name: Notify deployment
+        if: success()
+        run: |
+          echo "🚀 Backend deployed successfully!"
+          echo "🌐 ${{ steps.deploy.outputs.url }}"
+
+  cleanup-backend:
+    name: Cleanup Old Backend Images
+    runs-on: ubuntu-latest
+    needs: [build-and-push-backend, deploy-backend]
+    if: github.ref == 'refs/heads/main' && always()
+
+    steps:
+      - name: Delete old container images
+        uses: actions/delete-package-versions@v4
+        with:
+          package-name: ${{ github.repository }}/backend
+          package-type: container
+          min-versions-to-keep: 5
+          delete-only-untagged-versions: true

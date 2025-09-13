@@ -148,7 +148,8 @@ jobs:
       - name: Health check
         run: |
           echo "Performing health check on ${{ steps.deploy.outputs.url }}/api/health"
-          curl -f ${{ steps.deploy.outputs.url }}/api/health || exit 1
+          sleep 10
+          curl -f --max-time 30 ${{ steps.deploy.outputs.url }}/api/health || exit 1
 
       - name: Notify deployment
         if: success()

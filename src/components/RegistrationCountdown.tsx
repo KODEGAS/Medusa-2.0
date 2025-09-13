@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, AlertTriangle } from "lucide-react";
 
 export const RegistrationCountdown = () => {
-  const registrationDeadline = new Date("2025-10-12T23:59:59");
+
+  // Set registration deadline - adjust this date as needed
+  const registrationDeadline = useMemo(() => new Date("2025-10-12T23:59:59"), []);
+
   
   const [timeLeft, setTimeLeft] = useState({
     days: 0,

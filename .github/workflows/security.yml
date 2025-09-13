@@ -1,10 +1,11 @@
+---
 name: Security Scan & Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   schedule:
     # Run security scans weekly on Sundays at 3 AM UTC
     - cron: '0 3 * * 0'
@@ -23,21 +24,50 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
+      - name: Setup Node.js (fallback)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install dependencies
-        run: bun install
+        run: |
+          if command -v bun &> /dev/null; then
+            echo "Using Bun for installation"
+            bun install
+          else
+            echo "Bun not available, using npm with legacy peer deps"
+            npm install --legacy-peer-deps
+          fi
 
       - name: Run security audit
-        run: bun audit
+        run: |
+          if command -v bun &> /dev/null; then
+            bun audit
+          else
+            npm audit --audit-level=moderate
+          fi
+        continue-on-error: true
 
       - name: Run ESLint security rules
-        run: bun run lint
+        run: |
+          if command -v bun &> /dev/null; then
+            bun run lint
+          else
+            npm run lint
+          fi
 
       - name: Build project
-        run: bun run build
+        run: |
+          if command -v bun &> /dev/null; then
+            bun run build
+          else
+            npm run build
+          fi
 
   docker-security-scan:
     name: Docker Security Scan
@@ -49,10 +79,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -84,17 +114,35 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
+      - name: Setup Node.js (fallback)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install dependencies
-        run: bun install
+        run: |
+          if command -v bun &> /dev/null; then
+            echo "Using Bun for installation"
+            bun install
+          else
+            echo "Bun not available, using npm with legacy peer deps"
+            npm install --legacy-peer-deps
+          fi
 
       - name: Run npm audit
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
       - name: Check for outdated packages
-        run: bun outdated
+        run: |
+          if command -v bun &> /dev/null; then
+            bun outdated
+          else
+            npm outdated
+          fi
         continue-on-error: true

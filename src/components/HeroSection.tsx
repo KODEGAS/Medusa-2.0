@@ -2,8 +2,46 @@ import { useState, useEffect, memo, Suspense, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import PosterOverlay from "./PosterOverlay";
 
+
 // Dynamically import the 3D model canvas
 const Medusa3DCanvas = lazy(() => import("./Medusa3DModel"));
+
+// 3D Model imports
+import { Canvas, useFrame } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useRef } from "react";
+
+// 3D Model component
+import * as THREE from "three";
+
+// 3D Model component
+const Medusa3DModel = ({ onLoaded }: { onLoaded?: () => void }) => {
+  const gltf = useGLTF("/model.glb", true);
+  const ref = useRef<THREE.Object3D>(null);
+  const direction = useRef(1); // 1 for forward, -1 for backward
+  useFrame((_, delta) => {
+    if (ref.current) {
+      // Rotate between 0 and ~2.44 radians (140deg) at a slower speed
+      const maxRotation = (140 * Math.PI) / 180;
+      ref.current.rotation.y += direction.current * delta * 0.005;
+      if (ref.current.rotation.y >= maxRotation) {
+        ref.current.rotation.y = maxRotation;
+        direction.current = -1;
+      } else if (ref.current.rotation.y <= 0) {
+        ref.current.rotation.y = 0;
+        direction.current = 1;
+      }
+    }
+  });
+  // Notify parent when loaded
+  useEffect(() => {
+    if (gltf && gltf.scene && onLoaded) {
+      onLoaded();
+    }
+  }, [gltf, onLoaded]);
+  return <primitive ref={ref} object={gltf.scene} scale={2.2} position={[0, 0.55, 0]} />;
+};
+
 
 const HeroSection = memo(() => {
   const [modelLoaded, setModelLoaded] = useState(false);

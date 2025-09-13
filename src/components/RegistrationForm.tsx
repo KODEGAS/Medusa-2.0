@@ -23,11 +23,17 @@ export interface MemberInfo {
   year: string;
 }
 
+export interface PaymentInfo {
+  method: "upload" | "stripe";
+  file?: File;
+  amount?: number;
+}
+
 export const RegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [teamInfo, setTeamInfo] = useState<TeamInfo | null>(null);
   const [members, setMembers] = useState<MemberInfo[]>([]);
-  const [paymentInfo, setPaymentInfo] = useState<any>(null);
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleTeamInfoComplete = (data: TeamInfo) => {
@@ -40,7 +46,7 @@ export const RegistrationForm = () => {
     setCurrentStep(3);
   };
 
-  const handlePaymentComplete = (paymentData: any) => {
+  const handlePaymentComplete = (paymentData: PaymentInfo) => {
     setPaymentInfo(paymentData);
     setIsSubmitted(true);
   };

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, Trophy } from "lucide-react";
@@ -196,9 +195,9 @@ const TimelineSection = () => {
               Registration is now open! Form your team and prepare for the ultimate cybersecurity challenge.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/register" className="px-8 py-3 bg-primary text-primary-foreground font-orbitron font-bold rounded-lg hover:shadow-neon transition-all duration-300 animate-pulse-glow">
+              <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-primary text-primary-foreground font-orbitron font-bold rounded-lg hover:shadow-neon transition-all duration-300 animate-pulse-glow">
                 Register Team
-              </Link>
+              </a>
               <button className="px-8 py-3 border-2 border-accent text-accent font-mono rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-300">
                 Download Rules
               </button>

@@ -48,7 +48,7 @@ const App = () => {
           <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/register" element={<RegistrationPage />} />
+                <Route path="/7458c148293e2f70830e369ace8d3b9c" element={<RegistrationPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
           </BrowserRouter>

@@ -198,9 +198,11 @@ export const ContactUsSection = () => {
             variant="cyber"
             size="lg"
             className="text-lg px-8 py-6"
-            onClick={() => navigate("/register")}
+            asChild
           >
-            Get Started Now
+            <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">
+              Get Started Now
+            </a>
           </Button>
         </div>
       </div>

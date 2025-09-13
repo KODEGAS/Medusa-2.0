@@ -120,7 +120,7 @@ show_deployment_summary() {
     # Show important URLs
     echo "Important URLs:"
     echo "• Homepage: https://$DOMAIN"
-    echo "• Registration: https://$DOMAIN/register"
+    echo "• Registration: https://$DOMAIN/7458c148293e2f70830e369ace8d3b9c"
     echo "• Sitemap: https://$DOMAIN/sitemap.xml"
     echo "• Robots: https://$DOMAIN/robots.txt"
     echo ""

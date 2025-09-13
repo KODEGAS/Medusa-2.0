@@ -1,7 +1,7 @@
 const CACHE_NAME = 'medusa-2.0-v1';
 const urlsToCache = [
     '/',
-    '/register',
+    '/7458c148293e2f70830e369ace8d3b9c',
     '/src/main.tsx',
     '/src/index.css',
     '/assets/logowhite.png',

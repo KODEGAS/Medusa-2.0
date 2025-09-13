@@ -2,6 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "cleanUrls": true,
-  "trailingSlash": false
+  "functions": {},
+  "rewrites": [
+    { "source": "/assets/(.*)", "destination": "/assets/$1" },
+    { "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|glb|txt|xml|html|json|webmanifest))", "destination": "/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

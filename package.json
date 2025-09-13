@@ -93,7 +93,7 @@
     "terser": "^5.43.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
-
+    "vite": "^7.1.5"
   },
   "findUnusedExports": {
     "include": [
@@ -103,8 +103,5 @@
     "exclude": [
       "./src/**/*.stories.@(js|jsx|ts|tsx)"
     ]
-
-    "vite": "^7.1.5"
-
   }
 }

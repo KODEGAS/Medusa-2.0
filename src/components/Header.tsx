@@ -1,30 +1,41 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap, Users, Calendar, Award, Phone } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
-  // Try to trigger scroll events to "unlock" navigation
+  // Force navigation to be clickable immediately
   useEffect(() => {
-    const triggerScrollUnlock = () => {
-      // Trigger a small scroll to potentially unlock navigation
-      window.scrollTo({ top: 1, behavior: 'instant' });
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }, 100);
+    const enableNavigation = () => {
+      if (headerRef.current) {
+        const buttons = headerRef.current.querySelectorAll('button[data-nav-button]');
+        buttons.forEach((button) => {
+          const htmlButton = button as HTMLButtonElement;
+          htmlButton.style.pointerEvents = 'auto';
+          htmlButton.style.zIndex = '10000';
+          htmlButton.addEventListener('click', (e) => {
+            console.log('Direct event listener clicked:', e.target);
+          });
+        });
+      }
     };
 
-    // Try multiple methods to unlock navigation
-    const timer1 = setTimeout(triggerScrollUnlock, 500);
-    const timer2 = setTimeout(triggerScrollUnlock, 1000);
-    const timer3 = setTimeout(triggerScrollUnlock, 2000);
+    // Try multiple timing approaches
+    enableNavigation();
+    setTimeout(enableNavigation, 100);
+    setTimeout(enableNavigation, 500);
+    setTimeout(enableNavigation, 1000);
 
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
+      if (headerRef.current) {
+        const buttons = headerRef.current.querySelectorAll('button[data-nav-button]');
+        buttons.forEach((button) => {
+          button.removeEventListener('click', () => {});
+        });
+      }
     };
   }, []);
 
@@ -49,7 +60,11 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[9999] bg-red-500/50 backdrop-blur-md border-b-2 border-red-500" style={{ pointerEvents: 'auto' }}>
+    <header 
+      ref={headerRef}
+      className="fixed top-0 left-0 right-0 z-[9999] bg-red-500/50 backdrop-blur-md border-b-2 border-red-500" 
+      style={{ pointerEvents: 'auto' }}
+    >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -75,6 +90,7 @@ export const Header = () => {
               ) : (
                 <button
                   key={item.name}
+                  data-nav-button="true"
                   onClick={() => scrollToSection(item.href)}
                   onMouseDown={() => console.log('Mouse down on:', item.name)}
                   onMouseUp={() => console.log('Mouse up on:', item.name)}

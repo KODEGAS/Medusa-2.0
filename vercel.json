@@ -1,12 +1,95 @@
 {
   "routes": [
     {
+      "src": "/assets/(.*)",
+      "headers": {
+        "cache-control": "max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*\\.js)$",
+      "headers": {
+        "content-type": "application/javascript; charset=utf-8"
+      }
+    },
+    {
+      "src": "/(.*\\.css)$",
+      "headers": {
+        "content-type": "text/css; charset=utf-8"
+      }
+    },
+    {
+      "src": "/(.*\\.woff2?)$",
+      "headers": {
+        "content-type": "font/woff2"
+      }
+    },
+    {
       "src": "/7458c148293e2f70830e369ace8d3b9c",
       "dest": "/index.html"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.js)$",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.css)$",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.woff2)$",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "font/woff2"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.woff)$",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "font/woff"
+        }
+      ]
     }
   ]
 }

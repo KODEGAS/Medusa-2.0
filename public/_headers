@@ -1,0 +1,14 @@
+/*.js
+  Content-Type: application/javascript
+
+/*.css
+  Content-Type: text/css
+
+/*.woff2
+  Content-Type: font/woff2
+
+/*.woff
+  Content-Type: font/woff
+
+/assets/*
+  Cache-Control: max-age=31536000, immutable

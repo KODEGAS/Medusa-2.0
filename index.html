@@ -59,7 +59,7 @@
 <link rel="manifest" href="/site.webmanifest">
 
   <!-- Preload main heading font for LCP -->
-  <link rel="preload" href="https://fonts.gstatic.com/s/orbitron/v30/yMJRMIlzdpvBhQQL_Qq7dys.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="https://fonts.gstatic.com/s/orbitron/v30/yMJRMIlzdpvBhQQL_Qq7dys.woff2" as="font" type="font/woff2" crossorigin="anonymous">
   <!-- Preconnect to external domains for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -223,32 +223,23 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Medusa 2.0" />
 
-  <!-- Security Headers (CSP, HSTS, etc. should be set server-side) -->
+  <!-- Security Headers (Note: X-Frame-Options should be set server-side, not in meta) -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="DENY" />
   <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
   <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
 
   <!-- Performance hints -->
-  <link rel="preload" href="/src/main.tsx" as="script" crossorigin />
+  <link rel="preload" href="/src/main.tsx" as="script" crossorigin="anonymous" />
   <link rel="modulepreload" href="/src/App.tsx" />
   <link rel="modulepreload" href="/src/main.tsx" />
 
-
   <style>
-    /* Example critical CSS: Replace with output from a critical CSS tool */
+    /* Critical CSS for above-the-fold content */
     body { margin: 0; font-family: 'Orbitron', 'Roboto Mono', Arial, sans-serif; background: #000; color: #fff; }
     #root { min-height: 100vh; }
     .glow-text { text-shadow: 0 0 8px #39FF14, 0 0 2px #fff; }
     .bg-gradient-neon { background: linear-gradient(90deg, #39FF14 0%, #00fff7 100%); }
-    /* ...add more above-the-fold critical styles as needed... */
   </style>
-
-  <!-- 2. Lazy-load the main stylesheet -->
-  <link rel="preload" href="/index-BnvFgqgX.css" as="style" onload="this.rel='stylesheet'">
-  <noscript>
-    <link rel="stylesheet" href="/index-BnvFgqgX.css">
-  </noscript>
 
 </head>
 

@@ -183,12 +183,19 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
               </div>
 
               <div className="bg-muted/50 p-4 rounded-lg">
+                <h4 className="font-semibold mb-2">💳 Bank Details:</h4>
+                <div className="text-sm space-y-1 text-muted-foreground mb-4">
+                  <p><strong>Bank:</strong> People's Bank</p>
+                  <p><strong>Account Number:</strong> 055200290051008</p>
+                  <p><strong>Account Name:</strong> Electronics and Computer Science Student Club</p>
+                  <p><strong>Branch:</strong> Kelaniya</p>
+                </div>
+                
                 <h4 className="font-semibold mb-2">Payment Instructions:</h4>
                 <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>• Transfer LKR 3000 to our bank account</li>
+                  <li>• Transfer LKR 3000 to the above bank account</li>
                   <li>• Include your team name "{teamInfo.teamName}" in the reference</li>
                   <li>• Upload a clear photo/scan of your payment receipt</li>
-                  <li>• Payment will be verified within 24 hours</li>
                 </ul>
               </div>
 

@@ -16,7 +16,7 @@ export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: Registra
       <div className="max-w-4xl mx-auto text-center">
         <Card className="holographic-card p-12">
           <div className="w-24 h-24 mx-auto mb-6 bg-primary/20 rounded-full flex items-center justify-center animate-pulse-glow">
-            <CheckCircle className="w-12 h-12 text-primary" />
+            <CheckCircle className="w-12 h-12 text-muted-foreground" />
           </div>
           
           <h2 className="text-4xl font-orbitron font-bold text-primary mb-4">
@@ -28,7 +28,7 @@ export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: Registra
           </p>
 
           {/* WhatsApp Community Invitation */}
-          <div className="mb-8 p-6 bg-secondary/10 border border-secondary/30 rounded-lg">
+          <div className="mb-8 p-6 bg-acent/10 border border-secondary/30 rounded-lg">
             <div className="flex items-center justify-center mb-4">
               <MessageCircle className="w-8 h-8 text-secondary mr-3" />
               <h3 className="text-xl font-orbitron font-bold text-secondary">Join Our Community!</h3>
@@ -81,8 +81,8 @@ export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: Registra
                 </div>
                 {members.map((member, index) => (
                   <div key={index} className="flex items-center text-sm font-mono opacity-70">
-                    <User className="w-4 h-4 mr-3 text-secondary/60" />
-                    <span className="text-secondary/60 font-semibold">Member {index + 2}:</span> {member.name}
+                    <User className="w-4 h-4 mr-3 text-primary/60" />
+                    <span className="text-primary/60 font-semibold">Member {index + 2}:</span> {member.name}
                   </div>
                 ))}
               </div>

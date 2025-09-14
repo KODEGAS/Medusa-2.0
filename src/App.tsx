@@ -27,6 +27,11 @@ const WhatsAppRedirect = () => {
   return null;
 };
 
+const DelegateBookRedirect = () => {
+  window.location.href = "https://drive.google.com/file/d/12u17zxZLJWaSpoP5RT8oGxiogWgBUhwl/view";
+  return null;
+};
+
 // Loading component
 const PageLoader = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center z-[70]" style={{ background: 'rgba(0,0,0,0.85)' }}>
@@ -70,6 +75,10 @@ const App = () => {
                 <Route path="/linkedin" element={<LinkedInRedirect />} />
                 <Route path="/facebook" element={<FacebookRedirect />} />
                 <Route path="/whatsapp" element={<WhatsAppRedirect />} />
+                
+                {/* Delegate Book Redirect */}
+                <Route path="/delegate-book" element={<DelegateBookRedirect />} />
+                <Route path="/rules" element={<DelegateBookRedirect />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>

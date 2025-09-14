@@ -9,7 +9,7 @@ const anuka = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v175
 const maleesha = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483272/maleesha_mrb9xs.webp";
 const kavindu = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483268/kavindu_vms68i.webp";
 const thivina = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483274/thivina_eiemsn.webp";
-const kavishka = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483263/kavishka_xru4ev.webp";
+const movini = "https://res.cloudinary.com/du5tkpcut/image/upload/v1757866707/img13_ifelhc.jpg";
 const savithi = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483273/savithi_axapnj.webp";
 
 export const ContactUsSection = () => {
@@ -21,8 +21,8 @@ export const ContactUsSection = () => {
       email: "akshana-ec21053@stu.kln.ac.lk",
       phone: "+94 76 285 5861",
       image: anuka,
-      fallback: "AR",
-      color: "text-primary"
+      fallback: "AK",
+      color: "text-accent"
     },
     {
       position: "Chief Coordinator",
@@ -30,7 +30,7 @@ export const ContactUsSection = () => {
       email: "indunil-ec22042@stu.kln.ac.lk",
       phone: "+94 71 721 8184",
       image: maleesha,
-      fallback: "JS",
+      fallback: "MI",
       color: "text-accent"
     },
     {
@@ -39,7 +39,7 @@ export const ContactUsSection = () => {
       email: "galkotu-ec22053@stu.kln.ac.lk",
       phone: "+94 72 66 77 555",
       image: kavindu,
-      fallback: "CJ",
+      fallback: "KG",
       color: "text-accent"
     },
     {
@@ -48,7 +48,7 @@ export const ContactUsSection = () => {
       email: "chandun-ec22058@stu.kln.ac.lk",
       phone: "+94 76 30 74 621",
       image: thivina,
-      fallback: "MC",
+      fallback: "TC",
       color: "text-accent"
     },
     {
@@ -56,8 +56,8 @@ export const ContactUsSection = () => {
       name: "Movini Manavi",
       email: "manaviw-ec22062@stu.kln.ac.lk",
       phone: "+94 76 775 6095",
-      image: kavishka,
-      fallback: "TW",
+      image: movini,
+      fallback: "MV",
       color: "text-accent"
     },
     {
@@ -66,7 +66,7 @@ export const ContactUsSection = () => {
       email: "vihara-ec22063@stu.kln.ac.lk",
       phone: "+94 70 750 2664",
       image: savithi,
-      fallback: "AB",
+      fallback: "SV",
       color: "text-accent"
     },
 

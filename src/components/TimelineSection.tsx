@@ -196,7 +196,12 @@ const TimelineSection = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
            
-              <button className="px-8 py-3 border-2 border-accent text-accent font-mono rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-300">
+              <button 
+                onClick={() => {
+                  window.open('https://drive.google.com/file/d/12u17zxZLJWaSpoP5RT8oGxiogWgBUhwl/view', '_blank');
+                }}
+                className="px-8 py-3 border-2 border-accent text-accent font-mono rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-300"
+              >
                 Download Rules
               </button>
             </div>

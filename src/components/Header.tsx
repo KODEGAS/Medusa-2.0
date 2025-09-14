@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Menu, X, Users, Calendar, Award, Phone, Wifi } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
 
@@ -63,12 +64,21 @@ export const Header = () => {
           {/* IP Address & CTA Button */}
           <div className="hidden md:flex items-center gap-4">
             {userIP && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-card/50 rounded-lg border border-border/50">
-                <Wifi className="w-4 h-4 text-primary" />
-                <span className="text-xs font-mono text-muted-foreground">
-                  IP: {userIP}
-                </span>
-              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2 px-3 py-1 bg-card/50 rounded-lg border border-border/50 cursor-pointer hover:bg-card/70 transition-colors">
+                      <Wifi className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-mono text-muted-foreground">
+                        IP: {userIP}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-destructive border-destructive text-destructive-foreground font-mono text-sm">
+                    <p>Medusa is watching on you...</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             <Button variant="cyber" size="sm" asChild>
               <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">Register Now</a>

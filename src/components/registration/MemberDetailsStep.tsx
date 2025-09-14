@@ -8,12 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Shield, User } from "lucide-react";
 import { TeamInfo, MemberInfo } from "../RegistrationForm";
 import {
-  sanitizeMemberInfo,
-  validateEmail,
-  validatePhone,
-  validateName,
-  checkRateLimit,
-  getSecurityHeaders
+    sanitizeMemberInfo,
+    validateEmail,
+    validatePhone,
+    validateName,
+    checkRateLimit,
+    getSecurityHeaders
 } from "@/lib/sanitization";
 
 interface MemberDetailsStepProps {
@@ -115,7 +115,7 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
     };
 
     try {
-      const response = await fetch("https://medusa-2-0-backend.onrender.com/api/team", {
+      const response = await fetch("https://medusa-backend-1081502718638.us-central1.run.app/api/team", {
         method: "POST",
         headers: getSecurityHeaders(),
         body: JSON.stringify(teamData)

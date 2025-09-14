@@ -15,15 +15,19 @@ export const Header = () => {
   ];
 
   const scrollToSection = (href: string) => {
+    console.log('Navigation clicked:', href); // Debug log
     const element = document.querySelector(href);
     if (element) {
+      console.log('Element found, scrolling to:', element); // Debug log
       element.scrollIntoView({ behavior: "smooth" });
+    } else {
+      console.log('Element not found for:', href); // Debug log
     }
     setIsMenuOpen(false);
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[60] bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-red-500/50 backdrop-blur-md border-b-2 border-red-500" style={{ pointerEvents: 'auto' }}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -32,7 +36,7 @@ export const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-8" style={{ pointerEvents: 'auto' }}>
             {navItems.map((item) => (
               item.isExternal ? (
                 <a
@@ -41,6 +45,7 @@ export const Header = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
+                  style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                 >
                   <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
                   {item.name}
@@ -50,6 +55,7 @@ export const Header = () => {
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
                   className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
+                  style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                 >
                   <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
                   {item.name}
@@ -59,7 +65,7 @@ export const Header = () => {
           </nav>
 
           {/* CTA Button */}
-          <div className="hidden md:block">
+          <div className="hidden md:block" style={{ pointerEvents: 'auto' }}>
             <Button variant="cyber" size="sm" asChild>
               <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">Join CTF</a>
             </Button>

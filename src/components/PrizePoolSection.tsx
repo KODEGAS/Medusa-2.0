@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Trophy, Medal, Award } from "lucide-react";
+import winnerImage from "@/assets/winner.webp";
+import secondImage from "@/assets/second.webp";
+import thirdImage from "@/assets/third.webp";
 const PrizePoolSection = () => {
   const [animateNumbers, setAnimateNumbers] = useState(false);
 
@@ -50,31 +52,28 @@ const PrizePoolSection = () => {
 
   const prizes = [
     {
-      position: "1st",
-      amount: 70000,
-      icon: Trophy,
-      color: "from-yellow-400 to-yellow-600",
-      glow: "shadow-yellow-500/50",
-      height: "h-60",
-      delay: "delay-100"
-    },
-    {
-      position: "2nd",
+      id: 2,
+      position: "1ST RUNNER-UP",
       amount: 50000,
-      icon: Medal,
-      color: "from-gray-300 to-gray-500",
-      glow: "shadow-gray-400/50",
-      height: "h-44",
-      delay: "delay-200"
+      image: secondImage,
+      order: 1,
+      highlight: false
     },
     {
-      position: "3rd",
+      id: 1,
+      position: "WINNING TEAM",
+      amount: 70000,
+      image: winnerImage,
+      order: 2,
+      highlight: true
+    },
+    {
+      id: 3,
+      position: "2ND RUNNER-UP",
       amount: 40000,
-      icon: Award,
-      color: "from-orange-400 to-orange-600",
-      glow: "shadow-orange-500/50",
-      height: "h-28",
-      delay: "delay-300"
+      image: thirdImage,
+      order: 3,
+      highlight: false
     }
   ];
 
@@ -93,119 +92,59 @@ const PrizePoolSection = () => {
           <div className="w-24 h-1 bg-gradient-to-r from-transparent via-cyber-green to-transparent mx-auto"></div>
         </div>
 
-        {/* 3D Podium */}
-          <div
-            className="flex items-end justify-center gap-4 sm:gap-8 mb-16 perspective-1000 overflow-x-auto scrollbar-none w-full pt-32 md:pt-12 min-h-[18rem] md:min-h-[20rem]"
-            style={{ WebkitOverflowScrolling: 'touch', overflow: 'visible' }}
-          >
-          {prizes.map((prize, index) => {
-            return (
+        {/* Three Trophy Images Layout */}
+        <div className="flex justify-center items-end gap-6 md:gap-10 mb-16 px-4">
+          {prizes
+            .sort((a, b) => a.order - b.order)
+            .map((prize, index) => (
               <div
-                key={prize.position}
-                className={`relative group ${prize.delay} ${animateNumbers ? 'animate-scale-in' : 'opacity-0'} min-w-[7.5rem] sm:min-w-0`}
-                style={{ maxWidth: 140 }}
+                key={prize.id}
+                className={`relative group ${
+                  animateNumbers ? 'animate-scale-in opacity-100' : 'opacity-0'
+                } transition-all duration-1000`}
+                style={{ animationDelay: `${index * 200}ms` }}
               >
-                {/* Podium Base */}
-                <div 
-                  className={`${prize.height} w-24 sm:w-32 bg-gradient-to-t ${prize.color} rounded-t-lg relative transform-gpu transition-all duration-500 group-hover:scale-105 shadow-2xl ${prize.glow}`}
-                  style={{
-                    background: `linear-gradient(145deg, ${prize.color.split(' ')[1]}, ${prize.color.split(' ')[3]})`
-                  }}
-                >
-                  {/* Glowing edges */}
-                  <div className="absolute inset-0 rounded-t-lg border-2 border-cyber-green/30 group-hover:border-cyber-green/60 transition-colors duration-300"></div>
+                {/* Trophy Image */}
+                <div className="relative">
+                  {/* Glow Background Effect */}
+                  <div className={`absolute inset-0 rounded-full blur-3xl ${
+                    prize.highlight 
+                      ? 'bg-yellow-400/30 w-40 h-40 md:w-56 md:h-56' 
+                      : prize.id === 2 
+                        ? 'bg-green-800/50 w-32 h-32 md:w-48 md:h-48'
+                        : 'bg-cyan-400/25 w-32 h-32 md:w-48 md:h-48'
+                  } -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 animate-pulse`}></div>
                   
-                  {/* Position number */}
-                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-2xl font-bold text-black">
-                    {prize.position}
-                  </div>
+                  {/* Additional intense glow for winner */}
+                  {prize.highlight && (
+                    <div className="absolute inset-0 rounded-full blur-2xl bg-yellow-500/20 w-28 h-28 md:w-40 md:h-40 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"></div>
+                  )}
                   
-                  {/* Prize amount */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
-                    <div className="text-lg font-mono font-bold text-black">
-                      LKR <AnimatedNumber target={prize.amount} />
-                    </div>
-                  </div>
+                  {/* Additional glow for second place */}
+                  {prize.id === 2 && (
+                    <div className="absolute inset-0 rounded-full blur-2xl bg-green-900/40 w-24 h-24 md:w-36 md:h-36 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"></div>
+                  )}
+                  
+                  {/* Extra bright green glow for second place */}
+                  {prize.id === 2 && (
+                    <div className="absolute inset-0 rounded-full blur-xl bg-emerald-800/60 w-20 h-20 md:w-28 md:h-28 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"></div>
+                  )}
+                  
+                  <img
+                    src={prize.image}
+                    alt={`Trophy ${prize.id}`}
+                    className={`${
+                      prize.highlight 
+                        ? 'w-56 h-72 md:w-80 md:h-96' 
+                        : 'w-48 h-64 md:w-72 md:h-88'
+                    } object-contain mx-auto group-hover:scale-110 transition-transform duration-500 drop-shadow-2xl relative z-10`}
+                  />
                 </div>
 
-                {/* 3D Trophy Cup */}
-                  <div className="absolute -top-20 left-1/2 w-24 sm:w-32 transform -translate-x-1/2 group-hover:-translate-y-2 transition-transform duration-300 flex justify-center">
-                  <div className="relative">
-                    {/* Contrast BG for silver cup */}
-                    {index === 1 && (
-                      <div className="absolute -inset-2 rounded-full bg-black/10 z-0" style={{ filter: 'blur(2px)' }}></div>
-                    )}
-                    {/* Cup Bowl */}
-                    <div className={`w-12 h-12 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${
-                      index === 0 ? 'from-yellow-400 to-yellow-600' : 
-                      index === 1 ? 'from-gray-300 to-gray-500' : 
-                      'from-orange-400 to-orange-600'
-                    } shadow-xl relative z-10`}>
-                      <div className="absolute inset-1 rounded-full bg-gradient-to-t from-white/20 to-white/40"></div>
-                      <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-white/60"></div>
-                      {/* Extra border for silver cup */}
-                      {index === 1 && (
-                        <div className="absolute inset-0 rounded-full border-2 border-gray-500/70"></div>
-                      )}
-                    </div>
-                    {/* Cup Handles */}
-                    <div className={`absolute top-2 -left-2 w-4 h-8 border-2 rounded-full ${
-                      index === 0 ? 'border-yellow-500' : 
-                      index === 1 ? 'border-gray-500' : 
-                      'border-orange-500'
-                    } bg-transparent`}></div>
-                    <div className={`absolute top-2 -right-2 w-4 h-8 border-2 rounded-full ${
-                      index === 0 ? 'border-yellow-500' : 
-                      index === 1 ? 'border-gray-500' : 
-                      'border-orange-500'
-                    } bg-transparent`}></div>
-                    {/* Cup Base */}
-                    <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-4 bg-gradient-to-b ${
-                      index === 0 ? 'from-yellow-500 to-yellow-700' : 
-                      index === 1 ? 'from-gray-400 to-gray-600' : 
-                      'from-orange-500 to-orange-700'
-                    } rounded-b-lg shadow-lg z-10`}>
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
-                    </div>
-                    {/* Trophy Stem */}
-                    <div className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-2 h-4 bg-gradient-to-b ${
-                      index === 0 ? 'from-yellow-600 to-yellow-800' : 
-                      index === 1 ? 'from-gray-500 to-gray-700' : 
-                      'from-orange-600 to-orange-800'
-                    } z-10`}></div>
-                    {/* Trophy Pedestal */}
-                    <div className={`absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-gradient-to-b ${
-                      index === 0 ? 'from-yellow-500 to-yellow-700' : 
-                      index === 1 ? 'from-gray-400 to-gray-600' : 
-                      'from-orange-500 to-orange-700'
-                    } rounded shadow-lg z-10`}></div>
-                    {/* Glowing Effect */}
-                    <div className={`absolute inset-0 rounded-full ${
-                      index === 0 ? 'shadow-yellow-400/50' : 
-                      index === 1 ? 'shadow-gray-400/50' : 
-                      'shadow-orange-400/50'
-                    } shadow-2xl group-hover:shadow-3xl transition-shadow duration-300 z-10`}></div>
-                  </div>
-                </div>
+                
 
-                {/* Particle effects */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  {[...Array(6)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute w-1 h-1 bg-cyber-green rounded-full animate-ping"
-                      style={{
-                        left: `${20 + i * 15}%`,
-                        top: `${10 + (i % 2) * 30}%`,
-                        animationDelay: `${i * 0.2}s`,
-                        animationDuration: '2s'
-                      }}
-                    ></div>
-                  ))}
-                </div>
               </div>
-            );
-          })}
+            ))}
         </div>
 
         {/* Additional Prize Info */}

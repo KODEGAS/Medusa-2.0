@@ -35,7 +35,7 @@ const Medusa3DModel = ({ onLoaded, showPoster }: { onLoaded?: () => void; showPo
       </Html>
     );
   }
-  return <primitive ref={ref} object={gltf.scene} scale={2.2} position={[0, 0.55, 0]} />;
+  return <primitive ref={ref} object={gltf.scene} scale={2.2} position={[0, 0.55, -0.5]} />;
 };
 
 

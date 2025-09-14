@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,11 +7,12 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 import {
- 
+
   ChevronRight,
- 
+
 } from "lucide-react";
 
 const galleryImages = [
@@ -28,6 +29,29 @@ const galleryImages = [
 
 export const MedusaShowcase = () => {
   const [selectedImage, setSelectedImage] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+
+  // Sync carousel with thumbnail selection
+  useEffect(() => {
+    if (carouselApi) {
+      carouselApi.scrollTo(selectedImage);
+    }
+  }, [selectedImage, carouselApi]);
+
+  // Listen to carousel changes and update thumbnail selection
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const onSelect = () => {
+      setSelectedImage(carouselApi.selectedScrollSnap());
+    };
+
+    carouselApi.on("select", onSelect);
+    
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
   return (
     <section className="px-4 bg-gradient-to-br from-background via-muted/20 to-cyber-green/5 relative overflow-hidden">
@@ -43,7 +67,7 @@ export const MedusaShowcase = () => {
         {/* Image Gallery */}
         <div className="mb-16">
           <div className="max-w-4xl mx-auto">
-            <Carousel className="w-full">
+            <Carousel className="w-full" setApi={setCarouselApi}>
               <CarouselContent>
                 {galleryImages.map((url, index) => (
                   <CarouselItem key={index}>

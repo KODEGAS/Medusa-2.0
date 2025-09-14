@@ -27,7 +27,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] bg-red-500/50 backdrop-blur-md border-b-2 border-red-500" style={{ pointerEvents: 'auto' }}>
+    <header className="fixed top-0 left-0 right-0 z-[9999] bg-red-500/50 backdrop-blur-md border-b-2 border-red-500" style={{ pointerEvents: 'auto' }}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -54,8 +54,10 @@ export const Header = () => {
                 <button
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
+                  onMouseDown={() => console.log('Mouse down on:', item.name)}
+                  onMouseUp={() => console.log('Mouse up on:', item.name)}
                   className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
-                  style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+                  style={{ pointerEvents: 'auto', cursor: 'pointer', backgroundColor: 'yellow', padding: '8px' }}
                 >
                   <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
                   {item.name}

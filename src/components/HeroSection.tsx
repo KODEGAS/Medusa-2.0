@@ -7,8 +7,8 @@ import PosterOverlay from "./PosterOverlay";
 const Medusa3DCanvas = lazy(() => import("./Medusa3DModel"));
 
 // 3D Model imports
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import { useRef } from "react";
 
 // 3D Model component
@@ -205,17 +205,7 @@ const HeroSection = memo(() => {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full px-1">
-          {showHeavy && Button && icons.ArrowRight ? (
-            <Button variant="cyber" size="lg" className="text-lg px-8 py-6" asChild>
-              <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">
-                Register Now
-              </a>
-            </Button>
-          ) : (
-            <button className="text-lg px-8 py-6 rounded-lg bg-primary/60 text-white font-bold opacity-70 cursor-wait" disabled>
-              Register Now
-            </button>
-          )}
+          
           {showHeavy && Button ? (
             <Button
               variant="neon"

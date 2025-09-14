@@ -183,6 +183,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                 <option value="SLTC">SLTC</option>
                 <option value="SLIIT">SLIIT</option>
                 <option value="IIT">IIT</option>
+                <option value="KDU">KDU</option>
                 <option value="APIIT">APIIT</option>
                 <option value="The Open University of Sri Lanka">The Open University of Sri Lanka</option>
                 <option value="Other">Other</option>
@@ -271,7 +272,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                   className={`font-mono transition-all duration-300 ${
                     focusedField === "leaderPhone" ? "neon-border" : ""
                   } ${validationErrors.leaderPhone ? "border-destructive" : ""}`}
-                  placeholder="+91 9876543210"
+                  placeholder="+94 71 765 4321"
                 />
                 {validationErrors.leaderPhone && (
                   <p className="text-sm text-destructive font-mono">{validationErrors.leaderPhone}</p>

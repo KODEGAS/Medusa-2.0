@@ -130,8 +130,14 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
 
       toast({
         title: "Registration Successful!",
-        description: "Welcome to Medusa 2.0. Check your email for confirmation.",
+        description: "Welcome to Medusa 2.0.",
       });
+      
+      // Redirect to WhatsApp channel after successful registration
+      setTimeout(() => {
+        window.open("https://whatsapp.com/channel/0029Vb6vhSBKrWQv83bWfR3q/94726677555", "_blank");
+      }, 2000); // 2-second delay to allow user to see the success message
+      
       onComplete(sanitizedMembers);
     } catch (error) {
       console.error('Registration error:', error);
@@ -239,7 +245,7 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                     className={`font-mono transition-all duration-300 ${
                       focusedField === `phone-${index}` ? "neon-border" : ""
                     } ${validationErrors[`phone-${index}`] ? "border-destructive" : ""}`}
-                    placeholder="+91 9876543210"
+                    placeholder="+94 71 765 4324"
                   />
                   {validationErrors[`phone-${index}`] && (
                     <p className="text-sm text-destructive font-mono">{validationErrors[`phone-${index}`]}</p>

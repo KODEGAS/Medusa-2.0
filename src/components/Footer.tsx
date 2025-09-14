@@ -1,5 +1,6 @@
-import { Shield, Mail, Phone, MapPin, Linkedin, ExternalLink, Facebook, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, ExternalLink, Facebook, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoWhite from "@/assets/logo.png";
 
 export const Footer = () => {
   const socialLinks = [
@@ -41,16 +42,8 @@ export const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Brand Section */}
             <div className="lg:col-span-1">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-cyber rounded-lg flex items-center justify-center animate-pulse-glow">
-                  <Shield className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-orbitron font-bold text-transparent bg-gradient-neon bg-clip-text">
-                    MEDUSA 2.0
-                  </h3>
-                  <p className="text-sm font-mono text-muted-foreground">CTF Competition</p>
-                </div>
+              <div className="flex justify-center lg:justify-start mb-6">
+                <img src={logoWhite} alt="Medusa Logo" className="w-20 h-20 object-contain" />
               </div>
               <p className="text-sm text-muted-foreground font-mono mb-6">
                 The ultimate inter-university cybersecurity challenge. Test your skills,
@@ -118,13 +111,11 @@ export const Footer = () => {
                 Get the latest updates about MEDUSA 2.0 and future CTF events.
               </p>
               <div className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-2 bg-background/50 border border-border rounded-lg text-sm font-mono text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
-                />
-                <Button variant="cyber" size="sm" className="w-full">
-                  Subscribe
+                
+                <Button variant="cyber" size="sm" className="w-full" asChild>
+                  <a href="https://whatsapp.com/channel/0029Vb6vhSBKrWQv83bWfR3q/94726677555" target="_blank" rel="noopener noreferrer">
+                    Subscribe
+                  </a>
                 </Button>
               </div>
             </div>

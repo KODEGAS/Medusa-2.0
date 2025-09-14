@@ -139,13 +139,12 @@ const AboutSection = () => {
                 "AI Chatbot Injection",
                 "ML CTF",
                 "Mobile Exploitation",
-                "Cryptogrphya",
+                "Cryptography",
                 "Reverse Engineering",
                 "Binary Exploitation",
                 "Forensics",
                 "OSINT",
                 "Steganography",
-                "Network Security"
               ];
               const visible = isMobile && !showAllCategories ? categories.slice(0, 4) : categories;
               return visible.map((category, index) => (

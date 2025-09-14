@@ -58,6 +58,7 @@ All colors MUST be HSL.
 --shadow-green: 0 0 20px hsl(120 100% 55% / 0.5);
 --shadow-blue: 0 0 20px hsl(185 100% 50% / 0.5);
 --shadow-purple: 0 0 20px hsl(270 70% 40% / 0.5);
+--shadow-neon: 0 0 8px hsl(185 100% 50% / 0.6), 0 0 16px hsl(120 100% 55% / 0.4);
 --shadow-cyber: 0 4px 20px hsl(220 50% 8% / 0.8);
 
 /* Animations */
@@ -142,10 +143,10 @@ border-color: hsl(var(--neon-green));
 
 @keyframes pulse-glow {
 0%, 100% { 
-box-shadow: 0 0 5px hsl(var(--neon-green)), 0 0 10px hsl(var(--neon-green)); 
+box-shadow: 0 0 6px hsl(var(--neon-green)), 0 0 12px hsl(var(--neon-green)); 
 }
 50% { 
-box-shadow: 0 0 20px hsl(var(--neon-green)), 0 0 30px hsl(var(--neon-green)); 
+box-shadow: 0 0 10px hsl(var(--neon-green)), 0 0 16px hsl(var(--neon-green)); 
 }
 }
 

@@ -1,10 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Zap, Users, Calendar, Award, Phone } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Try to trigger scroll events to "unlock" navigation
+  useEffect(() => {
+    const triggerScrollUnlock = () => {
+      // Trigger a small scroll to potentially unlock navigation
+      window.scrollTo({ top: 1, behavior: 'instant' });
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 100);
+    };
+
+    // Try multiple methods to unlock navigation
+    const timer1 = setTimeout(triggerScrollUnlock, 500);
+    const timer2 = setTimeout(triggerScrollUnlock, 1000);
+    const timer3 = setTimeout(triggerScrollUnlock, 2000);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, []);
 
   const navItems = [
     { name: "About", href: "#about", icon: Award },

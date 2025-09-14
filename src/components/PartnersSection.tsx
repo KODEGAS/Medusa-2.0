@@ -21,16 +21,12 @@ export const PartnersSection = () => {
 
   // Placeholder partners 
   const partners = [
-    { name: "TechCorp", logo: "TC" },
-    { name: "CyberSec Solutions", logo: "CSS" },
-    { name: "Digital Fortress", logo: "DF" },
-    { name: "SecureNet", logo: "SN" },
-    { name: "InfoShield", logo: "IS" },
-    { name: "ByteGuard", logo: "BG" },
-    { name: "CryptoLabs", logo: "CL" },
-    { name: "NetDefender", logo: "ND" },
-    { name: "DataVault", logo: "DV" },
-    { name: "CodeBreaker", logo: "CB" },
+    { name: "HashX", logo: "HX" },
+    { name: "Daily Mirror", logo: "DM" },
+    { name: "HackSL", logo: "HS" },
+    { name: "AWS Club", logo: "AC" },
+    { name: "Nadula Wathurakumbura PhotoGraphy", logo: "NW" },
+    
   ];
 
   return (

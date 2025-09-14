@@ -52,10 +52,10 @@ export const ContactUsSection = () => {
       color: "text-accent"
     },
     {
-      position: "Public Relation Coordinator",
-      name: "Kavishka Gayan",
-      email: "wijesur-ec22036@stu.kln.ac.lk",
-      phone: "+94 70 260 4306",
+      position: "External Relation Coordinator",
+      name: "Movini Manavi",
+      email: "manaviw-ec22062@stu.kln.ac.lk",
+      phone: "+94 76 775 6095",
       image: kavishka,
       fallback: "TW",
       color: "text-accent"
@@ -172,7 +172,7 @@ export const ContactUsSection = () => {
               Emergency Support
             </h3>
             <p className="text-sm font-mono text-muted-foreground">
-              +94 72 66 77 555
+              +94 76 775 6095
             </p>
           </div>
 

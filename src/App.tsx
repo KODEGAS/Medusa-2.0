@@ -11,6 +11,22 @@ const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
 
+// Social Media Redirect Components
+const LinkedInRedirect = () => {
+  window.location.href = "https://www.linkedin.com/company/medusaecs/"; 
+  return null;
+};
+
+const FacebookRedirect = () => {
+  window.location.href = "https://www.facebook.com/share/16wRiSfKkW/?mibextid=wwXIfr"; 
+  return null;
+};
+
+const WhatsAppRedirect = () => {
+  window.location.href = "https://whatsapp.com/channel/0029Vb6vhSBKrWQv83bWfR3q/94726677555";
+  return null;
+};
+
 // Loading component
 const PageLoader = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center z-[70]" style={{ background: 'rgba(0,0,0,0.85)' }}>
@@ -49,6 +65,12 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/7458c148293e2f70830e369ace8d3b9c" element={<RegistrationPage />} />
+                
+                {/* Social Media Redirects */}
+                <Route path="/linkedin" element={<LinkedInRedirect />} />
+                <Route path="/facebook" element={<FacebookRedirect />} />
+                <Route path="/whatsapp" element={<WhatsAppRedirect />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
           </BrowserRouter>

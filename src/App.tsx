@@ -13,7 +13,7 @@ const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
 
 // Loading component
 const PageLoader = () => (
-  <div className="absolute inset-0 flex flex-col items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.85)' }}>
+  <div className="absolute inset-0 flex flex-col items-center justify-center z-[70]" style={{ background: 'rgba(0,0,0,0.85)' }}>
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mx-auto" />
           <p className="text-muted-foreground font-mono mt-6">Loading...</p>
         </div>

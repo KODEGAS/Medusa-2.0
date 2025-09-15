@@ -150,7 +150,7 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
             Complete Your Registration
           </CardTitle>
           <CardDescription className="text-lg">
-            Team: {teamInfo.teamName} • {members.length + 1} members • LKR {registrationFee} total
+            Team: {teamInfo.teamName} • {members.length + 1} members • LKR {registrationFee} 
           </CardDescription>
         </CardHeader>
 

@@ -11,14 +11,94 @@ export const Header = () => {
 
   useEffect(() => {
     const fetchIP = async () => {
-      try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        setUserIP(data.ip);
-      } catch (error) {
-        console.error('Failed to fetch IP:', error);
-        setUserIP("Unable to fetch");
+      // List of IP detection services to try in order
+      const ipServices = [
+        'https://api.ipify.org?format=json',
+        'https://api64.ipify.org?format=json',
+        'https://ipapi.co/json/',
+        'https://ipinfo.io/json',
+        'https://api.my-ip.io/ip.json',
+        'https://ip-api.com/json/',
+        'https://httpbin.org/ip'
+      ];
+
+      for (const service of ipServices) {
+        try {
+          console.log(`Trying IP service: ${service}`);
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+          
+          const response = await fetch(service, {
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache'
+            }
+          });
+          
+          clearTimeout(timeoutId);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log(`IP service response:`, data);
+          
+          // Different services return IP in different formats
+          let ip = '';
+          if (data.ip) ip = data.ip;
+          else if (data.origin) ip = data.origin; // httpbin format
+          else if (data.query) ip = data.query; // ip-api format
+          else if (typeof data === 'string') ip = data;
+          
+          if (ip) {
+            console.log(`Successfully fetched IP: ${ip}`);
+            setUserIP(ip);
+            return; // Success, exit the loop
+          }
+        } catch (error) {
+          console.warn(`Failed to fetch IP from ${service}:`, error);
+          continue; // Try next service
+        }
       }
+      
+      // If all services fail, try to get approximate location info
+      try {
+        console.log('All IP services failed, trying browser geolocation...');
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              setUserIP(`~${position.coords.latitude.toFixed(2)},${position.coords.longitude.toFixed(2)}`);
+            },
+            (error) => {
+              console.warn('Geolocation failed:', error);
+              setUserIP(getDeviceInfo());
+            },
+            { timeout: 3000 }
+          );
+        } else {
+          setUserIP(getDeviceInfo());
+        }
+      } catch (error) {
+        console.error('All IP detection methods failed:', error);
+        setUserIP(getDeviceInfo());
+      }
+    };
+    
+    // Helper function to get device/browser info as fallback
+    const getDeviceInfo = () => {
+      const ua = navigator.userAgent;
+      if (ua.includes('Mac') || ua.includes('iPhone') || ua.includes('iPad')) {
+        return ua.includes('Safari') && !ua.includes('Chrome') ? '🍎 Safari' : '🍎 Mac';
+      } else if (ua.includes('Windows')) {
+        return '🖥️ Windows';
+      } else if (ua.includes('Android')) {
+        return '🤖 Android';
+      } else if (ua.includes('Linux')) {
+        return '🐧 Linux';
+      }
+      return '🌐 Protected';
     };
     
     fetchIP();
@@ -89,12 +169,24 @@ export const Header = () => {
                     <div className="flex items-center gap-2 px-3 py-1 bg-card/50 rounded-lg border border-border/50 cursor-pointer hover:bg-card/70 transition-colors">
                       <Wifi className="w-4 h-4 text-primary" />
                       <span className="text-xs font-mono text-muted-foreground">
-                        IP: {userIP}
+                        {userIP.includes('🍎') || userIP.includes('🖥️') || userIP.includes('🤖') || userIP.includes('🐧') || userIP.includes('🌐') 
+                          ? `Device: ${userIP}` 
+                          : userIP.includes('~') 
+                            ? `Location: ${userIP}` 
+                            : `IP: ${userIP}`
+                        }
                       </span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-destructive border-destructive text-destructive-foreground font-mono text-sm">
-                    <p>Medusa is watching on you...</p>
+                  <TooltipContent className="bg-destructive border-destructive text-destructive-foreground font-mono text-sm max-w-xs">
+                    <p>Medusa is watching you...</p>
+                    {userIP.includes('🍎') || userIP.includes('🖥️') || userIP.includes('🤖') || userIP.includes('🐧') || userIP.includes('🌐') ? (
+                      <p className="text-xs mt-1 opacity-80">Privacy settings detected</p>
+                    ) : userIP.includes('~') ? (
+                      <p className="text-xs mt-1 opacity-80">Approximate location</p>
+                    ) : (
+                      <p className="text-xs mt-1 opacity-80">Network detected</p>
+                    )}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

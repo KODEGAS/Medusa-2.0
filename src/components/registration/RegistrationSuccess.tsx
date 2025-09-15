@@ -64,10 +64,7 @@ export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: Registra
                   <Users className="w-4 h-4 mr-3 text-primary" />
                   Team size: {teamInfo.memberCount} members
                 </div>
-                <div className="flex items-center text-sm font-mono">
-                  <CheckCircle className="w-4 h-4 mr-3 text-primary" />
-                  Confirmation sent to {teamInfo.leaderEmail}
-                </div>
+          
               </div>
             </div>
 
@@ -100,12 +97,7 @@ export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: Registra
               )}
             </div>
           )}
-          <div className="mt-8 p-4 bg-primary/10 border border-primary/20 rounded-lg">
-            <p className="text-sm font-mono text-muted-foreground">
-              <strong className="text-primary">Next Steps:</strong> Check your email for further instructions and event details. 
-              The competition schedule and platform access will be shared closer to the event date.
-            </p>
-          </div>
+
         </Card>
       </div>
     </section>

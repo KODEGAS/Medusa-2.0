@@ -3,17 +3,37 @@ import { Mail, Phone, MapPin, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { hasIncompleteRegistration, shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
 
 //profile images
 const anuka = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483245/anuka_f0fcxu.webp";
 const maleesha = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483272/maleesha_mrb9xs.webp";
 const kavindu = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483268/kavindu_vms68i.webp";
 const thivina = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483274/thivina_eiemsn.webp";
-const movini = "https://res.cloudinary.com/du5tkpcut/image/upload/v1757866707/img13_ifelhc.jpg";
+const movini = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757866707/img13_ifelhc.jpg";
 const savithi = "https://res.cloudinary.com/du5tkpcut/image/upload/w_150,q_70/v1757483273/savithi_axapnj.webp";
 
 export const ContactUsSection = () => {
   const navigate = useNavigate();
+  
+  const handleGetStartedClick = () => {
+    // Check if user should be redirected to CTF challenge first
+    if (shouldRedirectToCtf()) {
+      // First-time visitor - redirect to CTF challenge
+      window.location.href = getCtfChallengeUrl();
+      return;
+    }
+    
+    // User has completed CTF, proceed to registration
+    if (hasIncompleteRegistration()) {
+      // User has saved data, navigate to registration page
+      window.location.href = "/7458c148293e2f70830e369ace8d3b9c";
+    } else {
+      // No saved data, navigate to registration page normally
+      window.location.href = "/7458c148293e2f70830e369ace8d3b9c";
+    }
+  };
+
   const committeeMembers = [
     {
       position: "President (ECSC)",
@@ -198,11 +218,14 @@ export const ContactUsSection = () => {
             variant="cyber"
             size="lg"
             className="text-lg px-8 py-6"
-            asChild
+            onClick={handleGetStartedClick}
           >
-            <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">
-              Get Started Now
-            </a>
+            {shouldRedirectToCtf() 
+              ? "Get Started Now" 
+              : hasIncompleteRegistration() 
+                ? "Continue Registration" 
+                : "Get Started Now"
+            }
           </Button>
         </div>
       </div>

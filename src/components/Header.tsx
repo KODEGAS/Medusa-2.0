@@ -101,7 +101,7 @@ export const Header = () => {
             )}
             <Button variant="cyber" size="sm" onClick={handleRegisterClick}>
               {shouldRedirectToCtf() 
-                ? "Start Challenge" 
+                ? "Register Now" 
                 : hasIncompleteRegistration() 
                   ? "Continue Registration" 
                   : "Register Now"

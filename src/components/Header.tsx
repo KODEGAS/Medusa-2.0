@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Menu, X, Users, Calendar, Award, Phone, Wifi } from "lucide-react";
+import { Menu, X, Calendar, Award, Phone, Wifi } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
 import { hasIncompleteRegistration, shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
 
@@ -107,16 +107,56 @@ export const Header = () => {
   const navItems = [
     { name: "About", href: "#about", icon: Award },
     { name: "Timeline", href: "#timeline", icon: Calendar },
-    { name: "Partners", href: "#partners", icon: Users },
     { name: "Contact", href: "#contact", icon: Phone },
   ];
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    console.log(`Attempting to navigate to: ${href}`);
+    
+    // Close mobile menu first
     setIsMenuOpen(false);
+    
+    // Wait a bit for menu to close, then scroll
+    setTimeout(() => {
+      const element = document.querySelector(href);
+      console.log(`Element found for ${href}:`, element);
+      
+      if (element) {
+        // Calculate scroll position with header offset
+        const headerOffset = 100; // Increased offset for better spacing
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerOffset;
+        
+        console.log(`Scrolling to position: ${offsetPosition}`);
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      } else {
+        console.log(`Element not found immediately, retrying in 500ms...`);
+        // If element not found, try again after a longer delay (for lazy loading)
+        setTimeout(() => {
+          const retryElement = document.querySelector(href);
+          console.log(`Retry element found for ${href}:`, retryElement);
+          
+          if (retryElement) {
+            const headerOffset = 100;
+            const elementPosition = retryElement.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - headerOffset;
+            
+            console.log(`Retry scrolling to position: ${offsetPosition}`);
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth"
+            });
+          } else {
+            console.warn(`Navigation target not found after retry: ${href}`);
+          }
+        }, 500);
+      }
+    }, 100);
   };
 
   const handleRegisterClick = () => {
@@ -143,7 +183,15 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <img src={logoWhite} alt="Medusa Logo" className="w-24 h-24 object-contain" />
+            <img 
+              src={logoWhite} 
+              alt="Medusa Logo" 
+              className="w-24 h-24 object-contain cursor-pointer hover:scale-105 transition-transform duration-300" 
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                setIsMenuOpen(false);
+              }}
+            />
           </div>
 
           {/* Desktop Navigation */}
@@ -224,6 +272,22 @@ export const Header = () => {
                   {item.name}
                 </button>
               ))}
+              {/* Mobile Register Button */}
+              <div className="pt-4 border-t border-border">
+                <Button 
+                  variant="cyber" 
+                  size="sm" 
+                  onClick={handleRegisterClick}
+                  className="w-full"
+                >
+                  {shouldRedirectToCtf() 
+                    ? "Register Now" 
+                    : hasIncompleteRegistration() 
+                      ? "Continue Registration" 
+                      : "Register Now"
+                  }
+                </Button>
+              </div>
             </nav>
           </div>
         )}

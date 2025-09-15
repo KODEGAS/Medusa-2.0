@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
 
+// Import partner logos from assets
+import hashxLogo from "@/assets/partners/hashx.png";
+import dailyLogo from "@/assets/partners/daily.png";
+import nadulaLogo from "@/assets/partners/nadula.jpg";
+
 export const PartnersSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -19,20 +24,27 @@ export const PartnersSection = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Placeholder partners 
+  // Partners with image assets
   const partners = [
-    { name: "HashX", logo: "HX" },
-    { name: "Daily Mirror", logo: "DM" },
-    { name: "HackSL", logo: "HS" },
-    { name: "AWS Club", logo: "AC" },
-    { name: "Nadula Wathurakumbura PhotoGraphy", logo: "NW" },
-    
+    { 
+      name: "HashX", 
+      logo: hashxLogo,
+      fallback: "HX" 
+    },
+    { 
+      name: "Daily Mirror", 
+      logo: dailyLogo,
+      fallback: "DM" 
+    },
+    { 
+      name: "Nadula Wathurakumbura PhotoGraphy", 
+      logo: nadulaLogo,
+      fallback: "NW" 
+    },
   ];
 
   return (
     <section className="py-20 bg-background relative overflow-hidden">
-      {/* Background Effect */}
-  {/* <div className="absolute inset-0 cyber-grid opacity-10" /> */}
       
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
@@ -57,13 +69,36 @@ export const PartnersSection = () => {
             {[...partners, ...partners, ...partners].map((partner, index) => (
               <div
                 key={`${partner.name}-${index}`}
-                className="flex-shrink-0 holographic-card p-8 rounded-lg min-w-[200px] h-32 flex items-center justify-center group"
+                className="flex-shrink-0 holographic-card rounded-lg min-w-[200px] h-32 group hover:scale-105 transition-all duration-300 overflow-hidden relative"
               >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-cyber rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-orbitron font-bold text-background group-hover:animate-pulse-glow transition-all duration-300">
-                    {partner.logo}
+                {/* Logo as cover image */}
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <img
+                    src={partner.logo}
+                    alt={`${partner.name} logo`}
+                    className="w-full h-full object-contain group-hover:scale-105 filter brightness-90 group-hover:brightness-110 transition-all duration-300"
+                    onError={(e) => {
+                      // Fallback to text logo if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallbackDiv = target.nextElementSibling as HTMLDivElement;
+                      if (fallbackDiv) {
+                        fallbackDiv.style.display = 'flex';
+                      }
+                    }}
+                  />
+                  {/* Fallback text logo (hidden by default) */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-cyber rounded-lg hidden items-center justify-center text-2xl font-orbitron font-bold text-background"
+                    style={{ display: 'none' }}
+                  >
+                    {partner.fallback}
                   </div>
-                  <p className="text-sm font-mono text-muted-foreground group-hover:text-primary transition-colors">
+                </div>
+                
+                {/* Partner name overlay */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-3">
+                  <p className="text-xs font-mono text-white group-hover:text-primary transition-colors truncate">
                     {partner.name}
                   </p>
                 </div>

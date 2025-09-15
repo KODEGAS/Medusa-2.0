@@ -40,7 +40,7 @@ export const RegistrationSuccess = ({ teamInfo, members, paymentInfo }: Registra
               variant="cyber" 
               size="lg" 
               className="mx-auto"
-              onClick={() => window.open('https://whatsapp.com/channel/0029Vb6vhSBKrWQv83bWfR3q/94726677555', '_blank')}
+              onClick={() => window.open('https://chat.whatsapp.com/DPHxMpRfcBYB09nCGD0AdN?mode=ems_wa_c', '_blank')}
             >
               <MessageCircle className="w-5 h-5 mr-2" />
               Join WhatsApp Community

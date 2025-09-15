@@ -25,23 +25,13 @@ const Index = () => {
       <Header />
       <main className="pt-16">
         <HeroSection />
-        {/* Navigation anchor points - always in DOM */}
-        <div id="about" />
-        <div id="timeline" />
-        <div id="prizes" />
-        <div id="previous-events" />
-        <div id="medusa" />
-        <div id="partners" />
-        <div id="contact" />
-        
         <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
-          <VirtualSection><AboutSection /></VirtualSection>
-          <VirtualSection><TimelineSection /></VirtualSection>
+          <div id="about"><VirtualSection><AboutSection /></VirtualSection></div>
+          <div id="timeline"><VirtualSection><TimelineSection /></VirtualSection></div>
           <VirtualSection><PrizePoolSection /></VirtualSection>
           <VirtualSection><PreviousEventsSection /></VirtualSection>
           <VirtualSection><MedusaShowcase /></VirtualSection>
-          <VirtualSection><PartnersSection /></VirtualSection>
-          <VirtualSection><ContactUsSection /></VirtualSection>
+          <div id="contact"><VirtualSection><ContactUsSection /></VirtualSection></div>
         </Suspense>
         <div id="register" className="flex justify-center py-8">
           {/* Registration CTA or form can go here */}

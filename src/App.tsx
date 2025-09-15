@@ -70,7 +70,6 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/7458c148293e2f70830e369ace8d3b9c" element={<RegistrationPage />} />
-                
                 <Route path="/linkedin" element={<LinkedInRedirect />} />
                 <Route path="/facebook" element={<FacebookRedirect />} />
                 <Route path="/whatsapp" element={<WhatsAppRedirect />} />

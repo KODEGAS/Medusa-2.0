@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Challenge Flow Demo</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #111;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a1a1a;
+            border-left: 4px solid #00ff00;
+        }
+        .button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .danger {
+            color: #ff4444;
+            border-left-color: #ff4444;
+        }
+        .info {
+            color: #4444ff;
+            border-left-color: #4444ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Medusa 2.0 CTF Challenge Flow Demo</h1>
+        
+        <div class="step">
+            <h3>📋 How the CTF Flow Works:</h3>
+            <ol>
+                <li><strong>First Visit:</strong> When users click "Start Challenge", they get redirected to the CTF challenge website</li>
+                <li><strong>CTF Completion:</strong> After completing the challenge, users are redirected back to registration</li>
+                <li><strong>Registration:</strong> Users can fill out the registration form</li>
+                <li><strong>Persistence:</strong> If they close the browser and return, they skip the CTF and go directly to their saved progress</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🧪 Test the Flow:</h3>
+            <p>Click the buttons below to simulate different user states:</p>
+            
+            <a href="javascript:localStorage.clear(); location.reload();" class="button danger">
+                Clear All Data (Reset to First Visit)
+            </a>
+            
+            <a href="javascript:localStorage.setItem('medusa-ctf-completed', 'true'); location.reload();" class="button">
+                Simulate CTF Completed
+            </a>
+            
+            <a href="javascript:localStorage.setItem('medusa-registration-data', JSON.stringify({teamInfo: {teamName: 'Test Team'}, members: [], currentStep: 2, timestamp: Date.now(), ctfCompleted: true})); location.reload();" class="button info">
+                Simulate Incomplete Registration
+            </a>
+        </div>
+
+        <div class="step">
+            <h3>📊 Current Status:</h3>
+            <div id="status"></div>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Go to Medusa Site:</h3>
+            <a href="http://localhost:8081/" class="button">
+                Open Medusa Homepage
+            </a>
+            
+            <a href="http://localhost:8081/7458c148293e2f70830e369ace8d3b9c" class="button">
+                Go Directly to Registration
+            </a>
+            
+            <a href="http://localhost:8081/7458c148293e2f70830e369ace8d3b9c?from_ctf=true" class="button">
+                Simulate Return from CTF
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            const ctfCompleted = localStorage.getItem('medusa-ctf-completed') === 'true';
+            const registrationData = localStorage.getItem('medusa-registration-data');
+            const hasRegistration = registrationData !== null;
+            
+            let status = '<ul>';
+            status += `<li>CTF Completed: <strong>${ctfCompleted ? '✅ YES' : '❌ NO'}</strong></li>`;
+            status += `<li>Has Registration Data: <strong>${hasRegistration ? '✅ YES' : '❌ NO'}</strong></li>`;
+            
+            if (hasRegistration) {
+                try {
+                    const data = JSON.parse(registrationData);
+                    status += `<li>Current Step: <strong>${data.currentStep}</strong></li>`;
+                    status += `<li>Team Name: <strong>${data.teamInfo?.teamName || 'Not set'}</strong></li>`;
+                } catch (e) {
+                    status += `<li>Registration Data: <strong>⚠️ CORRUPTED</strong></li>`;
+                }
+            }
+            
+            status += '</ul>';
+            
+            // Determine expected behavior
+            status += '<h4>Expected Behavior:</h4>';
+            if (!ctfCompleted && !hasRegistration) {
+                status += '<p style="color: #ffaa00;">🔄 First-time visitor → Will redirect to CTF challenge</p>';
+            } else if (ctfCompleted && !hasRegistration) {
+                status += '<p style="color: #00ff00;">✅ CTF completed → Will go to registration form</p>';
+            } else if (hasRegistration) {
+                status += '<p style="color: #4444ff;">📋 Has saved data → Will continue registration from saved step</p>';
+            }
+            
+            document.getElementById('status').innerHTML = status;
+        }
+        
+        updateStatus();
+        
+        // Update status every second
+        setInterval(updateStatus, 1000);
+    </script>
+</body>
+</html>

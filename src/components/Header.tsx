@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Menu, X, Users, Calendar, Award, Phone, Wifi } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
+import { hasIncompleteRegistration, shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,6 +37,24 @@ export const Header = () => {
       element.scrollIntoView({ behavior: "smooth" });
     }
     setIsMenuOpen(false);
+  };
+
+  const handleRegisterClick = () => {
+    // Check if user should be redirected to CTF challenge first
+    if (shouldRedirectToCtf()) {
+      // First-time visitor - redirect to CTF challenge
+      window.location.href = getCtfChallengeUrl();
+      return;
+    }
+    
+    // User has completed CTF, proceed to registration
+    if (hasIncompleteRegistration()) {
+      // User has saved data, navigate to registration page
+      window.location.href = "/7458c148293e2f70830e369ace8d3b9c";
+    } else {
+      // No saved data, navigate to registration page normally
+      window.location.href = "/7458c148293e2f70830e369ace8d3b9c";
+    }
   };
 
   return (
@@ -80,8 +99,13 @@ export const Header = () => {
                 </Tooltip>
               </TooltipProvider>
             )}
-            <Button variant="cyber" size="sm" asChild>
-              <a href="https://medusa-ctf-production.azurewebsites.net/" target="_blank" rel="noopener noreferrer">Register Now</a>
+            <Button variant="cyber" size="sm" onClick={handleRegisterClick}>
+              {shouldRedirectToCtf() 
+                ? "Start Challenge" 
+                : hasIncompleteRegistration() 
+                  ? "Continue Registration" 
+                  : "Register Now"
+              }
             </Button>
           </div>
 

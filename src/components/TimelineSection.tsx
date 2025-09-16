@@ -198,11 +198,11 @@ const TimelineSection = () => {
            
               <button 
                 onClick={() => {
-                  window.open('https://drive.google.com/file/d/12u17zxZLJWaSpoP5RT8oGxiogWgBUhwl/view', '_blank');
+                  window.open('https://drive.google.com/file/d/1T78TrqqczMdD4zGxL9Vb5c4V5PpRjJke/view', '_blank');
                 }}
                 className="px-8 py-3 border-2 border-accent text-accent font-mono rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-300"
               >
-                Download Rules
+                Delegate Book
               </button>
             </div>
           </div>

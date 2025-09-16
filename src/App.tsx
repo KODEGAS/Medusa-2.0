@@ -28,7 +28,7 @@ const WhatsAppRedirect = () => {
 };
 
 const DelegateBookRedirect = () => {
-  window.location.href = "https://drive.google.com/file/d/12u17zxZLJWaSpoP5RT8oGxiogWgBUhwl/view";
+  window.location.href = "https://drive.google.com/file/d/1T78TrqqczMdD4zGxL9Vb5c4V5PpRjJke/view";
   return null;
 };
 

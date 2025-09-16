@@ -157,6 +157,16 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
         <CardContent className="space-y-6">
           {/* Only upload payment slip option remains */}
           <div className="space-y-6">
+              {/* 24-hour requirement notice */}
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-orange-800">
+                  <span className="text-lg">⏰</span>
+                  <p className="font-medium text-sm">
+                    <strong>Important:</strong> Payment receipt must be uploaded within 24 hours of registration to secure your spot.
+                  </p>
+                </div>
+              </div>
+
               <div className="border-2 border-dashed border-primary/30 rounded-lg p-8 text-center">
                 <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <div className="space-y-2">
@@ -196,6 +206,7 @@ export const PaymentStep = ({ teamInfo, members, onComplete, onBack }: PaymentSt
                   <li>• Transfer LKR 3000 to the above bank account</li>
                   <li>• Include your team name "{teamInfo.teamName}" in the reference</li>
                   <li>• Upload a clear photo/scan of your payment receipt</li>
+                  <li className="text-orange-600 font-medium">• ⏰ Upload payment receipt within 24 hours of registration</li>
                 </ul>
               </div>
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { markCtfCompleted } from "@/lib/registrationStorage";
 
 interface CtfHandlerProps {
@@ -6,7 +6,12 @@ interface CtfHandlerProps {
 }
 
 export const CtfHandler = ({ onCtfCompleted }: CtfHandlerProps) => {
+  const [hasNotified, setHasNotified] = useState(false);
+
   useEffect(() => {
+    // Don't run if we've already notified
+    if (hasNotified) return;
+
     // Check if user is coming from CTF challenge
     const urlParams = new URLSearchParams(window.location.search);
     const fromCtf = urlParams.get('from_ctf');
@@ -25,12 +30,13 @@ export const CtfHandler = ({ onCtfCompleted }: CtfHandlerProps) => {
         window.history.replaceState({}, document.title, newUrl);
       }
       
-      // Notify parent component if callback provided
+      // Notify parent component if callback provided (only once)
       if (onCtfCompleted) {
         onCtfCompleted();
+        setHasNotified(true);
       }
     }
-  }, [onCtfCompleted]);
+  }, [onCtfCompleted, hasNotified]);
 
   return null; // This component doesn't render anything
 };

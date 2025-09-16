@@ -39,6 +39,7 @@ export const RegistrationForm = () => {
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [ctfNotificationShown, setCtfNotificationShown] = useState(false);
   const { toast } = useToast();
 
   // Load saved registration data on component mount
@@ -99,11 +100,15 @@ export const RegistrationForm = () => {
   };
 
   const handleCtfCompleted = () => {
-    toast({
-      title: "CTF Challenge Completed!",
-      description: "Welcome back! You can now proceed with your registration.",
-      duration: 5000,
-    });
+    // Only show notification if it hasn't been shown already
+    if (!ctfNotificationShown) {
+      toast({
+        title: "CTF Challenge Completed!",
+        description: "Welcome back! You can now proceed with your registration.",
+        duration: 5000,
+      });
+      setCtfNotificationShown(true);
+    }
   };
 
   // Show loading state while checking localStorage

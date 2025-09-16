@@ -104,7 +104,7 @@ export const RegistrationForm = () => {
     if (!ctfNotificationShown) {
       toast({
         title: "CTF Challenge Completed!",
-        description: "Welcome back! You can now proceed with your registration.",
+        description: "You can now proceed with your registration.",
         duration: 5000,
       });
       setCtfNotificationShown(true);

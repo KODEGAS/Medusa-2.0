@@ -118,7 +118,7 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
     };
 
     try {
-      const response = await fetch("https://medusa-backend-1081502718638.us-central1.run.app/api/team", {
+      const response = await fetch("https://medusa-backend-new-1081502718638.us-central1.run.app/api/team", {
         method: "POST",
         headers: getSecurityHeaders(),
         body: JSON.stringify(teamData)

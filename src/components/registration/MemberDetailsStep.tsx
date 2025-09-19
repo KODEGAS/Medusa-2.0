@@ -8,12 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Shield, User } from "lucide-react";
 import { TeamInfo, MemberInfo } from "../RegistrationForm";
 import {
-    sanitizeMemberInfo,
-    validateEmail,
-    validatePhone,
-    validateName,
-    checkRateLimit,
-    getSecurityHeaders
+  sanitizeMemberInfo,
+  validateEmail,
+  validatePhone,
+  validateName,
+  checkRateLimit,
+  getSecurityHeaders
 } from "@/lib/sanitization";
 
 interface MemberDetailsStepProps {
@@ -106,6 +106,9 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
     const teamData = {
       teamName: teamInfo.teamName,
       university: teamInfo.university,
+      leaderName: teamInfo.leaderName,
+      leaderEmail: teamInfo.leaderEmail,
+      leaderPhone: teamInfo.leaderPhone,
       members: sanitizedMembers.map(m => ({
         name: m.name,
         email: m.email,

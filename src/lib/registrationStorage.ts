@@ -91,7 +91,6 @@ export const clearCtfCompletion = () => {
 };
 
 export const shouldRedirectToCtf = (): boolean => {
-  // If user has completed CTF or has incomplete registration, don't redirect
   return !getCtfCompletionStatus() && !hasIncompleteRegistration();
 };
 

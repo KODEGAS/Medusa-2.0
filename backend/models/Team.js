@@ -4,8 +4,8 @@ const memberSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
-  position: String,
-  university: String,
+  year: String,
+  isLeader: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

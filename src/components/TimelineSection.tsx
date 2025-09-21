@@ -19,7 +19,7 @@ const events = [
    {
     id: 3,
     title: "Awareness Session",
-    date: "October 17, 2024",
+    date: "October 17, 2025",
     time: "7:00 PM",
     description: "Introduction to CTF challenges and Compition Rules",
     icon: Users,
@@ -29,7 +29,7 @@ const events = [
   {
     id: 4,
     title: "Round 1: Qualifiers",
-    date: "October 25, 2024",
+    date: "October 25, 2025",
     time: "6 Hours",
     description: "Online qualifying round for top university teams",
     icon: Clock,

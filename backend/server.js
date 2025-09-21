@@ -8,7 +8,18 @@ import paymentRoutes from './routes/payment.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// CORS configuration for production
+const corsOptions = {
+  origin: [
+    'https://medusa.ecsc-uok.com',
+    'https://www.medusa.ecsc-uok.com'
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 
@@ -20,7 +31,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/team', teamRoutes);
 app.use('/api/payment', paymentRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })

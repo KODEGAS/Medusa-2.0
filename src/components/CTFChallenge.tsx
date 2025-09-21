@@ -16,7 +16,7 @@ export function CtfChallenge({ onSuccess }: CtfChallengeProps) {
         setIsSuccess(false);
 
         try {
-            const response = await fetch('http://localhost:3001/api/solve-challenge', {
+            const response = await fetch('https://medusa-backend-1081502718638.us-central1.run.app/api/solve-challenge', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),

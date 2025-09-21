@@ -34,11 +34,23 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
     expectations: ""
   });
   const [otherUniversity, setOtherUniversity] = useState("");
+  const [showOtherUniversity, setShowOtherUniversity] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (field: keyof TeamInfo, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'university') {
+      if (value === 'Other') {
+        setShowOtherUniversity(true);
+        setFormData(prev => ({ ...prev, [field]: value as string }));
+      } else {
+        setShowOtherUniversity(false);
+        setOtherUniversity('');
+        setFormData(prev => ({ ...prev, [field]: value as string }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
     
     // Clear validation error when user starts typing
     if (validationErrors[field]) {
@@ -48,7 +60,6 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
 
   const handleOtherUniversityChange = (value: string) => {
     setOtherUniversity(value);
-    setFormData(prev => ({ ...prev, university: value }));
   };
 
   const validateForm = (data: TeamInfo): boolean => {
@@ -98,9 +109,10 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
     }
 
     // Sanitize form data
+    const finalUniversity = showOtherUniversity ? otherUniversity : formData.university;
     const sanitizedData = sanitizeTeamInfo({
       ...formData,
-      university: formData.university === "Other" ? otherUniversity : formData.university
+      university: finalUniversity
     });
 
     // Validate sanitized data
@@ -188,7 +200,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                 <option value="The Open University of Sri Lanka">The Open University of Sri Lanka</option>
                 <option value="Other">Other</option>
               </select>
-              {formData.university === "Other" && (
+              {showOtherUniversity && (
                 <Input
                   id="other-university"
                   type="text"

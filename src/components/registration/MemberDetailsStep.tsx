@@ -103,22 +103,35 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
     setIsSubmitting(true);
 
     // Prepare team data for API with sanitized inputs
+    // Include leader as the first member in the members array
+    const leaderAsMember = {
+      name: teamInfo.leaderName,
+      email: teamInfo.leaderEmail,
+      phone: teamInfo.leaderPhone,
+      year: "Leader", // Special designation for leader
+      isLeader: true
+    };
+
     const teamData = {
       teamName: teamInfo.teamName,
       university: teamInfo.university,
       leaderName: teamInfo.leaderName,
       leaderEmail: teamInfo.leaderEmail,
       leaderPhone: teamInfo.leaderPhone,
-      members: sanitizedMembers.map(m => ({
-        name: m.name,
-        email: m.email,
-        phone: m.phone,
-        year: m.year
-      }))
+      members: [
+        leaderAsMember, // Leader as first member
+        ...sanitizedMembers.map(m => ({
+          name: m.name,
+          email: m.email,
+          phone: m.phone,
+          year: m.year,
+          isLeader: false
+        }))
+      ]
     };
 
     try {
-      const response = await fetch("https://medusa-backend-new-1081502718638.us-central1.run.app/api/team", {
+      const response = await fetch("https://medusa-backend-1081502718638.us-central1.run.app/api/team", {
         method: "POST",
         headers: getSecurityHeaders(),
         body: JSON.stringify(teamData)
@@ -143,7 +156,6 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
       
       onComplete(sanitizedMembers);
     } catch (error) {
-      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: error instanceof Error ? error.message : "An error occurred. Please try again.",
@@ -157,7 +169,7 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
   return (
     <Card className="holographic-card backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-3xl font-orbitron text-center text-primary glow-text">
+        <CardTitle className="text-3xl font-orbitron text-center text-primary">
           Member Details
         </CardTitle>
         <div className="flex justify-center gap-2 mt-4">
@@ -183,7 +195,7 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                 <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-primary" />
                 </div>
-                <h3 className="text-xl font-orbitron font-bold text-secondary glow-text">
+                <h3 className="text-xl font-orbitron font-bold text-secondary ">
                   Member {index + 2}
                 </h3>
               </div>

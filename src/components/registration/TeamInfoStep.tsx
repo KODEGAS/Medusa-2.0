@@ -172,7 +172,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="university" className="text-foreground font-mono">
-                University *
+                Institution *
               </Label>
               <select
                 id="university"
@@ -183,21 +183,37 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                 onFocus={() => setFocusedField("university")}
                 onBlur={() => setFocusedField(null)}
               >
-                <option value="">Select your university</option>
-                <option value="University of Kelaniya">University of Kelaniya</option>
-                <option value="University of Colombo">University of Colombo</option>
-                <option value="University of Moratuwa">University of Moratuwa</option>
-                <option value="University of Peradeniya">University of Peradeniya</option>
-                <option value="University of Sri Jayawardenapura">University of Sri Jayawardenapura</option>
-                <option value="University of Ruhuna">University of Ruhuna</option>
-                <option value="University of Jaffna">University of Jaffna</option>
-                <option value="Sabaragamuwa University of Sri Lanka">Sabaragamuwa University of Sri Lanka</option>
-                <option value="SLTC">SLTC</option>
-                <option value="SLIIT">SLIIT</option>
-                <option value="IIT">IIT</option>
-                <option value="KDU">KDU</option>
-                <option value="APIIT">APIIT</option>
-                <option value="The Open University of Sri Lanka">The Open University of Sri Lanka</option>
+                <option value="">Select your institution</option>
+                <optgroup label="Universities">
+                  <option value="University of Kelaniya">University of Kelaniya</option>
+                  <option value="University of Colombo">University of Colombo</option>
+                  <option value="University of Moratuwa">University of Moratuwa</option>
+                  <option value="University of Peradeniya">University of Peradeniya</option>
+                  <option value="University of Sri Jayawardenapura">University of Sri Jayawardenapura</option>
+                  <option value="University of Ruhuna">University of Ruhuna</option>
+                  <option value="University of Jaffna">University of Jaffna</option>
+                  <option value="Sabaragamuwa University of Sri Lanka">Sabaragamuwa University of Sri Lanka</option>
+                  <option value="The Open University of Sri Lanka">The Open University of Sri Lanka</option>
+                </optgroup>
+                <optgroup label="Private Institutes">
+                  <option value="SLTC">SLTC</option>
+                  <option value="SLIIT">SLIIT</option>
+                  <option value="IIT">IIT</option>
+                  <option value="KDU">KDU</option>
+                  <option value="APIIT">APIIT</option>
+                </optgroup>
+                <optgroup label="Schools">
+                  <option value="Royal College">Royal College</option>
+                  <option value="Trinity College Kandy">Trinity College Kandy</option>
+                  <option value="St. Joseph's College">St. Joseph's College</option>
+                  <option value="Ananda College">Ananda College</option>
+                  <option value="Nalanda College">Nalanda College</option>
+                  <option value="D.S. Senanayake College">D.S. Senanayake College</option>
+                  <option value="Visakha Vidyalaya">Visakha Vidyalaya</option>
+                  <option value="Ladies' College">Ladies' College</option>
+                  <option value="Methodist College">Methodist College</option>
+                  <option value="St. Thomas' College">St. Thomas' College</option>
+                </optgroup>
                 <option value="Other">Other</option>
               </select>
               {showOtherUniversity && (
@@ -212,7 +228,7 @@ export const TeamInfoStep = ({ onComplete }: TeamInfoStepProps) => {
                   className={`font-mono transition-all duration-300 mt-2 ${
                     focusedField === "other-university" ? "neon-border" : ""
                   }`}
-                  placeholder="Enter your university name"
+                  placeholder="Enter your institution name"
                 />
               )}
             </div>

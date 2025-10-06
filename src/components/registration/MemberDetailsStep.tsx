@@ -278,11 +278,19 @@ export const MemberDetailsStep = ({ teamInfo, onComplete, onBack }: MemberDetail
                     onChange={(e) => handleMemberChange(index, "year", e.target.value)}
                     className="w-full px-3 py-2 bg-input border border-border rounded-md font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <option value="">Select year</option>
-                    <option value="1st Year">1st Year</option>
-                    <option value="2nd Year">2nd Year</option>
-                    <option value="3rd Year">3rd Year</option>
-                    <option value="4th Year">4th Year</option>
+                    <option value="">Select year of study</option>
+                    <optgroup label="School Years">
+                      <option value="Grade 12">Grade 12</option>
+                      <option value="Grade 13">Grade 13 (A/L)</option>
+                    </optgroup>
+                    <optgroup label="University/College Years">
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year">3rd Year</option>
+                      <option value="4th Year">4th Year</option>
+                      <option value="5th Year">5th Year</option>
+                      <option value="Graduate">Graduate</option>
+                    </optgroup>
                   </select>
                 </div>
               </div>

@@ -4,6 +4,17 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Menu, X, Calendar, Award, Phone, Wifi } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
 import { hasIncompleteRegistration, shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -159,22 +170,29 @@ export const Header = () => {
     }, 100);
   };
 
-  const handleRegisterClick = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const performRedirect = () => {
     // Check if user should be redirected to CTF challenge first
     if (shouldRedirectToCtf()) {
       // First-time visitor - redirect to CTF challenge
       window.location.href = getCtfChallengeUrl();
       return;
     }
-    
+
     // User has completed CTF, proceed to registration
-    if (hasIncompleteRegistration()) {
-      // User has saved data, navigate to registration page
-      window.location.href = "/7458c148293e2f70830e369ace8d3b9c";
-    } else {
-      // No saved data, navigate to registration page normally
-      window.location.href = "/7458c148293e2f70830e369ace8d3b9c";
+    window.location.href = "/7458c148293e2f70830e369ace8d3b9c";
+  };
+
+  const handleRegisterClick = () => {
+    // If the CTF redirect is required, open confirmation dialog first
+    if (shouldRedirectToCtf()) {
+      setIsDialogOpen(true);
+      return;
     }
+
+    // Otherwise proceed immediately
+    performRedirect();
   };
 
   return (
@@ -239,14 +257,40 @@ export const Header = () => {
                 </Tooltip>
               </TooltipProvider>
             )}
-            <Button variant="cyber" size="sm" onClick={handleRegisterClick}>
-              {shouldRedirectToCtf() 
-                ? "Register Now" 
-                : hasIncompleteRegistration() 
-                  ? "Continue Registration" 
-                  : "Register Now"
-              }
-            </Button>
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="cyber" size="sm" onClick={handleRegisterClick}>
+                  {shouldRedirectToCtf()
+                    ? "Register Now"
+                    : hasIncompleteRegistration()
+                      ? "Continue Registration"
+                      : "Register Now"
+                  }
+                </Button>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Task Required</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You will be redirected to a short task. Completing this task is required to finish the registration.
+                    Do you want to proceed?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      setIsDialogOpen(false);
+                      // Small timeout to allow dialog to close visually before redirect
+                      setTimeout(() => performRedirect(), 120);
+                    }}
+                  >
+                    Proceed
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
 
           {/* Mobile Menu Button */}
@@ -274,19 +318,23 @@ export const Header = () => {
               ))}
               {/* Mobile Register Button */}
               <div className="pt-4 border-t border-border">
-                <Button 
-                  variant="cyber" 
-                  size="sm" 
-                  onClick={handleRegisterClick}
-                  className="w-full"
-                >
-                  {shouldRedirectToCtf() 
-                    ? "Register Now" 
-                    : hasIncompleteRegistration() 
-                      ? "Continue Registration" 
-                      : "Register Now"
-                  }
-                </Button>
+                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="cyber"
+                      size="sm"
+                      onClick={handleRegisterClick}
+                      className="w-full"
+                    >
+                      {shouldRedirectToCtf()
+                        ? "Register Now"
+                        : hasIncompleteRegistration()
+                          ? "Continue Registration"
+                          : "Register Now"
+                      }
+                    </Button>
+                  </AlertDialogTrigger>
+                </AlertDialog>
               </div>
             </nav>
           </div>

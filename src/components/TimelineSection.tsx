@@ -9,14 +9,14 @@ const events = [
   {
     id: 2,
     title: "Close Registration",
-    date: "October 12, 2025",
+    date: "October 23, 2025",
     time: "12:00 AM",
     description: "Team registration and verification process ends",
     status: "upcoming",
     details: "Final deadline for team registration. No late entries will be accepted. Ensure all documents are submitted and verified before this date.",
     icon: Calendar
   },
-   {
+  {
     id: 3,
     title: "Awareness Session",
     date: "October 24, 2025",

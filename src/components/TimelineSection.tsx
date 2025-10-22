@@ -19,7 +19,7 @@ const events = [
   {
     id: 3,
     title: "Awareness Session",
-    date: "October 24, 2025",
+    date: "October 25, 2025",
     time: "7:00 PM",
     description: "Introduction to CTF challenges and Compition Rules",
     icon: Users,

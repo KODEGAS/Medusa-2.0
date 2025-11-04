@@ -35,6 +35,12 @@ const DelegateBookRedirect = () => {
   return null;
 };
 
+const AwarenessSessionRedirect = () => {
+  window.location.href = "https://zoom.us/j/96715243562?pwd=ap9xBgK9YPyGBsfz0raf7Chehu1HZF.1";
+  return null;
+};
+
+
 // Loading component
 const PageLoader = () => (
   <div className="absolute inset-0 flex flex-col items-center justify-center z-[70]" style={{ background: 'rgba(0,0,0,0.85)' }}>
@@ -79,6 +85,7 @@ const App = () => {
                 <Route path="/linkedin" element={<LinkedInRedirect />} />
                 <Route path="/facebook" element={<FacebookRedirect />} />
                 <Route path="/whatsapp" element={<WhatsAppRedirect />} />
+                <Route path="/awareness-session" element={<AwarenessSessionRedirect />} />
                 
                 {/* Delegate Book Redirect */}
                 <Route path="/delegate-book" element={<DelegateBookRedirect />} />

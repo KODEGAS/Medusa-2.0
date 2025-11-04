@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Menu, X, Calendar, Award, Phone, Wifi } from "lucide-react";
+import { Menu, X, Calendar, Award, Phone, Wifi, Flag, Shield } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
+import { useNavigate, useLocation } from "react-router-dom";
 import { hasIncompleteRegistration, shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
 import {
   AlertDialog,
@@ -19,6 +20,8 @@ import {
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userIP, setUserIP] = useState<string>("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchIP = async () => {
@@ -116,10 +119,24 @@ export const Header = () => {
   }, []);
 
   const navItems = [
-    { name: "About", href: "#about", icon: Award },
-    { name: "Timeline", href: "#timeline", icon: Calendar },
-    { name: "Contact", href: "#contact", icon: Phone },
+    { name: "About", href: "#about", icon: Award, type: "scroll" },
+    { name: "Timeline", href: "#timeline", icon: Calendar, type: "scroll" },
+    { name: "Round 1", href: "/round1-auth", icon: Shield, type: "route" },
+    { name: "Submit Flag", href: "/submit-flag", icon: Flag, type: "route" },
+    { name: "Contact", href: "#contact", icon: Phone, type: "scroll" },
   ];
+
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.type === "route") {
+      // Close mobile menu first
+      setIsMenuOpen(false);
+      // Navigate to route
+      navigate(item.href);
+    } else {
+      // Scroll to section
+      scrollToSection(item.href);
+    }
+  };
 
   const scrollToSection = (href: string) => {
     console.log(`Attempting to navigate to: ${href}`);
@@ -127,6 +144,19 @@ export const Header = () => {
     // Close mobile menu first
     setIsMenuOpen(false);
     
+    // If not on home page, navigate there first
+    if (location.pathname !== "/") {
+      navigate("/");
+      // Wait for navigation to complete before scrolling
+      setTimeout(() => {
+        scrollToElement(href);
+      }, 300);
+    } else {
+      scrollToElement(href);
+    }
+  };
+
+  const scrollToElement = (href: string) => {
     // Wait a bit for menu to close, then scroll
     setTimeout(() => {
       const element = document.querySelector(href);
@@ -217,7 +247,7 @@ export const Header = () => {
             {navItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => scrollToSection(item.href)}
+                onClick={() => handleNavClick(item)}
                 className="flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 group"
               >
                 <item.icon className="w-4 h-4 group-hover:text-primary transition-colors" />
@@ -309,7 +339,7 @@ export const Header = () => {
               {navItems.map((item) => (
                 <button
                   key={item.name}
-                  onClick={() => scrollToSection(item.href)}
+                  onClick={() => handleNavClick(item)}
                   className="flex items-center gap-3 text-sm font-mono text-muted-foreground hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-card"
                 >
                   <item.icon className="w-4 h-4" />

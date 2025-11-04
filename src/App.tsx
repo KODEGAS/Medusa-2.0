@@ -10,6 +10,9 @@ import poster from "./assets/poster.webp";
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
+const FlagSubmissionPage = lazy(() => import("./pages/FlagSubmissionPage"));
+const Round1Page = lazy(() => import("./pages/Round1Page"));
+const Round1Auth = lazy(() => import("./pages/Round1Auth"));
 
 // Social Media Redirect Components
 const LinkedInRedirect = () => {
@@ -70,6 +73,9 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/7458c148293e2f70830e369ace8d3b9c" element={<RegistrationPage />} />
+                <Route path="/submit-flag" element={<FlagSubmissionPage />} />
+                <Route path="/round1-auth" element={<Round1Auth />} />
+                <Route path="/round1" element={<Round1Page />} />
                 <Route path="/linkedin" element={<LinkedInRedirect />} />
                 <Route path="/facebook" element={<FacebookRedirect />} />
                 <Route path="/whatsapp" element={<WhatsAppRedirect />} />

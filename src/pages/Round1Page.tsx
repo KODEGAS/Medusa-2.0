@@ -7,6 +7,187 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 
+// Timed hints configuration and component
+const HINTS: Array<{ id: string; title: string; body: string; unlockOffsetMs: number }> = [
+  {
+    id: "h1",
+    title: '"What lies within the image?"',
+    body: "Files can carry more than their name suggests. Analyze the structure to find what's embedded within.",
+  unlockOffsetMs: 1 * 60 * 1000, // 1 minute (testing)
+  },
+  {
+    id: "h2",
+    title: '"When you find a lock, seek the winged one..."',
+    body: "In Greek tales, when Medusa fell, something magnificent took flight. That creature's name may unlock what you seek.",
+  unlockOffsetMs: 2 * 60 * 1000, // 2 minutes (testing)
+  },
+  {
+    id: "h3",
+    title: '"Not all that is written is plainly read..."',
+    body: "Ancient scribes encoded their secrets. If text appears as mystical symbols (base64), decode it. And remember: sometimes the path is reversed.",
+  unlockOffsetMs: 3 * 60 * 1000, // 3 minutes (testing)
+  },
+  {
+    id: "h4",
+    title: '"Mirror, mirror..."',
+    body: "The final message may be backwards. Look at your findings through a different lens—sometimes reversing your perspective reveals the truth.",
+  unlockOffsetMs: 4 * 60 * 1000, // 4 minutes (testing)
+  },
+];
+
+function formatDuration(ms: number) {
+  if (ms <= 0) return "00:00:00";
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
+const TimedHints = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+  const teamId = typeof window !== 'undefined' ? sessionStorage.getItem('round1_team_id') : null;
+
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [serverHints, setServerHints] = useState<any[] | null>(null);
+  const [started, setStarted] = useState<boolean | null>(null);
+  const [now, setNow] = useState<number>(Date.now());
+  const [error, setError] = useState<string | null>(null);
+
+  // Poll clock for UI updates
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Initialize by asking server for status, and start session if needed
+  useEffect(() => {
+    let mounted = true;
+    async function init() {
+      if (!teamId) {
+        if (mounted) setError('No team ID found. Please authenticate to start the round.');
+        return;
+      }
+
+      try {
+        const statusRes = await fetch(`${apiUrl}/api/rounds/1/status?teamId=${encodeURIComponent(teamId)}`);
+        const statusJson = await statusRes.json();
+
+        if (!statusJson.started) {
+          // start session
+          const startRes = await fetch(`${apiUrl}/api/rounds/1/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamId })
+          });
+          const startJson = await startRes.json();
+          if (mounted) {
+            setStarted(true);
+            setStartTime(new Date(startJson.startTime).getTime());
+            setServerHints(HINTS);
+          }
+        } else {
+          if (mounted) {
+            setStarted(true);
+            setStartTime(new Date(statusJson.startTime).getTime());
+            // prefer server-provided hint metadata if available
+            setServerHints(statusJson.hints && statusJson.hints.length ? statusJson.hints : HINTS);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to initialize round status:', err);
+        if (mounted) setError('Failed to contact server for round status.');
+      }
+    }
+
+    init();
+    return () => { mounted = false; };
+  }, [apiUrl, teamId]);
+
+  if (error) {
+    return <div className="p-4 text-sm text-destructive font-mono">{error}</div>;
+  }
+
+  if (started === null || startTime === null || serverHints === null) {
+    return (
+      <div className="p-4 text-sm text-amber-300/80 font-mono">
+        Initializing round status...
+      </div>
+    );
+  }
+
+  const elapsed = now - startTime;
+
+  return (
+    <div className="space-y-4">
+      {/* Progress indicator for the entire hint set */}
+      {(() => {
+        const total = serverHints.length;
+        const unlockedCount = serverHints.filter((h: any) => ('unlocked' in h) ? h.unlocked : (elapsed >= h.unlockOffsetMs)).length;
+        const progressPercent = Math.round((unlockedCount / total) * 100);
+        return (
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-mono text-amber-300">{unlockedCount} / {total} hints unlocked</div>
+              <div className="text-xs text-amber-400">{progressPercent}%</div>
+            </div>
+            <div className="w-full bg-amber-900/20 h-2 rounded overflow-hidden">
+              <div
+                className="h-2 bg-amber-500 transition-all"
+                style={{ width: `${progressPercent}%` }}
+                role="progressbar"
+                aria-valuenow={progressPercent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              />
+            </div>
+          </div>
+        );
+      })()}
+      {serverHints.map((hint: any, idx: number) => {
+        const unlockOffsetMs = hint.unlockOffsetMs ?? hint.unlockOffsetMs;
+        const unlocked = ('unlocked' in hint) ? hint.unlocked : (elapsed >= unlockOffsetMs);
+        const timeLeft = ('timeLeftMs' in hint) ? hint.timeLeftMs : Math.max(0, unlockOffsetMs - elapsed);
+        return (
+          <div
+            key={hint.id}
+            className={`p-4 rounded-lg border ${unlocked ? 'bg-amber-950/10 border-amber-600/30' : 'bg-amber-950/20 border-amber-900/30'} flex items-start justify-between`}
+          >
+            <div className="max-w-[85%]">
+              <p className="font-serif text-amber-200/90 italic mb-2">
+                {idx === 0 ? '💭 ' : idx === 1 ? '🗝️ ' : idx === 2 ? '📜 ' : '🔄 '}
+                <strong className="text-amber-400">{hint.title}</strong>
+              </p>
+              {unlocked ? (
+                <p className="text-sm text-amber-300/70 font-mono">{hint.body}</p>
+              ) : (
+                <p className="text-sm text-amber-300/50 font-mono">This hint will unlock after <strong>{formatDuration(hint.unlockOffsetMs)}</strong>. Time until unlock: <strong>{formatDuration(timeLeft)}</strong></p>
+              )}
+            </div>
+            <div className="text-right">
+              {!unlocked ? (
+                <div className="inline-flex flex-col items-end">
+                  <Lock className="w-6 h-6 text-amber-500 mb-1" />
+                  <div className="text-xs text-amber-400 font-mono">{formatDuration(timeLeft)}</div>
+                </div>
+              ) : (
+                <div className="inline-flex flex-col items-end text-amber-300">
+                  <div className="text-sm font-mono">Unlocked</div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      <div className="mt-2 text-xs text-amber-400 font-mono">
+        Timer started at: {new Date(startTime).toLocaleString()} (local time). Hints unlock relative to this time.
+      </div>
+    </div>
+  );
+};
+
 const Round1Page = () => {
   const navigate = useNavigate();
   const [downloadedImages, setDownloadedImages] = useState<string[]>([]);
@@ -26,15 +207,14 @@ const Round1Page = () => {
       id: "img1",
       name: "The Prophecy Written",
       description: "A cryptic image holding secrets within - examine carefully",
-      url: "https://storage.googleapis.com/YOUR_BUCKET/pwout.png", // Replace with actual URL
+      url: "https://demo-bucket-aws-cloud-club-uok.s3.ap-south-1.amazonaws.com/pw_out.png", 
       filename: "pwout.png"
     },
     {
       id: "img2",
       name: "The Hidden Archive",
       description: "What appears as one thing may contain another entirely",
-      url: "https://storage.googleapis.com/YOUR_BUCKET/zipimage.jpg", // Replace with actual URL
-      filename: "zipimage.jpg"
+      url: "https://demo-bucket-aws-cloud-club-uok.s3.ap-south-1.amazonaws.com/medzip.jpg", 
     },
   ];
 
@@ -259,7 +439,7 @@ const Round1Page = () => {
             </CardContent>
           </Card>
 
-          {/* Additional Cryptic Hints */}
+          {/* Additional Cryptic Hints - timed unlocks */}
           <Card className="mb-12 bg-card/30 backdrop-blur-sm border-2 border-amber-900/30">
             <CardHeader className="border-b border-amber-900/30">
               <div className="flex items-center gap-3">
@@ -269,55 +449,13 @@ const Round1Page = () => {
                     Whispers from the Oracle
                   </CardTitle>
                   <CardDescription className="font-serif italic text-amber-200/60">
-                    Ancient wisdom to guide your quest
+                    Ancient wisdom to guide your quest — hints unlock over time
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-4">
-                <div className="p-4 bg-amber-950/20 rounded-lg border border-amber-900/30">
-                  <p className="font-serif text-amber-200/90 italic mb-2">
-                    💭 <strong className="text-amber-400">"What lies within the image?"</strong>
-                  </p>
-                  <p className="text-sm text-amber-300/70 font-mono">
-                    Files can carry more than their name suggests. Analyze the structure to find what's embedded within.
-                  </p>
-                </div>
-                
-                <div className="p-4 bg-amber-950/20 rounded-lg border border-amber-900/30">
-                  <p className="font-serif text-amber-200/90 italic mb-2">
-                    🗝️ <strong className="text-amber-400">"When you find a lock, seek the winged one..."</strong>
-                  </p>
-                  <p className="text-sm text-amber-300/70 font-mono">
-                    In Greek tales, when Medusa fell, something magnificent took flight. That creature's name may unlock what you seek.
-                  </p>
-                </div>
-                
-                <div className="p-4 bg-amber-950/20 rounded-lg border border-amber-900/30">
-                  <p className="font-serif text-amber-200/90 italic mb-2">
-                    📜 <strong className="text-amber-400">"Not all that is written is plainly read..."</strong>
-                  </p>
-                  <p className="text-sm text-amber-300/70 font-mono">
-                    Ancient scribes encoded their secrets. If text appears as mystical symbols, decode it. And remember: sometimes the path is reversed.
-                  </p>
-                </div>
-                
-                <div className="p-4 bg-amber-950/20 rounded-lg border border-amber-900/30">
-                  <p className="font-serif text-amber-200/90 italic mb-2">
-                    🔄 <strong className="text-amber-400">"Mirror, mirror..."</strong>
-                  </p>
-                  <p className="text-sm text-amber-300/70 font-mono">
-                    The final message may be backwards.
-                  </p>
-                </div>
-                
-                <div className="mt-6 p-4 bg-gradient-to-r from-amber-900/30 to-transparent rounded-lg border-l-4 border-amber-500">
-                  <p className="font-serif text-amber-100 text-sm">
-                    <strong>Suggested Approach:</strong> Examine → Extract → Unlock → Decode → ?
-                  </p>
-                </div>
-              </div>
+              <TimedHints />
             </CardContent>
           </Card>
 

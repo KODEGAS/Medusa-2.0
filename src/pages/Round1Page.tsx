@@ -207,14 +207,14 @@ const Round1Page = () => {
       id: "img1",
       name: "The Prophecy Written",
       description: "A cryptic image holding secrets within - examine carefully",
-      url: "https://demo-bucket-aws-cloud-club-uok.s3.ap-south-1.amazonaws.com/pw_out.png", 
+      url: "https://medusa-ecsc.s3.ap-south-1.amazonaws.com/pw_out.png", 
       filename: "pwout.png"
     },
     {
       id: "img2",
       name: "The Hidden Archive",
       description: "What appears as one thing may contain another entirely",
-      url: "https://demo-bucket-aws-cloud-club-uok.s3.ap-south-1.amazonaws.com/medzip.jpg", 
+      url: "https://medusa-ecsc.s3.ap-south-1.amazonaws.com/pw_out.png", 
     },
   ];
 

@@ -43,7 +43,7 @@ const FlagSubmissionPage = () => {
 
     try {
       // Call the backend API
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://medusa-2-0-backend.onrender.com';
+      const apiUrl = 'https://medusa-2-0-backend.onrender.com';
       const response = await fetch(`${apiUrl}/api/flag/submit`, {
         method: 'POST',
         headers: { 

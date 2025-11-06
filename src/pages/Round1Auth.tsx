@@ -16,9 +16,6 @@ const Round1Auth = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
 
-  // Store the valid API key - In production, verify this against backend
-  const VALID_API_KEY = "MEDUSA_R1_2025"; // Change this to your actual API key
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -35,20 +32,23 @@ const Round1Auth = () => {
 
     setIsVerifying(true);
 
-    // Simulate verification delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
     try {
-      // In production, you should verify against backend
-      // const response = await fetch(`${apiUrl}/api/verify-access`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ apiKey, teamId })
-      // });
+      // Call backend verification endpoint
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/auth/verify`, {
+        method: 'POST',
+        credentials: 'include', // Important: sends/receives cookies
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ apiKey, teamId })
+      });
 
-      // For now, simple client-side check (move to backend in production)
-      if (apiKey === VALID_API_KEY) {
-        // Store authentication in sessionStorage
+      const data = await response.json();
+
+      if (response.ok && data.authenticated) {
+        // Server has set HttpOnly JWT cookie
+        // Store minimal client-side flags for UI state
         sessionStorage.setItem('round1_authenticated', 'true');
         sessionStorage.setItem('round1_team_id', teamId);
         sessionStorage.setItem('round1_auth_time', new Date().toISOString());
@@ -56,7 +56,7 @@ const Round1Auth = () => {
         // Redirect to Round 1 page
         navigate('/round1');
       } else {
-        setError("Invalid API Key. Please check and try again.");
+        setError(data.error || "Invalid API Key. Please check and try again.");
       }
     } catch (err) {
       console.error("Verification error:", err);

@@ -1,37 +1,42 @@
 import express from 'express';
 import FlagSubmission from '../models/FlagSubmission.js';
 import rateLimit from 'express-rate-limit';
+import authenticate from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
-// Rate limiter: 10 submissions per 5 minutes per IP
-const flagSubmissionLimiter = rateLimit({
+// Rate limiter: 10 submissions per 5 minutes per IP (global protection)
+const ipRateLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 10, // Limit each IP to 10 requests per windowMs
+  max: 15, // Limit each IP to 15 requests per windowMs
   message: { 
-    error: 'Too many flag submissions. Please try again later.',
+    error: 'Too many flag submissions from this IP. Please try again later.',
     retryAfter: '5 minutes'
   },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Validation middleware
+// Per-team rate limiter: 10 submissions per 5 minutes per team
+const teamRateLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10, // Limit each team to 10 submissions per windowMs
+  keyGenerator: (req) => {
+    // Use teamId from JWT token as the key
+    return req.user?.teamId || req.ip;
+  },
+  message: { 
+    error: 'Your team has exceeded the submission limit. Please try again later.',
+    retryAfter: '5 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipFailedRequests: false, // Count failed requests too
+});
+
+// Validation middleware (now teamId comes from JWT, not body)
 const validateFlagSubmission = (req, res, next) => {
-  const { teamId, flag } = req.body;
-
-  // Validate teamId
-  if (!teamId || typeof teamId !== 'string' || teamId.trim().length === 0) {
-    return res.status(400).json({ 
-      error: 'Team ID is required and must be a valid string' 
-    });
-  }
-
-  if (teamId.length > 50) {
-    return res.status(400).json({ 
-      error: 'Team ID is too long (max 50 characters)' 
-    });
-  }
+  const { flag } = req.body;
 
   // Validate flag
   if (!flag || typeof flag !== 'string' || flag.trim().length === 0) {
@@ -52,17 +57,17 @@ const validateFlagSubmission = (req, res, next) => {
     });
   }
 
-  // Sanitize inputs
-  req.body.teamId = teamId.trim();
+  // Sanitize input
   req.body.flag = flag.trim();
 
   next();
 };
 
-// Submit flag endpoint
-router.post('/submit', flagSubmissionLimiter, validateFlagSubmission, async (req, res) => {
+// Submit flag endpoint - now protected with JWT auth
+router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFlagSubmission, async (req, res) => {
   try {
-    const { teamId, flag } = req.body;
+    const teamId = req.user.teamId; // Read from JWT token (secure)
+    const { flag } = req.body;
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.get('user-agent');
 
@@ -92,11 +97,15 @@ router.post('/submit', flagSubmissionLimiter, validateFlagSubmission, async (req
 
     await flagSubmission.save();
 
+    // Log submission for audit trail
+    console.log(`Flag submitted by team ${teamId} from IP ${ipAddress} at ${new Date().toISOString()}`);
+
     res.status(201).json({ 
       success: true,
       message: 'Flag submitted successfully and is being verified',
       submissionId: flagSubmission._id,
-      submittedAt: flagSubmission.submittedAt
+      submittedAt: flagSubmission.submittedAt,
+      teamId: teamId // Confirm which team submitted
     });
 
   } catch (error) {
@@ -115,10 +124,18 @@ router.post('/submit', flagSubmissionLimiter, validateFlagSubmission, async (req
   }
 });
 
-// Get submissions for a team (optional - for admin or team dashboard)
-router.get('/submissions/:teamId', async (req, res) => {
+// Get submissions for a team - protected, teams can only see their own
+router.get('/submissions/:teamId', authenticate, async (req, res) => {
   try {
     const { teamId } = req.params;
+    const requestingTeamId = req.user.teamId;
+
+    // Teams can only view their own submissions (unless admin - future enhancement)
+    if (teamId !== requestingTeamId) {
+      return res.status(403).json({ 
+        error: 'You can only view your own team\'s submissions' 
+      });
+    }
 
     const submissions = await FlagSubmission.find({ teamId })
       .sort({ submittedAt: -1 })

@@ -9,17 +9,12 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 const FlagSubmissionPage = () => {
-  const [teamId, setTeamId] = useState("");
   const [flag, setFlag] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState("");
 
   const validateInputs = () => {
-    if (!teamId.trim()) {
-      setError("Team ID is required");
-      return false;
-    }
     if (!flag.trim()) {
       setError("Flag is required");
       return false;
@@ -42,15 +37,16 @@ const FlagSubmissionPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Call the backend API
-      const apiUrl = 'https://medusa-2-0-backend.onrender.com';
+      // Call the backend API with JWT authentication
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await fetch(`${apiUrl}/api/flag/submit`, {
         method: 'POST',
+        credentials: 'include', // Send JWT cookie for authentication
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ teamId, flag })
+        body: JSON.stringify({ flag }) // teamId comes from JWT token
       });
 
       const data = await response.json();
@@ -69,7 +65,6 @@ const FlagSubmissionPage = () => {
       
       // Success!
       setSubmitSuccess(true);
-      setTeamId("");
       setFlag("");
     } catch (err) {
       console.error("Flag submission error:", err);
@@ -82,7 +77,6 @@ const FlagSubmissionPage = () => {
   const handleReset = () => {
     setSubmitSuccess(false);
     setError("");
-    setTeamId("");
     setFlag("");
   };
 
@@ -145,30 +139,18 @@ const FlagSubmissionPage = () => {
                   Flag Submission Form
                 </CardTitle>
                 <CardDescription className="font-mono">
-                  Enter your team ID and the captured flag to earn points
+                  Enter the captured flag to earn points for your team
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Team ID Input */}
-                  <div className="space-y-2">
-                    <Label htmlFor="teamId" className="font-mono text-foreground">
-                      Team ID <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="teamId"
-                      type="text"
-                      placeholder="Enter your team ID (e.g., TEAM001)"
-                      value={teamId}
-                      onChange={(e) => setTeamId(e.target.value)}
-                      className="font-mono"
-                      disabled={isSubmitting}
-                      required
-                    />
-                    <p className="text-xs font-mono text-muted-foreground">
-                      Use the Team ID provided during registration
-                    </p>
-                  </div>
+                  {/* Info Alert - Team ID from JWT */}
+                  <Alert className="border-primary/30 bg-primary/10">
+                    <Flag className="h-4 w-4 text-primary" />
+                    <AlertDescription className="font-mono text-sm">
+                      Your team ID is automatically detected from your authenticated session.
+                    </AlertDescription>
+                  </Alert>
 
                   {/* Flag Input */}
                   <div className="space-y-2">

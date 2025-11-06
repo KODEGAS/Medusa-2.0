@@ -1,5 +1,6 @@
 import express from 'express';
 import RoundSession from '../models/RoundSession.js';
+import authenticate from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
@@ -12,14 +13,10 @@ const HINTS = [
 ];
 
 // Start a round session for a team (idempotent)
-router.post('/:round/start', async (req, res) => {
+router.post('/:round/start', authenticate, async (req, res) => {
   try {
     const { round } = req.params;
-    const { teamId } = req.body;
-
-    if (!teamId || typeof teamId !== 'string') {
-      return res.status(400).json({ error: 'teamId is required' });
-    }
+    const teamId = req.user.teamId; // Read from JWT token, not request body
 
     const roundNum = parseInt(round, 10) || 1;
 
@@ -37,14 +34,10 @@ router.post('/:round/start', async (req, res) => {
 });
 
 // Get status for a team's round session
-router.get('/:round/status', async (req, res) => {
+router.get('/:round/status', authenticate, async (req, res) => {
   try {
     const { round } = req.params;
-    const { teamId } = req.query;
-
-    if (!teamId || typeof teamId !== 'string') {
-      return res.status(400).json({ error: 'teamId query parameter is required' });
-    }
+    const teamId = req.user.teamId; // Read from JWT token, not query params
 
     const roundNum = parseInt(round, 10) || 1;
     const session = await RoundSession.findOne({ teamId, round: roundNum });

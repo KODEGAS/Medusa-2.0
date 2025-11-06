@@ -71,15 +71,18 @@ const TimedHints = () => {
       }
 
       try {
-        const statusRes = await fetch(`${apiUrl}/api/rounds/1/status?teamId=${encodeURIComponent(teamId)}`);
+        // Use credentials: 'include' to send HttpOnly JWT cookie
+        const statusRes = await fetch(`${apiUrl}/api/rounds/1/status`, {
+          credentials: 'include'
+        });
         const statusJson = await statusRes.json();
 
         if (!statusJson.started) {
           // start session
           const startRes = await fetch(`${apiUrl}/api/rounds/1/start`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ teamId })
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
           });
           const startJson = await startRes.json();
           if (mounted) {

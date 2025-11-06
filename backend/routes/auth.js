@@ -1,5 +1,6 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
@@ -72,13 +73,33 @@ router.post('/verify', authLimiter, async (req, res) => {
     // Log successful authentication (optional - store in database)
     console.log(`Team ${teamId} authenticated for ${keyInfo.name} at ${new Date().toISOString()}`);
 
+    // Issue JWT token
+    const payload = {
+      teamId: teamId,
+      round: keyInfo.round,
+      apiKey: apiKey
+    };
+    
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { 
+      expiresIn: '6h' // Token expires after 6 hours
+    });
+
+    // Set HttpOnly secure cookie (preferred for web clients)
+    res.cookie('medusa_token', token, {
+      httpOnly: true, // Prevents JavaScript access (XSS protection)
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: 'lax', // CSRF protection (use 'strict' if same domain)
+      maxAge: 6 * 60 * 60 * 1000 // 6 hours in milliseconds
+    });
+
     // Return success
     res.json({ 
       success: true,
       authenticated: true,
       round: keyInfo.round,
       message: `Access granted to ${keyInfo.name}`,
-      teamId: teamId
+      teamId: teamId,
+      expiresIn: '6h'
     });
 
   } catch (error) {

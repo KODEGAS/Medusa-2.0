@@ -62,10 +62,13 @@ const corsOptions = {
     'http://localhost:8082',
     'https://medusa.ecsc-uok.com',
     'https://www.medusa.ecsc-uok.com',
-    'https://medusa-2-0.vercel.app'
+    'https://medusa-2-0.vercel.app',
+    'https://medusa-2-0-backend.onrender.com' // Add Render backend for self-requests
   ],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 };
 
 app.use(cors(corsOptions));

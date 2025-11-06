@@ -85,11 +85,13 @@ router.post('/verify', authLimiter, async (req, res) => {
     });
 
     // Set HttpOnly secure cookie (preferred for web clients)
+    // Use sameSite: 'none' for cross-domain (frontend on different domain than backend)
     res.cookie('medusa_token', token, {
       httpOnly: true, // Prevents JavaScript access (XSS protection)
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'lax', // CSRF protection (use 'strict' if same domain)
-      maxAge: 6 * 60 * 60 * 1000 // 6 hours in milliseconds
+      secure: true, // Required for sameSite: 'none' - always use HTTPS
+      sameSite: 'none', // Allow cross-site cookies (frontend and backend on different domains)
+      maxAge: 6 * 60 * 60 * 1000, // 6 hours in milliseconds
+      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost' // Don't set domain in production to allow cross-origin
     });
 
     // Return success

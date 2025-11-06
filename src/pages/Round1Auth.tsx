@@ -47,7 +47,11 @@ const Round1Auth = () => {
       const data = await response.json();
 
       if (response.ok && data.authenticated) {
-        // Server has set HttpOnly JWT cookie
+        // Store JWT token in localStorage for Authorization header
+        if (data.token) {
+          localStorage.setItem('medusa_token', data.token);
+        }
+        
         // Store minimal client-side flags for UI state
         sessionStorage.setItem('round1_authenticated', 'true');
         sessionStorage.setItem('round1_team_id', teamId);

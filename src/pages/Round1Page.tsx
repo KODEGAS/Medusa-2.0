@@ -70,15 +70,32 @@ const TimedHints = () => {
         return;
       }
 
+      // Get token from localStorage
+      const token = localStorage.getItem('medusa_token');
+      if (!token) {
+        if (mounted) setError('Authentication token not found. Please log in again at /round1-auth');
+        return;
+      }
+
       try {
-        // Use credentials: 'include' to send HttpOnly JWT cookie
+        // Send JWT via Authorization header (more reliable for cross-domain)
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
         const statusRes = await fetch(`${apiUrl}/api/rounds/1/status`, {
-          credentials: 'include'
+          credentials: 'include', // Still include for cookie fallback
+          headers: headers
         });
 
         // Check for authentication errors
         if (statusRes.status === 401) {
-          if (mounted) setError('Authentication expired. Please log in again at /round1-auth');
+          if (mounted) {
+            setError('Authentication expired. Please log in again at /round1-auth');
+            // Clear invalid token
+            localStorage.removeItem('medusa_token');
+          }
           return;
         }
 
@@ -89,7 +106,7 @@ const TimedHints = () => {
           const startRes = await fetch(`${apiUrl}/api/rounds/1/start`, {
             method: 'POST',
             credentials: 'include',
-            headers: { 'Content-Type': 'application/json' }
+            headers: headers
           });
           const startJson = await startRes.json();
           if (mounted) {

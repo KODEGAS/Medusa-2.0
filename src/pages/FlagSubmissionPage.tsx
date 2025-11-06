@@ -37,14 +37,23 @@ const FlagSubmissionPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Call the backend API with JWT authentication
+      // Get JWT token from localStorage
+      const token = localStorage.getItem('medusa_token');
+      if (!token) {
+        setError("Authentication token not found. Please log in at Round 1 Auth page.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Call the backend API with JWT authentication via Authorization header
       const apiUrl = import.meta.env.VITE_API_URL;
       const response = await fetch(`${apiUrl}/api/flag/submit`, {
         method: 'POST',
-        credentials: 'include', // Send JWT cookie for authentication
+        credentials: 'include', // Still include for cookie fallback
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}` // ✅ Send JWT via Authorization header
         },
         body: JSON.stringify({ flag }) // teamId comes from JWT token
       });
@@ -55,6 +64,8 @@ const FlagSubmissionPage = () => {
         // Handle specific error cases
         if (response.status === 401) {
           setError("Authentication expired. Please go to Round 1 Auth page and log in again.");
+          // Clear invalid token
+          localStorage.removeItem('medusa_token');
         } else if (response.status === 409) {
           setError(data.error || "This flag has already been submitted by your team");
         } else if (response.status === 429) {

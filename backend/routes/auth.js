@@ -84,20 +84,20 @@ router.post('/verify', authLimiter, async (req, res) => {
       expiresIn: '6h' // Token expires after 6 hours
     });
 
-    // Set HttpOnly secure cookie (preferred for web clients)
-    // Use sameSite: 'none' for cross-domain (frontend on different domain than backend)
+    // Set HttpOnly secure cookie (for same-domain setups)
     res.cookie('medusa_token', token, {
-      httpOnly: true, // Prevents JavaScript access (XSS protection)
-      secure: true, // Required for sameSite: 'none' - always use HTTPS
-      sameSite: 'none', // Allow cross-site cookies (frontend and backend on different domains)
-      maxAge: 6 * 60 * 60 * 1000, // 6 hours in milliseconds
-      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost' // Don't set domain in production to allow cross-origin
+      httpOnly: true,
+      secure: true, // HTTPS only
+      sameSite: 'none', // Allow cross-site
+      maxAge: 6 * 60 * 60 * 1000, // 6 hours
     });
 
-    // Return success
+    // ALSO return token in response body for cross-domain usage
+    // Frontend will store in localStorage and send via Authorization header
     res.json({ 
       success: true,
       authenticated: true,
+      token: token, // ✅ Return token for Authorization header usage
       round: keyInfo.round,
       message: `Access granted to ${keyInfo.name}`,
       teamId: teamId,

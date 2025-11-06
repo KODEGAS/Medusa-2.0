@@ -38,7 +38,7 @@ const FlagSubmissionPage = () => {
 
     try {
       // Call the backend API with JWT authentication
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const response = await fetch(`${apiUrl}/api/flag/submit`, {
         method: 'POST',
         credentials: 'include', // Send JWT cookie for authentication

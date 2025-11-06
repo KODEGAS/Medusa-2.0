@@ -4,12 +4,12 @@ import authenticate from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
-// Server-side hint schedule (ms). For production change to hours as needed.
+// Server-side hint schedule (ms). Production uses hours.
 const HINTS = [
-  { id: 'h1', unlockOffsetMs: 1 * 60 * 1000 }, // 1 minute (testing)
-  { id: 'h2', unlockOffsetMs: 2 * 60 * 1000 }, // 2 minutes
-  { id: 'h3', unlockOffsetMs: 3 * 60 * 1000 }, // 3 minutes
-  { id: 'h4', unlockOffsetMs: 4 * 60 * 1000 }, // 4 minutes
+  { id: 'h1', unlockOffsetMs: 1 * 60 * 60 * 1000 }, // 1 hour
+  { id: 'h2', unlockOffsetMs: 2 * 60 * 60 * 1000 }, // 2 hours
+  { id: 'h3', unlockOffsetMs: 3 * 60 * 60 * 1000 }, // 3 hours
+  { id: 'h4', unlockOffsetMs: 4 * 60 * 60 * 1000 }, // 4 hours
 ];
 
 // Start a round session for a team (idempotent)

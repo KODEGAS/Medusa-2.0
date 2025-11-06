@@ -13,25 +13,25 @@ const HINTS: Array<{ id: string; title: string; body: string; unlockOffsetMs: nu
     id: "h1",
     title: '"What lies within the image?"',
     body: "Files can carry more than their name suggests. Analyze the structure to find what's embedded within.",
-  unlockOffsetMs: 1 * 60 * 1000, // 1 minute (testing)
+    unlockOffsetMs: 1 * 60 * 60 * 1000, // 1 hour
   },
   {
     id: "h2",
     title: '"When you find a lock, seek the winged one..."',
     body: "In Greek tales, when Medusa fell, something magnificent took flight. That creature's name may unlock what you seek.",
-  unlockOffsetMs: 2 * 60 * 1000, // 2 minutes (testing)
+    unlockOffsetMs: 2 * 60 * 60 * 1000, // 2 hours
   },
   {
     id: "h3",
     title: '"Not all that is written is plainly read..."',
     body: "Ancient scribes encoded their secrets. If text appears as mystical symbols (base64), decode it. And remember: sometimes the path is reversed.",
-  unlockOffsetMs: 3 * 60 * 1000, // 3 minutes (testing)
+    unlockOffsetMs: 3 * 60 * 60 * 1000, // 3 hours
   },
   {
     id: "h4",
     title: '"Mirror, mirror..."',
     body: "The final message may be backwards. Look at your findings through a different lens—sometimes reversing your perspective reveals the truth.",
-  unlockOffsetMs: 4 * 60 * 1000, // 4 minutes (testing)
+    unlockOffsetMs: 4 * 60 * 60 * 1000, // 4 hours
   },
 ];
 

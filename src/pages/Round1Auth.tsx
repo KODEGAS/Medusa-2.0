@@ -34,7 +34,7 @@ const Round1Auth = () => {
 
     try {
       // Call backend verification endpoint
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const response = await fetch(`${apiUrl}/api/auth/verify`, {
         method: 'POST',
         credentials: 'include', // Important: sends/receives cookies

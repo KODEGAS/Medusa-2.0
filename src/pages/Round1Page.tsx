@@ -75,6 +75,13 @@ const TimedHints = () => {
         const statusRes = await fetch(`${apiUrl}/api/rounds/1/status`, {
           credentials: 'include'
         });
+
+        // Check for authentication errors
+        if (statusRes.status === 401) {
+          if (mounted) setError('Authentication expired. Please log in again at /round1-auth');
+          return;
+        }
+
         const statusJson = await statusRes.json();
 
         if (!statusJson.started) {

@@ -53,7 +53,9 @@ const FlagSubmissionPage = () => {
 
       if (!response.ok) {
         // Handle specific error cases
-        if (response.status === 409) {
+        if (response.status === 401) {
+          setError("Authentication expired. Please go to Round 1 Auth page and log in again.");
+        } else if (response.status === 409) {
           setError(data.error || "This flag has already been submitted by your team");
         } else if (response.status === 429) {
           setError("Too many submissions. Please wait a few minutes and try again.");

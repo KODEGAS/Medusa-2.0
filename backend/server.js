@@ -9,6 +9,7 @@ import paymentRoutes from './routes/payment.js';
 import flagRoutes from './routes/flag.js';
 import authRoutes from './routes/auth.js';
 import roundsRoutes from './routes/rounds.js';
+import adminRoutes from './routes/admin.js';
 
 dotenv.config();
 
@@ -86,6 +87,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/flag', flagRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/rounds', roundsRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 3001;
 const MONGODB_URI = process.env.MONGODB_URI;

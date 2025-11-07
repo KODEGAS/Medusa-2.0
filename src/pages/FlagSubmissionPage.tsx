@@ -169,7 +169,7 @@ const FlagSubmissionPage = () => {
                 )}
                 
                 <p className="text-sm font-mono text-muted-foreground/70 mb-8">
-                  Results will be released soon. Keep track of the leaderboard for updates.
+                  Results will be released soon. Keep track on the WhatsApp channel.
                 </p>
                 
                 {submissionInfo && submissionInfo.remainingAttempts > 0 ? (
@@ -252,14 +252,6 @@ const FlagSubmissionPage = () => {
                     </Alert>
                   )}
 
-                  {/* Info Alert */}
-                  <Alert className="border-primary/50 bg-primary/5">
-                    <Flag className="h-4 w-4 text-primary" />
-                    <AlertDescription className="font-mono text-sm">
-                      Flags are validated in real-time. Duplicate submissions will be ignored.
-                    </AlertDescription>
-                  </Alert>
-
                   {/* Submit Button */}
                   <Button
                     type="submit"
@@ -287,7 +279,7 @@ const FlagSubmissionPage = () => {
                   </h3>
                   <ul className="space-y-2 text-sm font-mono text-muted-foreground">
                     <li className="flex items-start">
-                      <span className="text-amber-400 mr-2">⚠️</span>
+                      <span className="text-primary mr-2">•</span>
                       <span><strong>Maximum 2 submissions</strong> per team allowed</span>
                     </li>
                     <li className="flex items-start">
@@ -295,7 +287,7 @@ const FlagSubmissionPage = () => {
                       <span>Flags are case-sensitive and must match exactly</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-amber-400 mr-2">📉</span>
+                      <span className="text-primary mr-2">•</span>
                       <span><strong>Second submission incurs 25% point deduction</strong> if correct</span>
                     </li>
                     <li className="flex items-start">

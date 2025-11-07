@@ -24,7 +24,7 @@ const HINTS: Array<{ id: string; title: string; body: string; unlockOffsetMs: nu
   {
     id: "h3",
     title: '"Not all that is written is plainly read..."',
-    body: "Ancient scribes encoded their secrets. If text appears as mystical symbols (base64), decode it. And remember: sometimes the path is reversed.",
+    body: "Ancient scribes encoded their secrets. If text appears as mystical symbols, decode it. And remember: sometimes the path is reversed.",
     unlockOffsetMs: 3 * 60 * 60 * 1000, // 3 hours
   },
   {
@@ -447,10 +447,6 @@ const Round1Page = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-amber-500 mt-1">•</span>
-                      <span>Consider using forensic tools to reveal hidden data</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-500 mt-1">•</span>
                       <span>If you find something locked, remember: Greek mythology may hold the key</span>
                     </li>
                     <li className="flex items-start gap-2">
@@ -509,15 +505,7 @@ const Round1Page = () => {
                   <Flag className="mr-3 h-6 w-6" />
                   Submit Your Flag
                 </Button>
-                <Button 
-                  onClick={() => navigate('/#timeline-section')}
-                  variant="outline"
-                  size="lg"
-                  className="px-8 py-6 text-lg font-serif border-2 border-amber-600/50 text-amber-400 hover:bg-amber-950/50"
-                >
-                  <Scroll className="mr-2 h-5 w-5" />
-                  View Timeline
-                </Button>
+  
               </div>
               
               {/* Greek-style divider */}
@@ -532,23 +520,6 @@ const Round1Page = () => {
               </p>
             </CardContent>
           </Card>
-
-          {/* Additional Help Section */}
-          <div className="mt-8 text-center">
-            <div className="inline-flex flex-wrap justify-center gap-6 font-mono text-sm text-amber-300/60">
-              <a href="/#contact-section" className="hover:text-amber-400 transition-colors flex items-center gap-2">
-                <span>Need Help?</span>
-              </a>
-              <span className="text-amber-600">|</span>
-              <a href="/delegate-book" className="hover:text-amber-400 transition-colors flex items-center gap-2">
-                <span>Competition Rules</span>
-              </a>
-              <span className="text-amber-600">|</span>
-              <a href="/#about" className="hover:text-amber-400 transition-colors flex items-center gap-2">
-                <span>About MEDUSA</span>
-              </a>
-            </div>
-          </div>
         </div>
       </main>
 

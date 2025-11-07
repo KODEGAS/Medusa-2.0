@@ -118,7 +118,7 @@ const Round1Auth = () => {
                   <Input
                     id="teamId"
                     type="text"
-                    placeholder="Enter your team ID (e.g., TEAM001)"
+                    placeholder="Enter your team ID"
                     value={teamId}
                     onChange={(e) => setTeamId(e.target.value)}
                     className="font-mono"
@@ -146,7 +146,7 @@ const Round1Auth = () => {
                     required
                   />
                   <p className="text-xs font-mono text-muted-foreground">
-                    The API key was shared via email and WhatsApp channel
+                    The API key was shared via a WhatsApp channel
                   </p>
                 </div>
 
@@ -164,7 +164,7 @@ const Round1Auth = () => {
                 <Alert className="border-amber-600/30 bg-amber-950/30">
                   <Lock className="h-4 w-4 text-amber-500" />
                   <AlertDescription className="font-mono text-sm text-amber-100/80">
-                    This key grants access to Round 1 challenges. Keep it secure and do not share with other teams.
+                    This key grants access to Round 1 challenges. Keep it secure and do not share with others.
                   </AlertDescription>
                 </Alert>
 
@@ -196,37 +196,16 @@ const Round1Auth = () => {
                 <ul className="space-y-2 text-sm font-mono text-muted-foreground">
                   <li className="flex items-start">
                     <span className="text-amber-500 mr-2">•</span>
-                    <span>Check your registration email for the Round 1 API key</span>
+                    <span>Check WhatsApp channel for the Round 1 API key</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-amber-500 mr-2">•</span>
-                    <span>Visit our WhatsApp channel for announcements</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-amber-500 mr-2">•</span>
-                    <span>Contact organizers if you haven't received your key</span>
+                    <span>Contact organizers if you haven't received your team id</span>
                   </li>
                 </ul>
               </div>
             </CardContent>
           </Card>
-
-          {/* Quick Links */}
-          <div className="mt-8 text-center space-y-4">
-            <div className="flex flex-wrap justify-center gap-4 font-mono text-sm">
-              <a href="/#timeline-section" className="text-primary hover:underline">
-                View Event Timeline
-              </a>
-              <span className="text-muted-foreground">|</span>
-              <a href="/#contact-section" className="text-primary hover:underline">
-                Contact Support
-              </a>
-              <span className="text-muted-foreground">|</span>
-              <a href="/" className="text-primary hover:underline">
-                Back to Home
-              </a>
-            </div>
-          </div>
         </div>
       </main>
 

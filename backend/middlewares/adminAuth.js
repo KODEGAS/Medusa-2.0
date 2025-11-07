@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import getRealIP from '../utils/getRealIP.js';
 
 const adminAuth = (req, res, next) => {
   try {
@@ -6,7 +7,8 @@ const adminAuth = (req, res, next) => {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.warn(`Admin access denied - No token provided from IP: ${req.ip}`);
+      const clientIP = getRealIP(req);
+      console.warn(`⚠️ Admin access denied - No token provided from IP: ${clientIP}`);
       return res.status(401).json({ 
         error: 'Admin access denied. No token provided.' 
       });
@@ -19,7 +21,8 @@ const adminAuth = (req, res, next) => {
 
     // Check if user is admin
     if (decoded.role !== 'admin') {
-      console.warn(`Access denied - Non-admin role attempted: ${decoded.role} from IP: ${req.ip}`);
+      const clientIP = getRealIP(req);
+      console.warn(`⚠️ Access denied - Non-admin role attempted: ${decoded.role} from IP: ${clientIP}`);
       return res.status(403).json({ 
         error: 'Access denied. Admin privileges required.' 
       });

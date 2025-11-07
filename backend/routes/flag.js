@@ -2,6 +2,7 @@ import express from 'express';
 import FlagSubmission from '../models/FlagSubmission.js';
 import rateLimit from 'express-rate-limit';
 import authenticate from '../middlewares/authenticate.js';
+import getRealIP from '../utils/getRealIP.js';
 
 const router = express.Router();
 
@@ -68,7 +69,7 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
   try {
     const teamId = req.user.teamId; // Read from JWT token (secure)
     const { flag } = req.body;
-    const ipAddress = req.ip || req.connection.remoteAddress;
+    const ipAddress = getRealIP(req);
     const userAgent = req.get('user-agent');
 
     // Check how many submissions this team has made

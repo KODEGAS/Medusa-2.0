@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import FlagSubmission from '../models/FlagSubmission.js';
 import Team from '../models/Team.js';
 import adminAuth from '../middlewares/adminAuth.js';
+import getRealIP from '../utils/getRealIP.js';
 
 const router = express.Router();
 
@@ -61,8 +62,9 @@ router.post('/login', loginRateLimiter, async (req, res) => {
 
     // Validate credentials (use same error message to prevent user enumeration)
     if (!usernameMatch || !passwordMatch) {
-      // Log failed attempt
-      console.warn(`Failed admin login attempt for username: ${username} from IP: ${req.ip}`);
+      // Log failed attempt with real IP
+      const clientIP = getRealIP(req);
+      console.warn(`❌ Failed admin login attempt for username: ${username} from IP: ${clientIP}`);
       
       return res.status(401).json({ 
         error: 'Invalid admin credentials' 
@@ -80,8 +82,9 @@ router.post('/login', loginRateLimiter, async (req, res) => {
       { expiresIn: '8h' } // Admin sessions last 8 hours
     );
 
-    // Log successful login
-    console.log(`✅ Admin login successful: ${ADMIN_USERNAME} from IP: ${req.ip} at ${new Date().toISOString()}`);
+    // Log successful login with real IP
+    const clientIP = getRealIP(req);
+    console.log(`✅ Admin login successful: ${ADMIN_USERNAME} from IP: ${clientIP} at ${new Date().toISOString()}`);
 
     res.json({
       success: true,

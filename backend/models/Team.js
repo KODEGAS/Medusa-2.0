@@ -10,15 +10,23 @@ const memberSchema = new mongoose.Schema({
 });
 
 const teamSchema = new mongoose.Schema({
+  teamId: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    index: true,
+    trim: true
+  },
   teamName: { type: String, required: true },
   university: String,
   leaderName: { type: String, required: true },
-  leaderEmail: { type: String, required: true },
-  leaderPhone: { type: String, required: true },
+  leaderEmail: { type: String },
+  leaderPhone: { type: String },
   members: [memberSchema], // Array of member subdocuments
   payment: {
     slip: String // filename of uploaded payment slip
   },
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
 

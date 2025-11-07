@@ -1,6 +1,7 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
+import Team from '../models/Team.js';
 
 const router = express.Router();
 
@@ -70,12 +71,31 @@ router.post('/verify', authLimiter, async (req, res) => {
       });
     }
 
-    // Log successful authentication (optional - store in database)
-    console.log(`Team ${teamId} authenticated for ${keyInfo.name} at ${new Date().toISOString()}`);
+    // Validate Team ID against database
+    const team = await Team.findOne({ teamId: teamId.trim() });
+    
+    if (!team) {
+      return res.status(401).json({ 
+        error: 'Invalid Team ID. Please check your Team ID and try again.',
+        authenticated: false
+      });
+    }
+
+    if (!team.isActive) {
+      return res.status(403).json({ 
+        error: 'Your team has been deactivated. Please contact organizers.',
+        authenticated: false
+      });
+    }
+
+    // Log successful authentication
+    console.log(`Team ${teamId} (${team.teamName} - ${team.university}) authenticated for ${keyInfo.name} at ${new Date().toISOString()}`);
 
     // Issue JWT token
     const payload = {
-      teamId: teamId,
+      teamId: team.teamId,
+      teamName: team.teamName,
+      university: team.university,
       round: keyInfo.round,
       apiKey: apiKey
     };
@@ -100,7 +120,9 @@ router.post('/verify', authLimiter, async (req, res) => {
       token: token, // ✅ Return token for Authorization header usage
       round: keyInfo.round,
       message: `Access granted to ${keyInfo.name}`,
-      teamId: teamId,
+      teamId: team.teamId,
+      teamName: team.teamName,
+      university: team.university,
       expiresIn: '6h'
     });
 

@@ -71,12 +71,16 @@ const AdminDashboard = () => {
   const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
+  // Get obscured paths from environment
+  const ADMIN_API_PATH = import.meta.env.VITE_ADMIN_API_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2f3a';
+  const ADMIN_LOGIN_PATH = import.meta.env.VITE_ADMIN_LOGIN_PATH || '7f3e9a2c1b5d8e4f6a0c7b3d9e1f5a2b';
+
   const adminToken = localStorage.getItem('adminToken');
   const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
 
   useEffect(() => {
     if (!adminToken) {
-      navigate('/admin/login');
+      navigate(`/${ADMIN_LOGIN_PATH}`);
       return;
     }
     fetchData();
@@ -87,9 +91,9 @@ const AdminDashboard = () => {
     setError('');
 
     try {
-      // Fetch submissions
+      // Fetch submissions using obscured API path
       const submissionsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/submissions`,
+        `${import.meta.env.VITE_API_URL}/api/${ADMIN_API_PATH}/submissions`,
         {
           headers: {
             'Authorization': `Bearer ${adminToken}`,
@@ -101,7 +105,7 @@ const AdminDashboard = () => {
         if (submissionsResponse.status === 401) {
           localStorage.removeItem('adminToken');
           localStorage.removeItem('adminUser');
-          navigate('/admin/login');
+          navigate(`/${ADMIN_LOGIN_PATH}`);
           return;
         }
         throw new Error('Failed to fetch submissions');
@@ -110,9 +114,9 @@ const AdminDashboard = () => {
       const submissionsData = await submissionsResponse.json();
       setSubmissions(submissionsData.submissions);
 
-      // Fetch statistics
+      // Fetch statistics using obscured API path
       const statsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/statistics`,
+        `${import.meta.env.VITE_API_URL}/api/${ADMIN_API_PATH}/statistics`,
         {
           headers: {
             'Authorization': `Bearer ${adminToken}`,
@@ -135,7 +139,7 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
-    navigate('/admin/login');
+    navigate(`/${ADMIN_LOGIN_PATH}`);
   };
 
   const toggleTeamExpansion = (teamId: string) => {

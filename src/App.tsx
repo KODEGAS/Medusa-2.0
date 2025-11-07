@@ -53,6 +53,9 @@ const PageLoader = () => (
 
 const queryClient = new QueryClient();
 
+// Admin panel routes from environment (security through obscurity)
+const ADMIN_LOGIN_PATH = import.meta.env.VITE_ADMIN_LOGIN_PATH || '7f3e9a2c1b5d8e4f6a0c7b3d9e1f5a2b';
+const ADMIN_DASHBOARD_PATH = import.meta.env.VITE_ADMIN_DASHBOARD_PATH || '4c9e7f2a6b1d3e8f5a0b9c7d2e6f1a3b';
 
 const App = () => {
   const [posterLoaded, setPosterLoaded] = useState(false);
@@ -85,9 +88,9 @@ const App = () => {
                 <Route path="/round1-auth" element={<Round1Auth />} />
                 <Route path="/round1" element={<Round1Page />} />
                 
-                {/* Admin Routes */}
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                {/* Admin Routes - Obscured paths for security */}
+                <Route path={`/${ADMIN_LOGIN_PATH}`} element={<AdminLogin />} />
+                <Route path={`/${ADMIN_DASHBOARD_PATH}`} element={<AdminDashboard />} />
                 
                 <Route path="/linkedin" element={<LinkedInRedirect />} />
                 <Route path="/facebook" element={<FacebookRedirect />} />

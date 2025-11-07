@@ -14,13 +14,17 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Get obscured paths from environment
+  const ADMIN_API_PATH = import.meta.env.VITE_ADMIN_API_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2f3a';
+  const ADMIN_DASHBOARD_PATH = import.meta.env.VITE_ADMIN_DASHBOARD_PATH || '4c9e7f2a6b1d3e8f5a0b9c7d2e6f1a3b';
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/login`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/${ADMIN_API_PATH}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,8 +42,8 @@ const AdminLogin = () => {
       localStorage.setItem('adminToken', data.token);
       localStorage.setItem('adminUser', JSON.stringify(data.admin));
 
-      // Redirect to admin dashboard
-      navigate('/admin/dashboard');
+      // Redirect to admin dashboard using obscured path
+      navigate(`/${ADMIN_DASHBOARD_PATH}`);
 
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');

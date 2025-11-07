@@ -87,7 +87,15 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/flag', flagRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/rounds', roundsRoutes);
-app.use('/api/admin', adminRoutes);
+
+// Admin routes with obscured path (security through obscurity)
+const adminPath = process.env.ADMIN_ROUTE_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2f3a';
+app.use(`/api/${adminPath}`, adminRoutes);
+
+// Log admin route path on startup (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  console.log(`🔐 Admin panel accessible at: /api/${adminPath}`);
+}
 
 const PORT = process.env.PORT || 3001;
 const MONGODB_URI = process.env.MONGODB_URI;

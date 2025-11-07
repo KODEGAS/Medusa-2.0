@@ -208,7 +208,7 @@ const FlagSubmissionPage = () => {
                         <ul className="text-xs space-y-1 ml-4">
                           <li>• You have <strong>only 2 attempts</strong> to submit flags</li>
                           <li>• First submission: Full points if correct</li>
-                          <li>• Second submission: <strong className="text-amber-400">20% point deduction</strong> will apply if correct</li>
+                          <li>• Second submission: <strong className="text-amber-400">25% point deduction</strong> will apply if correct</li>
                           <li>• Make sure your flag is correct before submitting!</li>
                         </ul>
                       </div>
@@ -296,7 +296,7 @@ const FlagSubmissionPage = () => {
                     </li>
                     <li className="flex items-start">
                       <span className="text-amber-400 mr-2">📉</span>
-                      <span><strong>Second submission incurs 20% point deduction</strong> if correct</span>
+                      <span><strong>Second submission incurs 25% point deduction</strong> if correct</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-primary mr-2">•</span>

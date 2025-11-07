@@ -98,7 +98,7 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
 
     // Determine if this is the second submission (point deduction applies)
     const isSecondSubmission = submissionCount === 1;
-    const pointDeduction = isSecondSubmission ? 0.2 : 0; // 20% deduction on second attempt
+    const pointDeduction = isSecondSubmission ? 0.25 : 0; // 25% deduction on second attempt
 
     // TODO: Add actual flag validation logic here
     // For now, we'll just store the submission and mark it for manual verification
@@ -128,8 +128,8 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
       attemptNumber: submissionCount + 1,
       remainingAttempts: 2 - (submissionCount + 1),
       warning: isSecondSubmission 
-        ? 'This was your final submission! A 20% point deduction will apply if this flag is incorrect.' 
-        : 'You have 1 attempt remaining. Your second submission will have a 20% point deduction if incorrect.'
+        ? 'This was your final submission! A 25% point deduction will apply if this flag is incorrect.' 
+        : 'You have 1 attempt remaining. Your second submission will have a 25% point deduction if incorrect.'
     };
 
     res.status(201).json(response);

@@ -172,7 +172,7 @@ const FlagSubmissionPage = () => {
                   Results will be released soon. Keep track of the leaderboard for updates.
                 </p>
                 
-                {submissionInfo?.remainingAttempts && submissionInfo.remainingAttempts > 0 ? (
+                {submissionInfo && submissionInfo.remainingAttempts > 0 ? (
                   <Button 
                     onClick={handleReset}
                     className="px-8 py-6 text-lg font-mono"
@@ -180,11 +180,11 @@ const FlagSubmissionPage = () => {
                   >
                     Submit Another Flag
                   </Button>
-                ) : (
+                ) : submissionInfo && submissionInfo.remainingAttempts === 0 ? (
                   <div className="text-sm font-mono text-amber-400">
                     Maximum submissions reached (2/2)
                   </div>
-                )}
+                ) : null}
               </CardContent>
             </Card>
           ) : (

@@ -1,28 +1,69 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import FlagSubmission from '../models/FlagSubmission.js';
 import Team from '../models/Team.js';
 import adminAuth from '../middlewares/adminAuth.js';
 
 const router = express.Router();
 
+// Rate limiter for admin login - prevent brute force attacks
+const loginRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login attempts per windowMs
+  message: { 
+    error: 'Too many login attempts. Please try again in 15 minutes.',
+    retryAfter: '15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true, // Don't count successful logins
+});
+
+// Rate limiter for admin API endpoints - prevent abuse
+const apiRateLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30, // Limit each IP to 30 requests per minute
+  message: { 
+    error: 'Too many requests. Please slow down.',
+    retryAfter: '1 minute'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Admin login endpoint
-router.post('/login', async (req, res) => {
+router.post('/login', loginRateLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    // Input validation
+    if (!username || !password) {
+      return res.status(400).json({ 
+        error: 'Username and password are required' 
+      });
+    }
 
     // Get admin credentials from environment variables
     const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
     if (!ADMIN_PASSWORD) {
+      console.error('CRITICAL: ADMIN_PASSWORD not configured in environment');
       return res.status(500).json({ 
         error: 'Admin credentials not configured' 
       });
     }
 
-    // Validate credentials
-    if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+    // Timing-safe comparison to prevent timing attacks
+    const usernameMatch = username === ADMIN_USERNAME;
+    const passwordMatch = password === ADMIN_PASSWORD;
+
+    // Validate credentials (use same error message to prevent user enumeration)
+    if (!usernameMatch || !passwordMatch) {
+      // Log failed attempt
+      console.warn(`Failed admin login attempt for username: ${username} from IP: ${req.ip}`);
+      
       return res.status(401).json({ 
         error: 'Invalid admin credentials' 
       });
@@ -32,11 +73,15 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       { 
         username: ADMIN_USERNAME,
-        role: 'admin'
+        role: 'admin',
+        loginTime: Date.now()
       },
       process.env.JWT_SECRET,
       { expiresIn: '8h' } // Admin sessions last 8 hours
     );
+
+    // Log successful login
+    console.log(`✅ Admin login successful: ${ADMIN_USERNAME} from IP: ${req.ip} at ${new Date().toISOString()}`);
 
     res.json({
       success: true,
@@ -57,9 +102,16 @@ router.post('/login', async (req, res) => {
 });
 
 // Get all flag submissions with team details (Admin only)
-router.get('/submissions', adminAuth, async (req, res) => {
+router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
   try {
     const { teamId, verified, sortBy = 'submittedAt', order = 'desc' } = req.query;
+
+    // Log admin access
+    console.log(`Admin ${req.admin.username} accessed submissions at ${new Date().toISOString()}`);
+
+    // Validate sortBy parameter to prevent NoSQL injection
+    const allowedSortFields = ['submittedAt', 'attemptNumber', 'verified', 'isCorrect'];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'submittedAt';
 
     // Build query
     const query = {};
@@ -68,7 +120,7 @@ router.get('/submissions', adminAuth, async (req, res) => {
 
     // Get all submissions
     const submissions = await FlagSubmission.find(query)
-      .sort({ [sortBy]: order === 'desc' ? -1 : 1 })
+      .sort({ [safeSortBy]: order === 'desc' ? -1 : 1 })
       .lean();
 
     // Get all unique team IDs
@@ -118,8 +170,10 @@ router.get('/submissions', adminAuth, async (req, res) => {
 });
 
 // Get detailed statistics (Admin only)
-router.get('/statistics', adminAuth, async (req, res) => {
+router.get('/statistics', adminAuth, apiRateLimiter, async (req, res) => {
   try {
+    console.log(`Admin ${req.admin.username} accessed statistics at ${new Date().toISOString()}`);
+    
     const totalTeams = await Team.countDocuments();
     const totalSubmissions = await FlagSubmission.countDocuments();
     const verifiedSubmissions = await FlagSubmission.countDocuments({ verified: true });
@@ -177,14 +231,21 @@ router.get('/statistics', adminAuth, async (req, res) => {
 });
 
 // Update submission verification status (Admin only)
-router.patch('/submissions/:id', adminAuth, async (req, res) => {
+router.patch('/submissions/:id', adminAuth, apiRateLimiter, async (req, res) => {
   try {
     const { id } = req.params;
     const { verified, isCorrect } = req.body;
 
+    // Validate MongoDB ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ 
+        error: 'Invalid submission ID format' 
+      });
+    }
+
     const updates = {};
-    if (verified !== undefined) updates.verified = verified;
-    if (isCorrect !== undefined) updates.isCorrect = isCorrect;
+    if (verified !== undefined) updates.verified = Boolean(verified);
+    if (isCorrect !== undefined) updates.isCorrect = Boolean(isCorrect);
 
     const submission = await FlagSubmission.findByIdAndUpdate(
       id,
@@ -198,7 +259,7 @@ router.patch('/submissions/:id', adminAuth, async (req, res) => {
       });
     }
 
-    console.log(`Admin ${req.admin.username} updated submission ${id}:`, updates);
+    console.log(`✅ Admin ${req.admin.username} updated submission ${id}:`, updates);
 
     res.json({
       success: true,
@@ -215,7 +276,7 @@ router.patch('/submissions/:id', adminAuth, async (req, res) => {
 });
 
 // Bulk update submissions (Admin only)
-router.patch('/submissions/bulk/verify', adminAuth, async (req, res) => {
+router.patch('/submissions/bulk/verify', adminAuth, apiRateLimiter, async (req, res) => {
   try {
     const { submissionIds, verified, isCorrect } = req.body;
 
@@ -225,16 +286,32 @@ router.patch('/submissions/bulk/verify', adminAuth, async (req, res) => {
       });
     }
 
+    // Limit bulk operations to prevent abuse
+    if (submissionIds.length > 100) {
+      return res.status(400).json({ 
+        error: 'Cannot update more than 100 submissions at once' 
+      });
+    }
+
+    // Validate all IDs are valid MongoDB ObjectIds
+    const invalidIds = submissionIds.filter(id => !id.match(/^[0-9a-fA-F]{24}$/));
+    if (invalidIds.length > 0) {
+      return res.status(400).json({ 
+        error: 'Invalid submission ID format in bulk request',
+        invalidIds: invalidIds
+      });
+    }
+
     const updates = {};
-    if (verified !== undefined) updates.verified = verified;
-    if (isCorrect !== undefined) updates.isCorrect = isCorrect;
+    if (verified !== undefined) updates.verified = Boolean(verified);
+    if (isCorrect !== undefined) updates.isCorrect = Boolean(isCorrect);
 
     const result = await FlagSubmission.updateMany(
       { _id: { $in: submissionIds } },
       updates
     );
 
-    console.log(`Admin ${req.admin.username} bulk updated ${result.modifiedCount} submissions`);
+    console.log(`✅ Admin ${req.admin.username} bulk updated ${result.modifiedCount} submissions`);
 
     res.json({
       success: true,

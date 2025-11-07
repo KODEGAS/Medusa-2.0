@@ -44,6 +44,18 @@ const flagSubmissionSchema = new mongoose.Schema({
   verifiedAt: {
     type: Date,
     default: null
+  },
+  attemptNumber: {
+    type: Number,
+    default: 1,
+    min: 1,
+    max: 2
+  },
+  pointDeduction: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 1
   }
 });
 

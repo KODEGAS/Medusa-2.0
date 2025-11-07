@@ -13,6 +13,11 @@ const FlagSubmissionPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [submissionInfo, setSubmissionInfo] = useState<{
+    attemptNumber?: number;
+    remainingAttempts?: number;
+    warning?: string;
+  } | null>(null);
 
   const validateInputs = () => {
     if (!flag.trim()) {
@@ -53,7 +58,7 @@ const FlagSubmissionPage = () => {
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${token}` // ✅ Send JWT via Authorization header
+          'Authorization': `Bearer ${token}` //  Send JWT via Authorization header
         },
         body: JSON.stringify({ flag }) // teamId comes from JWT token
       });
@@ -66,6 +71,8 @@ const FlagSubmissionPage = () => {
           setError("Authentication expired. Please go to Round 1 Auth page and log in again.");
           // Clear invalid token
           localStorage.removeItem('medusa_token');
+        } else if (response.status === 403) {
+          setError(data.error || "Maximum submission limit reached. You can only submit 2 flags.");
         } else if (response.status === 409) {
           setError(data.error || "This flag has already been submitted by your team");
         } else if (response.status === 429) {
@@ -76,8 +83,13 @@ const FlagSubmissionPage = () => {
         return;
       }
       
-      // Success!
+      // Success! Store submission info
       setSubmitSuccess(true);
+      setSubmissionInfo({
+        attemptNumber: data.attemptNumber,
+        remainingAttempts: data.remainingAttempts,
+        warning: data.warning
+      });
       setFlag("");
     } catch (err) {
       console.error("Flag submission error:", err);
@@ -89,6 +101,7 @@ const FlagSubmissionPage = () => {
 
   const handleReset = () => {
     setSubmitSuccess(false);
+    setSubmissionInfo(null);
     setError("");
     setFlag("");
   };
@@ -129,20 +142,49 @@ const FlagSubmissionPage = () => {
                 <p className="text-lg font-mono text-muted-foreground mb-3">
                   Your flag has been recorded and is being verified.
                 </p>
-                <div className="inline-flex items-center gap-2 text-sm font-mono text-primary bg-primary/10 px-4 py-2 rounded-lg mb-8">
-                  <Trophy className="w-4 h-4" />
-                  <span>Results will be released soon</span>
-                </div>
+                
+                {/* Submission Info */}
+                {submissionInfo && (
+                  <div className="mb-6 space-y-3">
+                    <div className="inline-flex items-center gap-2 text-sm font-mono text-primary bg-primary/10 px-4 py-2 rounded-lg">
+                      <Trophy className="w-4 h-4" />
+                      <span>Attempt {submissionInfo.attemptNumber} of 2 submitted</span>
+                    </div>
+                    
+                    {submissionInfo.remainingAttempts !== undefined && submissionInfo.remainingAttempts > 0 && (
+                      <div className="text-sm font-mono text-muted-foreground">
+                        {submissionInfo.remainingAttempts} attempt{submissionInfo.remainingAttempts > 1 ? 's' : ''} remaining
+                      </div>
+                    )}
+                    
+                    {/* Warning about point deduction */}
+                    {submissionInfo.warning && (
+                      <Alert className="border-yellow-600/50 bg-yellow-950/30 text-left">
+                        <AlertDescription className="font-mono text-sm text-yellow-200">
+                          ⚠️ {submissionInfo.warning}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                )}
+                
                 <p className="text-sm font-mono text-muted-foreground/70 mb-8">
-                  Keep track of the leaderboard for live updates on your standing.
+                  Results will be released soon. Keep track of the leaderboard for updates.
                 </p>
-                <Button 
-                  onClick={handleReset}
-                  className="px-8 py-6 text-lg font-mono"
-                  variant="outline"
-                >
-                  Submit Another Flag
-                </Button>
+                
+                {submissionInfo?.remainingAttempts && submissionInfo.remainingAttempts > 0 ? (
+                  <Button 
+                    onClick={handleReset}
+                    className="px-8 py-6 text-lg font-mono"
+                    variant="outline"
+                  >
+                    Submit Another Flag
+                  </Button>
+                ) : (
+                  <div className="text-sm font-mono text-amber-400">
+                    Maximum submissions reached (2/2)
+                  </div>
+                )}
               </CardContent>
             </Card>
           ) : (
@@ -157,6 +199,22 @@ const FlagSubmissionPage = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Warning Alert - Submission Limit */}
+                  <Alert className="border-amber-600/50 bg-amber-950/30">
+                    <Flag className="h-5 w-5 text-amber-400" />
+                    <AlertDescription className="font-mono text-sm text-amber-100/90">
+                      <div className="space-y-2">
+                        <p className="font-bold text-amber-300">⚠️ Important Submission Rules:</p>
+                        <ul className="text-xs space-y-1 ml-4">
+                          <li>• You have <strong>only 2 attempts</strong> to submit flags</li>
+                          <li>• First submission: Full points if correct</li>
+                          <li>• Second submission: <strong className="text-amber-400">20% point deduction</strong> will apply if correct</li>
+                          <li>• Make sure your flag is correct before submitting!</li>
+                        </ul>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+
                   {/* Info Alert - Team ID from JWT */}
                   <Alert className="border-primary/30 bg-primary/10">
                     <Flag className="h-4 w-4 text-primary" />
@@ -173,7 +231,7 @@ const FlagSubmissionPage = () => {
                     <Input
                       id="flag"
                       type="text"
-                      placeholder="medusa{...}"
+                      placeholder="MEDUSA{...}"
                       value={flag}
                       onChange={(e) => setFlag(e.target.value)}
                       className="font-mono text-accent"
@@ -229,43 +287,31 @@ const FlagSubmissionPage = () => {
                   </h3>
                   <ul className="space-y-2 text-sm font-mono text-muted-foreground">
                     <li className="flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span>Each flag can only be submitted once per team</span>
+                      <span className="text-amber-400 mr-2">⚠️</span>
+                      <span><strong>Maximum 2 submissions</strong> per team allowed</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-primary mr-2">•</span>
                       <span>Flags are case-sensitive and must match exactly</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span>Points will be awarded after verification</span>
+                      <span className="text-amber-400 mr-2">📉</span>
+                      <span><strong>Second submission incurs 20% point deduction</strong> if correct</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-primary mr-2">•</span>
-                      <span>Check the leaderboard for real-time rankings</span>
+                      <span>First correct submission determines your score and timing</span>
                     </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">•</span>
+                      <span>Verify your flag carefully before submitting</span>
+                    </li>
+        
                   </ul>
                 </div>
               </CardContent>
             </Card>
           )}
-
-          {/* Quick Links */}
-          <div className="mt-8 text-center space-y-4">
-            <div className="flex flex-wrap justify-center gap-4 font-mono text-sm">
-              <a href="/#timeline-section" className="text-primary hover:underline">
-                View Event Timeline
-              </a>
-              <span className="text-muted-foreground">|</span>
-              <a href="/registration" className="text-primary hover:underline">
-                Register Your Team
-              </a>
-              <span className="text-muted-foreground">|</span>
-              <a href="/#contact-section" className="text-primary hover:underline">
-                Need Help?
-              </a>
-            </div>
-          </div>
         </div>
       </main>
 

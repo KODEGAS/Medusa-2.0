@@ -71,6 +71,18 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.get('user-agent');
 
+    // Check how many submissions this team has made
+    const submissionCount = await FlagSubmission.countDocuments({ teamId });
+
+    // Limit to 2 submissions per team
+    if (submissionCount >= 2) {
+      return res.status(403).json({ 
+        error: 'Maximum submission limit reached. Your team can only submit 2 flags.',
+        submissionCount: submissionCount,
+        maxSubmissions: 2
+      });
+    }
+
     // Check for duplicate submission
     const existingSubmission = await FlagSubmission.findOne({ 
       teamId, 
@@ -84,6 +96,10 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
       });
     }
 
+    // Determine if this is the second submission (point deduction applies)
+    const isSecondSubmission = submissionCount === 1;
+    const pointDeduction = isSecondSubmission ? 0.2 : 0; // 20% deduction on second attempt
+
     // TODO: Add actual flag validation logic here
     // For now, we'll just store the submission and mark it for manual verification
     const flagSubmission = new FlagSubmission({
@@ -92,21 +108,31 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
       ipAddress,
       userAgent,
       isCorrect: false, // Will be verified later
-      verified: false
+      verified: false,
+      attemptNumber: submissionCount + 1,
+      pointDeduction: pointDeduction
     });
 
     await flagSubmission.save();
 
     // Log submission for audit trail
-    console.log(`Flag submitted by team ${teamId} from IP ${ipAddress} at ${new Date().toISOString()}`);
+    console.log(`Flag submitted by team ${teamId} (Attempt ${submissionCount + 1}/2) from IP ${ipAddress} at ${new Date().toISOString()}`);
 
-    res.status(201).json({ 
+    // Prepare response with submission info and warning for second attempt
+    const response = {
       success: true,
       message: 'Flag submitted successfully and is being verified',
       submissionId: flagSubmission._id,
       submittedAt: flagSubmission.submittedAt,
-      teamId: teamId // Confirm which team submitted
-    });
+      teamId: teamId,
+      attemptNumber: submissionCount + 1,
+      remainingAttempts: 2 - (submissionCount + 1),
+      warning: isSecondSubmission 
+        ? 'This was your final submission! A 20% point deduction will apply if this flag is incorrect.' 
+        : 'You have 1 attempt remaining. Your second submission will have a 20% point deduction if incorrect.'
+    };
+
+    res.status(201).json(response);
 
   } catch (error) {
     console.error('Flag submission error:', error);

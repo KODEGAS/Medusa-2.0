@@ -42,6 +42,10 @@ backend/.pm2/
 backend/pm2.json
 backend/ecosystem.config.js
 
+# Scripts with sensitive data
+backend/scripts/
+!backend/scripts/.gitkeep
+
 # Google Cloud
 backend/gcp-service-account.json
 *.key

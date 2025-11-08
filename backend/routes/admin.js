@@ -3,8 +3,10 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import FlagSubmission from '../models/FlagSubmission.js';
 import Team from '../models/Team.js';
+import RoundSession from '../models/RoundSession.js';
 import adminAuth from '../middlewares/adminAuth.js';
 import getRealIP from '../utils/getRealIP.js';
+import { calculatePoints } from '../utils/calculatePoints.js';
 
 const router = express.Router();
 
@@ -341,13 +343,38 @@ router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, r
     let correctCount = 0;
     let incorrectCount = 0;
     
-    // Verify each submission
+    // Verify each submission and calculate points
     for (const submission of submissions) {
       const isCorrect = submission.flag.trim() === CORRECT_FLAG;
+      
+      let points = 0;
+      
+      // Calculate points if correct
+      if (isCorrect) {
+        try {
+          // Get team's round start time
+          const roundSession = await RoundSession.findOne({ 
+            teamId: submission.teamId, 
+            round: 1 
+          });
+          
+          const roundStartTime = roundSession?.startTime || new Date();
+          points = calculatePoints(
+            roundStartTime,
+            submission.submittedAt,
+            submission.attemptNumber
+          );
+        } catch (err) {
+          console.warn(`Could not calculate points for submission ${submission._id}:`, err);
+          // Use a default point calculation based on attempt
+          points = submission.attemptNumber === 1 ? 800 : 600;
+        }
+      }
       
       await FlagSubmission.findByIdAndUpdate(submission._id, {
         verified: true,
         isCorrect: isCorrect,
+        points: points,
         verifiedAt: new Date()
       });
       
@@ -358,11 +385,11 @@ router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, r
       }
     }
     
-    console.log(`✅ Admin ${req.admin.username} auto-verified ${submissions.length} submissions: ${correctCount} correct, ${incorrectCount} incorrect`);
+    console.log(`✅ Admin ${req.admin.username} auto-verified ${submissions.length} submissions: ${correctCount} correct (with points), ${incorrectCount} incorrect`);
     
     res.json({
       success: true,
-      message: 'Auto-verification completed',
+      message: 'Auto-verification completed with point calculation',
       verified: submissions.length,
       correct: correctCount,
       incorrect: incorrectCount
@@ -372,6 +399,60 @@ router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, r
     console.error('Error auto-verifying submissions:', error);
     res.status(500).json({ 
       error: 'Failed to auto-verify submissions' 
+    });
+  }
+});
+
+// Recalculate points for all correct submissions (Admin only)
+router.post('/submissions/recalculate-points', adminAuth, apiRateLimiter, async (req, res) => {
+  try {
+    // Get all correct submissions (verified and correct)
+    const submissions = await FlagSubmission.find({ 
+      verified: true, 
+      isCorrect: true 
+    });
+    
+    let updatedCount = 0;
+    
+    // Recalculate points for each correct submission
+    for (const submission of submissions) {
+      try {
+        // Get team's round start time
+        const roundSession = await RoundSession.findOne({ 
+          teamId: submission.teamId, 
+          round: 1 
+        });
+        
+        const roundStartTime = roundSession?.startTime || new Date();
+        const points = calculatePoints(
+          roundStartTime,
+          submission.submittedAt,
+          submission.attemptNumber
+        );
+        
+        await FlagSubmission.findByIdAndUpdate(submission._id, {
+          points: points
+        });
+        
+        updatedCount++;
+      } catch (err) {
+        console.warn(`Could not recalculate points for submission ${submission._id}:`, err);
+      }
+    }
+    
+    console.log(`✅ Admin ${req.admin.username} recalculated points for ${updatedCount} correct submissions`);
+    
+    res.json({
+      success: true,
+      message: 'Points recalculated successfully',
+      updated: updatedCount,
+      total: submissions.length
+    });
+    
+  } catch (error) {
+    console.error('Error recalculating points:', error);
+    res.status(500).json({ 
+      error: 'Failed to recalculate points' 
     });
   }
 });

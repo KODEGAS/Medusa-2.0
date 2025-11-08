@@ -173,6 +173,36 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleRecalculatePoints = async () => {
+    if (!confirm('Recalculate points for all correct submissions based on submission time?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions/recalculate-points`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`✅ Recalculated points for ${data.updated} submissions`);
+        fetchData(); // Refresh data
+      } else {
+        alert('Failed to recalculate points');
+      }
+    } catch (err) {
+      alert('Error recalculating points');
+      console.error(err);
+    }
+  };
+
   const toggleTeamExpansion = (teamId: string) => {
     const newExpanded = new Set(expandedTeams);
     if (newExpanded.has(teamId)) {
@@ -236,6 +266,14 @@ const AdminDashboard = () => {
           >
             <CheckCircle className="mr-2 h-4 w-4" />
             Auto-Verify All
+          </Button>
+          <Button
+            onClick={handleRecalculatePoints}
+            variant="outline"
+            className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+          >
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Recalculate Points
           </Button>
           <Button
             onClick={handleLogout}

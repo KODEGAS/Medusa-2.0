@@ -64,9 +64,9 @@ export function calculatePoints(roundStartTime, submitTime, attemptNumber) {
   // Attempt penalty (25% penalty for 2nd attempt)
   const attemptPenalty = attemptNumber === 2 ? 0.25 : 0;
   
-  // Calculate final points with high precision (4 decimal places)
-  // This ensures every millisecond counts and creates unique scores
-  const points = Math.round((BASE_POINTS * timeMultiplier * (1 - attemptPenalty)) * 10000) / 10000;
+  // Calculate final points rounded to 1 decimal place
+  // This ensures unique scores while being easy to read
+  const points = Math.round((BASE_POINTS * timeMultiplier * (1 - attemptPenalty)) * 10) / 10;
   
   return points;
 }

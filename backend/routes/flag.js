@@ -1,6 +1,5 @@
 import express from 'express';
 import FlagSubmission from '../models/FlagSubmission.js';
-import RoundSession from '../models/RoundSession.js';
 import rateLimit from 'express-rate-limit';
 import authenticate from '../middlewares/authenticate.js';
 import getRealIP from '../utils/getRealIP.js';
@@ -10,6 +9,9 @@ const router = express.Router();
 
 // CORRECT FLAG for Round 1
 const CORRECT_FLAG = 'MEDUSA{5t3g4n0_1n_7h3_d33p_4bY55_0f_7h3_0c34n_15_4_7r345ur3}';
+
+// GLOBAL COMPETITION START TIME - November 8, 2025 at 19:00:00 IST
+const GLOBAL_COMPETITION_START = new Date('2025-11-08T19:00:00+05:30');
 
 // Rate limiter: 10 submissions per 5 minutes per IP (global protection)
 const ipRateLimiter = rateLimit({
@@ -109,16 +111,8 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     // Check if flag is correct
     const isCorrect = flag.trim() === CORRECT_FLAG;
     
-    // Get team's round start time for point calculation
-    let roundStartTime = new Date(); // Default to now if no session found
-    try {
-      const roundSession = await RoundSession.findOne({ teamId, round: 1 });
-      if (roundSession && roundSession.startTime) {
-        roundStartTime = roundSession.startTime;
-      }
-    } catch (err) {
-      console.warn('Could not fetch round start time for team', teamId);
-    }
+    // Use global competition start time for fair point calculation
+    const roundStartTime = GLOBAL_COMPETITION_START;
     
     // Calculate points if correct
     const points = isCorrect 

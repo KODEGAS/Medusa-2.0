@@ -3,12 +3,14 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import FlagSubmission from '../models/FlagSubmission.js';
 import Team from '../models/Team.js';
-import RoundSession from '../models/RoundSession.js';
 import adminAuth from '../middlewares/adminAuth.js';
 import getRealIP from '../utils/getRealIP.js';
 import { calculatePoints } from '../utils/calculatePoints.js';
 
 const router = express.Router();
+
+// GLOBAL COMPETITION START TIME - November 8, 2025 at 19:00:00 IST
+const GLOBAL_COMPETITION_START = new Date('2025-11-08T19:00:00+05:30');
 
 // Rate limiter for admin login - prevent brute force attacks
 const loginRateLimiter = rateLimit({
@@ -349,18 +351,11 @@ router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, r
       
       let points = 0;
       
-      // Calculate points if correct
+      // Calculate points if correct using global competition start time
       if (isCorrect) {
         try {
-          // Get team's round start time
-          const roundSession = await RoundSession.findOne({ 
-            teamId: submission.teamId, 
-            round: 1 
-          });
-          
-          const roundStartTime = roundSession?.startTime || new Date();
           points = calculatePoints(
-            roundStartTime,
+            GLOBAL_COMPETITION_START,
             submission.submittedAt,
             submission.attemptNumber
           );
@@ -417,15 +412,9 @@ router.post('/submissions/recalculate-points', adminAuth, apiRateLimiter, async 
     // Recalculate points for each correct submission
     for (const submission of submissions) {
       try {
-        // Get team's round start time
-        const roundSession = await RoundSession.findOne({ 
-          teamId: submission.teamId, 
-          round: 1 
-        });
-        
-        const roundStartTime = roundSession?.startTime || new Date();
+        // Use global competition start time for fair calculation
         const points = calculatePoints(
-          roundStartTime,
+          GLOBAL_COMPETITION_START,
           submission.submittedAt,
           submission.attemptNumber
         );

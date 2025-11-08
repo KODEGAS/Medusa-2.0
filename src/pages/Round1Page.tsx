@@ -254,15 +254,28 @@ const Round1Page = () => {
 
   const handleDownload = async (imageUrl: string, filename: string, imageId: string) => {
     try {
-      // Use direct link download to bypass CORS issues
+      // Fetch the image with CORS
+      const response = await fetch(imageUrl, {
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch image');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = imageUrl;
+      link.href = url;
       link.download = filename || 'download';
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      // Clean up the blob URL
+      setTimeout(() => window.URL.revokeObjectURL(url), 100);
 
       // Mark as downloaded
       if (!downloadedImages.includes(imageId)) {
@@ -270,11 +283,7 @@ const Round1Page = () => {
       }
     } catch (error) {
       console.error('Download failed:', error);
-      // Fallback: open in new tab
-      window.open(imageUrl, '_blank');
-      if (!downloadedImages.includes(imageId)) {
-        setDownloadedImages([...downloadedImages, imageId]);
-      }
+      alert('Failed to download image. Please check your internet connection or try again.');
     }
   };
 

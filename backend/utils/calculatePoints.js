@@ -9,34 +9,41 @@
 export function calculatePoints(roundStartTime, submitTime, attemptNumber) {
   const BASE_POINTS = 1000;
   
-  // Calculate time elapsed in seconds
+  // Calculate time elapsed in seconds (with millisecond precision)
   const timeElapsedMs = new Date(submitTime) - new Date(roundStartTime);
   const secondsElapsed = timeElapsedMs / 1000;
   const minutesElapsed = secondsElapsed / 60;
   
-  // Time-based multiplier (second-based with linear decay in early stages)
+  // Time-based multiplier (continuous linear decay for maximum granularity)
   let timeMultiplier = 1.0;
   
   if (secondsElapsed <= 300) {
-    // First 5 minutes: Linear decay from 100% to 99% (0.2% per minute, ~0.0033% per second)
+    // First 5 minutes: Linear decay from 100% to 99%
+    // Every second reduces by 0.00333%
     timeMultiplier = 1.0 - (secondsElapsed / 300) * 0.01;
   } else if (secondsElapsed <= 900) {
-    // 5-15 minutes: Linear decay from 99% to 97% (0.2% per minute)
+    // 5-15 minutes: Linear decay from 99% to 97%
+    // Every second reduces by 0.00333%
     const secondsAfter300 = secondsElapsed - 300;
     timeMultiplier = 0.99 - (secondsAfter300 / 600) * 0.02;
   } else if (secondsElapsed <= 1800) {
-    // 15-30 minutes: Linear decay from 97% to 95% (0.133% per minute)
+    // 15-30 minutes: Linear decay from 97% to 95%
+    // Every second reduces by 0.00222%
     const secondsAfter900 = secondsElapsed - 900;
     timeMultiplier = 0.97 - (secondsAfter900 / 900) * 0.02;
-  } else if (minutesElapsed <= 60) {
-    // 30-60 minutes: 95%
-    timeMultiplier = 0.95;
-  } else if (minutesElapsed <= 90) {
-    // 60-90 minutes: 90%
-    timeMultiplier = 0.90;
-  } else if (minutesElapsed <= 120) {
-    // 90-120 minutes (2 hours): 85%
-    timeMultiplier = 0.85;
+  } else if (secondsElapsed <= 3600) {
+    // 30-60 minutes: Linear decay from 95% to 90%
+    // Every second reduces by 0.00278%
+    const secondsAfter1800 = secondsElapsed - 1800;
+    timeMultiplier = 0.95 - (secondsAfter1800 / 1800) * 0.05;
+  } else if (secondsElapsed <= 5400) {
+    // 60-90 minutes: Linear decay from 90% to 85%
+    const secondsAfter3600 = secondsElapsed - 3600;
+    timeMultiplier = 0.90 - (secondsAfter3600 / 1800) * 0.05;
+  } else if (secondsElapsed <= 7200) {
+    // 90-120 minutes: Linear decay from 85% to 80%
+    const secondsAfter5400 = secondsElapsed - 5400;
+    timeMultiplier = 0.85 - (secondsAfter5400 / 1800) * 0.05;
   } else if (minutesElapsed <= 180) {
     // 2-3 hours: 80%
     timeMultiplier = 0.80;
@@ -57,8 +64,9 @@ export function calculatePoints(roundStartTime, submitTime, attemptNumber) {
   // Attempt penalty (25% penalty for 2nd attempt)
   const attemptPenalty = attemptNumber === 2 ? 0.25 : 0;
   
-  // Calculate final points (round to 2 decimal places for precision)
-  const points = Math.round((BASE_POINTS * timeMultiplier * (1 - attemptPenalty)) * 100) / 100;
+  // Calculate final points with high precision (4 decimal places)
+  // This ensures every millisecond counts and creates unique scores
+  const points = Math.round((BASE_POINTS * timeMultiplier * (1 - attemptPenalty)) * 10000) / 10000;
   
   return points;
 }

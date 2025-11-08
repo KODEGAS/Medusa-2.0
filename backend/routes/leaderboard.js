@@ -12,11 +12,14 @@ router.get('/', async (req, res) => {
       // Only correct submissions
       { $match: { isCorrect: true, verified: true } },
       
-      // Group by team and get the submission with highest points
+      // Sort first to ensure we get the best submission per team
+      { $sort: { points: -1, submittedAt: 1 } },
+      
+      // Group by team and get the submission with highest points (first after sort)
       { 
         $group: { 
           _id: '$teamId',
-          maxPoints: { $max: '$points' },
+          maxPoints: { $first: '$points' },
           attemptNumber: { $first: '$attemptNumber' },
           submittedAt: { $first: '$submittedAt' },
           pointDeduction: { $first: '$pointDeduction' }

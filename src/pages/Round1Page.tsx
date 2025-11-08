@@ -448,18 +448,6 @@ const Round1Page = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-amber-500 mt-1">•</span>
-                      <span>Look beneath the surface - images may contain more than meets the eye</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-500 mt-1">•</span>
-                      <span>If you find something locked, remember: Greek mythology may hold the key</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-500 mt-1">•</span>
-                      <span>Sometimes messages are encoded - you may need to decode and perhaps even reverse your thinking</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-500 mt-1">•</span>
                       <span>The flag format is: <code className="px-2 py-1 bg-black/40 rounded text-amber-400">MEDUSA&#123;...&#125;</code></span>
                     </li>
                   </ul>

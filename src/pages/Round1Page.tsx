@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Download, Flag, Video, Lock, Key, Scroll, Shield, Swords } from "lucide-react";
+import { Download, Flag, Video, Lock, Scroll, Shield, Swords } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
@@ -238,7 +238,7 @@ const Round1Page = () => {
     {
       id: "img1",
       name: "The Prophecy Written",
-      description: "A cryptic image holding secrets within - examine carefully",
+      description: "",
       url: "https://medusa-ecsc.s3.ap-south-1.amazonaws.com/round_01_image_000.png", 
       filename: "pwout.png"
     },
@@ -246,23 +246,23 @@ const Round1Page = () => {
     {
       id: "img2",
       name: "The Hidden Archive",
-      description: "What appears as one thing may contain another entirely",
-      url: "https://medusa-ecsc.s3.ap-south-1.amazonaws.com/round_01_image_01.jpg", 
+      description: "",
+      url: "https://medusa-ecsc.s3.ap-south-1.amazonaws.com/round_01_image_01.jpg",
+      filename: "medzip.jpg"
     },
   ];
 
   const handleDownload = async (imageUrl: string, filename: string, imageId: string) => {
     try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      // Use direct link download to bypass CORS issues
       const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
+      link.href = imageUrl;
+      link.download = filename || 'download';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
 
       // Mark as downloaded
       if (!downloadedImages.includes(imageId)) {
@@ -270,7 +270,11 @@ const Round1Page = () => {
       }
     } catch (error) {
       console.error('Download failed:', error);
-      alert('Failed to download image. Please try again.');
+      // Fallback: open in new tab
+      window.open(imageUrl, '_blank');
+      if (!downloadedImages.includes(imageId)) {
+        setDownloadedImages([...downloadedImages, imageId]);
+      }
     }
   };
 
@@ -353,15 +357,7 @@ const Round1Page = () => {
                   className="w-full h-full"
                 />
               </div>
-              <Alert className="mt-6 border-amber-600/30 bg-amber-950/30">
-                <Key className="h-4 w-4 text-amber-500" />
-                <AlertDescription className="font-serif text-amber-100/80">
-                  <strong>Hint:</strong> Not all is as it appears on the surface. 
-                  What seems like a simple image may contain hidden depths. 
-                  The ancient Greeks often concealed their secrets within secrets, 
-                  and sometimes the key to unlocking them lies in their own mythology.
-                </AlertDescription>
-              </Alert>
+      
             </CardContent>
           </Card>
 

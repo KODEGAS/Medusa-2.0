@@ -143,6 +143,36 @@ const AdminDashboard = () => {
     navigate(`/${ADMIN_LOGIN_PATH}`);
   };
 
+  const handleAutoVerify = async () => {
+    if (!confirm('Auto-verify all unverified submissions against the correct flag?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions/auto-verify`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`✅ Verified ${data.verified} submissions\n✓ Correct: ${data.correct}\n✗ Incorrect: ${data.incorrect}`);
+        fetchData(); // Refresh data
+      } else {
+        alert('Failed to auto-verify submissions');
+      }
+    } catch (err) {
+      alert('Error auto-verifying submissions');
+      console.error(err);
+    }
+  };
+
   const toggleTeamExpansion = (teamId: string) => {
     const newExpanded = new Set(expandedTeams);
     if (newExpanded.has(teamId)) {
@@ -198,14 +228,24 @@ const AdminDashboard = () => {
             <p className="text-slate-400">Welcome, {adminUser.username}</p>
           </div>
         </div>
-        <Button
-          onClick={handleLogout}
-          variant="outline"
-          className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={handleAutoVerify}
+            variant="outline"
+            className="border-green-500/50 text-green-400 hover:bg-green-500/10"
+          >
+            <CheckCircle className="mr-2 h-4 w-4" />
+            Auto-Verify All
+          </Button>
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </div>
       </div>
 
       {error && (

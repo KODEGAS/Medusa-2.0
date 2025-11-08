@@ -330,4 +330,50 @@ router.patch('/submissions/bulk/verify', adminAuth, apiRateLimiter, async (req, 
   }
 });
 
+// Auto-verify all submissions against correct flag (Admin only)
+router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, res) => {
+  try {
+    const CORRECT_FLAG = 'MEDUSA{5t3g4n0_1n_7h3_d33p_4bY55_0f_7h3_0c34n_15_4_7r345ur3}';
+    
+    // Get all unverified submissions
+    const submissions = await FlagSubmission.find({ verified: false });
+    
+    let correctCount = 0;
+    let incorrectCount = 0;
+    
+    // Verify each submission
+    for (const submission of submissions) {
+      const isCorrect = submission.flag.trim() === CORRECT_FLAG;
+      
+      await FlagSubmission.findByIdAndUpdate(submission._id, {
+        verified: true,
+        isCorrect: isCorrect,
+        verifiedAt: new Date()
+      });
+      
+      if (isCorrect) {
+        correctCount++;
+      } else {
+        incorrectCount++;
+      }
+    }
+    
+    console.log(`✅ Admin ${req.admin.username} auto-verified ${submissions.length} submissions: ${correctCount} correct, ${incorrectCount} incorrect`);
+    
+    res.json({
+      success: true,
+      message: 'Auto-verification completed',
+      verified: submissions.length,
+      correct: correctCount,
+      incorrect: incorrectCount
+    });
+    
+  } catch (error) {
+    console.error('Error auto-verifying submissions:', error);
+    res.status(500).json({ 
+      error: 'Failed to auto-verify submissions' 
+    });
+  }
+});
+
 export default router;

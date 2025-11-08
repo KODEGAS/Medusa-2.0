@@ -7,6 +7,81 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 
+// YouTube URL to Embed converter
+const convertYouTubeUrlToEmbed = (inputUrl: string): string | null => {
+  try {
+    if (!inputUrl) return null;
+    const maybeId = inputUrl.trim();
+    // If looks like just an ID (11-12 char, letters/numbers/_-)
+    if (/^[\w-]{11,}$/.test(maybeId) && !maybeId.includes('/')) {
+      return `https://www.youtube.com/embed/${maybeId}`;
+    }
+
+    let url = inputUrl.trim();
+    if (url.startsWith('//')) url = 'https:' + url;
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+    const u = new URL(url);
+
+    // If already an embed url, return normalized
+    if (u.hostname.includes('youtube.com') && u.pathname.startsWith('/embed/')) {
+      return `https://www.youtube.com${u.pathname}${u.search}`;
+    }
+
+    // youtu.be short link
+    if (u.hostname === 'youtu.be') {
+      const videoId = u.pathname.slice(1);
+      const params = new URLSearchParams();
+      if (u.searchParams.has('t')) {
+        params.set('start', String(parseYouTubeTime(u.searchParams.get('t')!)));
+      }
+      if (u.searchParams.has('list')) {
+        params.set('list', u.searchParams.get('list')!);
+      }
+      const qs = params.toString();
+      return `https://www.youtube.com/embed/${videoId}${qs ? '?' + qs : ''}`;
+    }
+
+    // youtube.com watch?v=VIDEO_ID
+    if (u.hostname.includes('youtube.com')) {
+      const v = u.searchParams.get('v');
+      if (v) {
+        const params = new URLSearchParams();
+        if (u.searchParams.get('list')) params.set('list', u.searchParams.get('list')!);
+        const t = u.searchParams.get('t') || u.searchParams.get('start');
+        if (t) params.set('start', String(parseYouTubeTime(t)));
+        return `https://www.youtube.com/embed/${v}${params.toString() ? '?' + params.toString() : ''}`;
+      }
+      const pathMatch = u.pathname.match(/\/(v|shorts)\/([\w-]{11,})/);
+      if (pathMatch) {
+        return `https://www.youtube.com/embed/${pathMatch[2]}`;
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error('Invalid YouTube url', e);
+    return null;
+  }
+};
+
+// Helper: parse timestamps like "1m30s", "90", "90s"
+function parseYouTubeTime(t: string): number {
+  if (!t) return 0;
+  t = t.trim();
+  if (/^\d+$/.test(t)) return parseInt(t, 10);
+  let seconds = 0;
+  const re = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/;
+  const m = t.match(re);
+  if (m) {
+    seconds += parseInt(m[1] || '0', 10) * 3600;
+    seconds += parseInt(m[2] || '0', 10) * 60;
+    seconds += parseInt(m[3] || '0', 10);
+    return seconds;
+  }
+  const n = parseInt(t.replace(/\D/g, ''), 10);
+  return isNaN(n) ? 0 : n;
+}
+
 // Timed hints configuration and component
 const HINTS: Array<{ id: string; title: string; body: string; unlockOffsetMs: number }> = [
   {
@@ -354,11 +429,11 @@ const Round1Page = () => {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="aspect-video bg-black/50 rounded-lg overflow-hidden border-2 border-amber-900/30 shadow-inner">
-                {/* Replace with your actual video URL */}
+                {/* YouTube video converted from: https://youtu.be/qcHkCVuppA4 */}
                 <iframe
                   width="100%"
                   height="100%"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  src={convertYouTubeUrlToEmbed("https://youtu.be/qcHkCVuppA4") || ""}
                   title="Round 1 Challenge Video"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

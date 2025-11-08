@@ -36,6 +36,10 @@ const DelegateBookRedirect = () => {
   window.location.href = "https://drive.google.com/file/d/1wJ7caV0KBz3yEniIXMDS388mtdBoMhSF/view";
   return null;
 };
+const Round1GuideRedirect = () => {
+  window.location.href = "https://drive.google.com/file/d/1-JrnSUCrk2jyDi6p_jMlLlkAr025C6js/view";
+  return null;
+};
 
 const AwarenessSessionRedirect = () => {
   window.location.href = "https://zoom.us/j/96715243562?pwd=ap9xBgK9YPyGBsfz0raf7Chehu1HZF.1";
@@ -95,6 +99,7 @@ const App = () => {
                 <Route path="/linkedin" element={<LinkedInRedirect />} />
                 <Route path="/facebook" element={<FacebookRedirect />} />
                 <Route path="/whatsapp" element={<WhatsAppRedirect />} />
+                <Route path="/round1-guide" element={<Round1GuideRedirect />} />
                 <Route path="/awareness-session" element={<AwarenessSessionRedirect />} />
                 
                 {/* Delegate Book Redirect */}

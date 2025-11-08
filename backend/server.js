@@ -10,6 +10,7 @@ import flagRoutes from './routes/flag.js';
 import authRoutes from './routes/auth.js';
 import roundsRoutes from './routes/rounds.js';
 import adminRoutes from './routes/admin.js';
+import leaderboardRoutes from './routes/leaderboard.js';
 
 dotenv.config();
 
@@ -87,6 +88,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/flag', flagRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/rounds', roundsRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 // Admin routes with obscured path (security through obscurity)
 const adminPath = process.env.ADMIN_ROUTE_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2f3a';

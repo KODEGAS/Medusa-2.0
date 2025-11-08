@@ -1,10 +1,15 @@
 import express from 'express';
 import FlagSubmission from '../models/FlagSubmission.js';
+import RoundSession from '../models/RoundSession.js';
 import rateLimit from 'express-rate-limit';
 import authenticate from '../middlewares/authenticate.js';
 import getRealIP from '../utils/getRealIP.js';
+import { calculatePoints } from '../utils/calculatePoints.js';
 
 const router = express.Router();
+
+// CORRECT FLAG for Round 1
+const CORRECT_FLAG = 'MEDUSA{5t3g4n0_1n_7h3_d33p_4bY55_0f_7h3_0c34n_15_4_7r345ur3}';
 
 // Rate limiter: 10 submissions per 5 minutes per IP (global protection)
 const ipRateLimiter = rateLimit({
@@ -101,35 +106,61 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     const isSecondSubmission = submissionCount === 1;
     const pointDeduction = isSecondSubmission ? 0.25 : 0; // 25% deduction on second attempt
 
-    // TODO: Add actual flag validation logic here
+    // Check if flag is correct
+    const isCorrect = flag.trim() === CORRECT_FLAG;
+    
+    // Get team's round start time for point calculation
+    let roundStartTime = new Date(); // Default to now if no session found
+    try {
+      const roundSession = await RoundSession.findOne({ teamId, round: 1 });
+      if (roundSession && roundSession.startTime) {
+        roundStartTime = roundSession.startTime;
+      }
+    } catch (err) {
+      console.warn('Could not fetch round start time for team', teamId);
+    }
+    
+    // Calculate points if correct
+    const points = isCorrect 
+      ? calculatePoints(roundStartTime, new Date(), submissionCount + 1)
+      : 0;
+
     const flagSubmission = new FlagSubmission({
       teamId,
       flag,
       ipAddress,
       userAgent,
-      isCorrect: false, // Will be verified later
-      verified: false,
+      isCorrect: isCorrect,
+      verified: true, // Auto-verify since we're checking against correct flag
+      verifiedAt: new Date(),
       attemptNumber: submissionCount + 1,
-      pointDeduction: pointDeduction
+      pointDeduction: pointDeduction,
+      points: points
     });
 
     await flagSubmission.save();
 
     // Log submission for audit trail
-    console.log(`Flag submitted by team ${teamId} (Attempt ${submissionCount + 1}/2) from IP ${ipAddress} at ${new Date().toISOString()}`);
+    console.log(`Flag submitted by team ${teamId} (Attempt ${submissionCount + 1}/2) - ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'} - ${points} points from IP ${ipAddress} at ${new Date().toISOString()}`);
 
-    // Prepare response with submission info and warning for second attempt
+    // Prepare response with submission info
     const response = {
       success: true,
-      message: 'Flag submitted successfully and is being verified',
+      message: isCorrect 
+        ? '🎉 Congratulations! Your flag is correct!' 
+        : '❌ Incorrect flag. Please try again.',
       submissionId: flagSubmission._id,
       submittedAt: flagSubmission.submittedAt,
       teamId: teamId,
       attemptNumber: submissionCount + 1,
       remainingAttempts: 2 - (submissionCount + 1),
-      warning: isSecondSubmission 
-        ? 'This was your final submission! A 25% point deduction will apply if this flag is incorrect.' 
-        : 'You have 1 attempt remaining. Your second submission will have a 25% point deduction if incorrect.'
+      isCorrect: isCorrect,
+      points: points,
+      warning: !isCorrect && isSecondSubmission 
+        ? 'This was your final submission! No more attempts remaining.' 
+        : !isCorrect && submissionCount === 0
+        ? 'You have 1 attempt remaining. Your second submission will have a 25% point deduction.'
+        : undefined
     };
 
     res.status(201).json(response);

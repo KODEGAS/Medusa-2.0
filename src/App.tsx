@@ -15,6 +15,7 @@ const Round1Page = lazy(() => import("./pages/Round1Page"));
 const Round1Auth = lazy(() => import("./pages/Round1Auth"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 
 // Social Media Redirect Components
 const LinkedInRedirect = () => {
@@ -94,6 +95,7 @@ const App = () => {
                 <Route path="/submit-flag" element={<FlagSubmissionPage />} />
                 <Route path="/round1-auth" element={<Round1Auth />} />
                 <Route path="/round1" element={<Round1Page />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
                 
                 {/* Admin Routes - Obscured paths for security */}
                 <Route path={`/${ADMIN_LOGIN_PATH}`} element={<AdminLogin />} />

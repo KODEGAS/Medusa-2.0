@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Menu, X, Calendar, Award, Phone, Wifi, Flag, Shield } from "lucide-react";
 import logoWhite from "@/assets/logowhite.png";
 import { useNavigate, useLocation } from "react-router-dom";
-import { hasIncompleteRegistration, shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
+import { shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -14,7 +14,6 @@ import {
   AlertDialogTitle,
   AlertDialogAction,
   AlertDialogCancel,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 export const Header = () => {
@@ -287,18 +286,10 @@ export const Header = () => {
                 </Tooltip>
               </TooltipProvider>
             )}
+            <Button variant="cyber" size="sm" disabled className="cursor-not-allowed opacity-60">
+              Registrations Closed
+            </Button>
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <AlertDialogTrigger asChild>
-                <Button variant="cyber" size="sm" onClick={handleRegisterClick}>
-                  {shouldRedirectToCtf()
-                    ? "Register Now"
-                    : hasIncompleteRegistration()
-                      ? "Continue Registration"
-                      : "Register Now"
-                  }
-                </Button>
-              </AlertDialogTrigger>
-
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Task Required</AlertDialogTitle>
@@ -348,23 +339,14 @@ export const Header = () => {
               ))}
               {/* Mobile Register Button */}
               <div className="pt-4 border-t border-border">
-                <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="cyber"
-                      size="sm"
-                      onClick={handleRegisterClick}
-                      className="w-full"
-                    >
-                      {shouldRedirectToCtf()
-                        ? "Register Now"
-                        : hasIncompleteRegistration()
-                          ? "Continue Registration"
-                          : "Register Now"
-                      }
-                    </Button>
-                  </AlertDialogTrigger>
-                </AlertDialog>
+                <Button
+                  variant="cyber"
+                  size="sm"
+                  disabled
+                  className="w-full cursor-not-allowed opacity-60"
+                >
+                  Registrations Closed
+                </Button>
               </div>
             </nav>
           </div>

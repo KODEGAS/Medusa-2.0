@@ -5,25 +5,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
-    ShieldCheck,
-    LogOut,
-    Users,
-    Flag,
-    CheckCircle,
-    Clock,
-    AlertTriangle,
-    TrendingUp,
-    Calendar,
-    ChevronDown,
-    ChevronUp
+  ShieldCheck,
+  LogOut,
+  Users,
+  Flag,
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+  TrendingUp,
+  Calendar,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 
 interface Submission {
@@ -74,6 +74,7 @@ const AdminDashboard = () => {
   // Get obscured paths from environment
   const ADMIN_API_PATH = import.meta.env.VITE_ADMIN_API_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2f3a';
   const ADMIN_LOGIN_PATH = import.meta.env.VITE_ADMIN_LOGIN_PATH || '7f3e9a2c1b5d8e4f6a0c7b3d9e1f5a2b';
+  const ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL || import.meta.env.VITE_API_URL;
 
   const adminToken = localStorage.getItem('adminToken');
   const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
@@ -93,7 +94,7 @@ const AdminDashboard = () => {
     try {
       // Fetch submissions using obscured API path
       const submissionsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/${ADMIN_API_PATH}/submissions`,
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions`,
         {
           headers: {
             'Authorization': `Bearer ${adminToken}`,
@@ -116,7 +117,7 @@ const AdminDashboard = () => {
 
       // Fetch statistics using obscured API path
       const statsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/${ADMIN_API_PATH}/statistics`,
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/statistics`,
         {
           headers: {
             'Authorization': `Bearer ${adminToken}`,

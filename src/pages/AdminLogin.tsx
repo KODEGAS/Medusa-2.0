@@ -17,6 +17,7 @@ const AdminLogin = () => {
   // Get obscured paths from environment
   const ADMIN_API_PATH = import.meta.env.VITE_ADMIN_API_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2f3a';
   const ADMIN_DASHBOARD_PATH = import.meta.env.VITE_ADMIN_DASHBOARD_PATH || '4c9e7f2a6b1d3e8f5a0b9c7d2e6f1a3b';
+  const ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL || import.meta.env.VITE_API_URL;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/${ADMIN_API_PATH}/login`, {
+      const response = await fetch(`${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

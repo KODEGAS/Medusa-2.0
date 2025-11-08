@@ -173,23 +173,28 @@ const TimedHints = () => {
         );
       })()}
       {serverHints.map((hint: any, idx: number) => {
-        const unlockOffsetMs = hint.unlockOffsetMs ?? hint.unlockOffsetMs;
+        const unlockOffsetMs = hint.unlockOffsetMs || 0;
         const unlocked = ('unlocked' in hint) ? hint.unlocked : (elapsed >= unlockOffsetMs);
         const timeLeft = ('timeLeftMs' in hint) ? hint.timeLeftMs : Math.max(0, unlockOffsetMs - elapsed);
+        const hintBody = hint.body || HINTS[idx]?.body || 'No hint available';
+        const hintTitle = hint.title || HINTS[idx]?.title || 'Mystery Hint';
+        
         return (
           <div
             key={hint.id}
             className={`p-4 rounded-lg border ${unlocked ? 'bg-amber-950/10 border-amber-600/30' : 'bg-amber-950/20 border-amber-900/30'} flex items-start justify-between`}
           >
             <div className="max-w-[85%]">
-              <p className="font-serif text-amber-200/90 italic mb-2">
-                {idx === 0 ? '💭 ' : idx === 1 ? '🗝️ ' : idx === 2 ? '📜 ' : '🔄 '}
-                <strong className="text-amber-400">{hint.title}</strong>
-              </p>
+              <div className="mb-3 bg-gradient-to-r from-amber-900/40 to-transparent p-2 rounded border-l-4 border-yellow-400">
+                <p className="font-serif text-lg font-bold">
+                  <span className="mr-2">{idx === 0 ? '💭' : idx === 1 ? '🗝️' : idx === 2 ? '📜' : '🔄'}</span>
+                  <span className="text-yellow-200">{hintTitle}</span>
+                </p>
+              </div>
               {unlocked ? (
-                <p className="text-sm text-amber-300/70 font-mono">{hint.body}</p>
+                <p className="text-sm text-white font-mono leading-relaxed bg-amber-900/20 p-3 rounded border border-amber-600/30">{hintBody}</p>
               ) : (
-                <p className="text-sm text-amber-300/50 font-mono">This hint will unlock after <strong>{formatDuration(hint.unlockOffsetMs)}</strong>. Time until unlock: <strong>{formatDuration(timeLeft)}</strong></p>
+                <p className="text-sm text-amber-300/50 font-mono">This hint will unlock after <strong>{formatDuration(hint.unlockOffsetMs || unlockOffsetMs)}</strong>. Time until unlock: <strong>{formatDuration(timeLeft)}</strong></p>
               )}
             </div>
             <div className="text-right">

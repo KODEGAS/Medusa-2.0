@@ -102,7 +102,6 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     const pointDeduction = isSecondSubmission ? 0.25 : 0; // 25% deduction on second attempt
 
     // TODO: Add actual flag validation logic here
-    // For now, we'll just store the submission and mark it for manual verification
     const flagSubmission = new FlagSubmission({
       teamId,
       flag,

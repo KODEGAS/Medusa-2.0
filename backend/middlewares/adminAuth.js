@@ -22,34 +22,34 @@ const adminAuth = (req, res, next) => {
     // Check if user is admin
     if (decoded.role !== 'admin') {
       const clientIP = getRealIP(req);
-      console.warn(`⚠️ Access denied - Non-admin role attempted: ${decoded.role} from IP: ${clientIP}`);
+      console.warn(`Access denied - Non-admin role attempted: ${decoded.role} from IP: ${clientIP}`);
       return res.status(403).json({ 
         error: 'Access denied. Admin privileges required.' 
       });
     }
 
-    // Optional: Check token age for additional security
+    // Check token age for additional security
     const tokenAge = Date.now() - (decoded.loginTime || 0);
     const maxTokenAge = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
     
     if (decoded.loginTime && tokenAge > maxTokenAge) {
-      console.warn(`Admin token expired - Age: ${Math.floor(tokenAge / 1000 / 60)} minutes`);
-      return res.status(401).json({ 
+    console.warn(`Admin token expired - Age: ${Math.floor(tokenAge / 1000 / 60)} minutes`);
+    return res.status(401).json({ 
         error: 'Admin token expired. Please login again.' 
-      });
+    });
     }
 
     // Attach admin info to request
     req.admin = decoded;
     next();
 
-  } catch (error) {
+} catch (error) {
     console.error('Admin auth error:', error.message);
     
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
+    return res.status(401).json({ 
         error: 'Invalid admin token' 
-      });
+    });
     }
     
     if (error.name === 'TokenExpiredError') {

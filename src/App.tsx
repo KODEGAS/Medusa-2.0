@@ -36,9 +36,12 @@ const DelegateBookRedirect = () => {
   window.location.href = "https://drive.google.com/file/d/1wJ7caV0KBz3yEniIXMDS388mtdBoMhSF/view";
   return null;
 };
+
 const Round1GuideRedirect = () => {
-  window.location.href = "https://drive.google.com/file/d/1-JrnSUCrk2jyDi6p_jMlLlkAr025C6js/view";
-  return null;
+  useEffect(() => {
+    window.location.href = "https://drive.google.com/file/d/1-JrnSUCrk2jyDi6p_jMlLlkAr025C6js/view";
+  }, []);
+  return <PageLoader />;
 };
 
 const AwarenessSessionRedirect = () => {

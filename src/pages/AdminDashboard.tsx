@@ -15,7 +15,8 @@ import {
   TrendingUp,
   Calendar,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Edit
 } from 'lucide-react';
 import {
   Table,
@@ -69,6 +70,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
+  const [editingSubmissionId, setEditingSubmissionId] = useState<string | null>(null);
+  const [editingTime, setEditingTime] = useState<string>('');
   const navigate = useNavigate();
 
   // Get obscured paths from environment
@@ -201,6 +204,54 @@ const AdminDashboard = () => {
       alert('Error recalculating points');
       console.error(err);
     }
+  };
+
+  const handleUpdateSubmissionTime = async (submissionId: string, newTime: string) => {
+    if (!newTime) {
+      alert('Please enter a valid date and time');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions/${submissionId}/update-time`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ submittedAt: newTime }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`✅ Submission time updated successfully`);
+        setEditingSubmissionId(null);
+        setEditingTime('');
+        fetchData(); // Refresh data
+      } else {
+        alert('Failed to update submission time: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Error updating submission time');
+      console.error(err);
+    }
+  };
+
+  const startEditingTime = (submissionId: string, currentTime: string) => {
+    setEditingSubmissionId(submissionId);
+    // Format for datetime-local input
+    const date = new Date(currentTime);
+    const formatted = date.toISOString().slice(0, 16);
+    setEditingTime(formatted);
+  };
+
+  const cancelEditingTime = () => {
+    setEditingSubmissionId(null);
+    setEditingTime('');
   };
 
   const toggleTeamExpansion = (teamId: string) => {
@@ -464,22 +515,57 @@ const AdminDashboard = () => {
                                           </Badge>
                                         )}
                                       </h4>
-                                      <div className="flex items-center gap-4 mt-2 text-sm">
-                                        <span className="text-slate-400 flex items-center gap-1">
-                                          <Calendar className="h-3 w-3" />
-                                          {dt.date}
-                                        </span>
-                                        <span className="text-purple-400 font-mono flex items-center gap-1">
-                                          <Clock className="h-3 w-3" />
-                                          {dt.time}
-                                        </span>
-                                        {timeDiff && (
-                                          <span className="text-orange-400 text-xs">
-                                            <TrendingUp className="h-3 w-3 inline mr-1" />
-                                            {timeDiff} after first attempt
+                                      {editingSubmissionId === attempt._id ? (
+                                        <div className="flex items-center gap-2 mt-2">
+                                          <input
+                                            type="datetime-local"
+                                            value={editingTime}
+                                            onChange={(e) => setEditingTime(e.target.value)}
+                                            className="px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                          />
+                                          <Button
+                                            size="sm"
+                                            onClick={() => handleUpdateSubmissionTime(attempt._id, editingTime)}
+                                            className="bg-green-600 hover:bg-green-700 text-xs"
+                                          >
+                                            Save
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={cancelEditingTime}
+                                            className="text-xs"
+                                          >
+                                            Cancel
+                                          </Button>
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center gap-4 mt-2 text-sm">
+                                          <span className="text-slate-400 flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" />
+                                            {dt.date}
                                           </span>
-                                        )}
-                                      </div>
+                                          <span className="text-purple-400 font-mono flex items-center gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            {dt.time}
+                                          </span>
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => startEditingTime(attempt._id, attempt.submittedAt)}
+                                            className="text-blue-400 hover:text-blue-300 text-xs h-6 px-2"
+                                          >
+                                            <Edit className="h-3 w-3 mr-1" />
+                                            Edit Time
+                                          </Button>
+                                          {timeDiff && (
+                                            <span className="text-orange-400 text-xs">
+                                              <TrendingUp className="h-3 w-3 inline mr-1" />
+                                              {timeDiff} after first attempt
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                     <div className="flex gap-2">
                                       {attempt.verified ? (

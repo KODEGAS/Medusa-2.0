@@ -446,4 +446,68 @@ router.post('/submissions/recalculate-points', adminAuth, apiRateLimiter, async 
   }
 });
 
+// Update submission time (Admin only)
+router.patch('/submissions/:id/update-time', adminAuth, apiRateLimiter, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { submittedAt } = req.body;
+
+    // Validate MongoDB ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ 
+        error: 'Invalid submission ID format' 
+      });
+    }
+
+    // Validate date
+    const newDate = new Date(submittedAt);
+    if (isNaN(newDate.getTime())) {
+      return res.status(400).json({ 
+        error: 'Invalid date format' 
+      });
+    }
+
+    // Get the submission
+    const submission = await FlagSubmission.findById(id);
+    if (!submission) {
+      return res.status(404).json({ 
+        error: 'Submission not found' 
+      });
+    }
+
+    // Update the submission time
+    submission.submittedAt = newDate;
+
+    // Recalculate points if it's a correct submission
+    if (submission.isCorrect && submission.verified) {
+      const points = calculatePoints(
+        GLOBAL_COMPETITION_START,
+        newDate,
+        submission.attemptNumber
+      );
+      submission.points = points;
+    }
+
+    await submission.save();
+
+    console.log(`✅ Admin ${req.admin.username} updated submission ${id} time to ${newDate.toISOString()}`);
+
+    res.json({
+      success: true,
+      message: 'Submission time updated successfully',
+      submission: {
+        _id: submission._id,
+        submittedAt: submission.submittedAt,
+        points: submission.points
+      }
+    });
+
+  } catch (error) {
+    console.error('Error updating submission time:', error);
+    res.status(500).json({ 
+      error: 'Failed to update submission time' 
+    });
+  }
+});
+
 export default router;

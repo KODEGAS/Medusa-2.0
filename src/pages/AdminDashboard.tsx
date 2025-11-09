@@ -218,6 +218,12 @@ const AdminDashboard = () => {
     }
 
     try {
+      // Convert datetime-local string to ISO string with proper timezone
+      // datetime-local gives us "2025-11-08T19:30" which is in local time
+      // We need to convert it to a full ISO string with timezone
+      const localDate = new Date(newTime);
+      const isoString = localDate.toISOString();
+
       const response = await fetch(
         `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions/${submissionId}/update-time`,
         {
@@ -226,14 +232,14 @@ const AdminDashboard = () => {
             'Authorization': `Bearer ${adminToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ submittedAt: newTime }),
+          body: JSON.stringify({ submittedAt: isoString }),
         }
       );
 
       const data = await response.json();
 
       if (data.success) {
-        alert(`✅ Submission time updated successfully`);
+        alert(`✅ Submission time updated successfully\nNew time: ${new Date(data.submission.submittedAt).toLocaleString()}`);
         setEditingSubmissionId(null);
         setEditingTime('');
         fetchData(); // Refresh data
@@ -249,8 +255,15 @@ const AdminDashboard = () => {
   const startEditingTime = (submissionId: string, currentTime: string) => {
     setEditingSubmissionId(submissionId);
     // Format for datetime-local input
+    // Convert from ISO string to local datetime string (YYYY-MM-DDTHH:mm)
     const date = new Date(currentTime);
-    const formatted = date.toISOString().slice(0, 16);
+    // Get local datetime string by adjusting for timezone offset
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const formatted = `${year}-${month}-${day}T${hours}:${minutes}`;
     setEditingTime(formatted);
   };
 

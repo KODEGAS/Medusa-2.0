@@ -55,6 +55,7 @@ const Round1Auth = () => {
         // Store minimal client-side flags for UI state
         sessionStorage.setItem('round1_authenticated', 'true');
         sessionStorage.setItem('round1_team_id', teamId);
+        sessionStorage.setItem('round1_team_name', data.teamName); // Store team name for leaderboard identification
         sessionStorage.setItem('round1_auth_time', new Date().toISOString());
         
         // Redirect to Round 1 page

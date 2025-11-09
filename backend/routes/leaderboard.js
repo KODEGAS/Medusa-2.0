@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
         
         return {
           rank: index + 1,
-          teamId: entry._id,
+          // teamId: entry._id, // REMOVED for security - don't expose team IDs publicly
           teamName: team?.teamName || 'Unknown Team',
           university: team?.university || 'Unknown University',
           leaderName: team?.leaderName || null,
@@ -113,7 +113,7 @@ router.get('/team/:teamId', async (req, res) => {
       success: true,
       hasSolved: true,
       rank,
-      teamId,
+      // teamId removed for security
       teamName: team?.teamName,
       university: team?.university,
       points: teamSubmission.points,

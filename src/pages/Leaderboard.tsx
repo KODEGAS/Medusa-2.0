@@ -3,11 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Trophy, Medal, Award, TrendingUp, Users, Clock, Target, Zap } from 'lucide-react';
+import { Trophy, Medal, Award, Clock } from 'lucide-react';
 
 interface LeaderboardEntry {
   rank: number;
-  teamId: string;
+  // teamId removed for security
   teamName: string;
   university: string;
   points: number;
@@ -28,14 +28,14 @@ const Leaderboard = () => {
   const [stats, setStats] = useState<LeaderboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [myTeamId, setMyTeamId] = useState<string | null>(null);
+  const [myTeamName, setMyTeamName] = useState<string | null>(null);
 
   const apiUrl = import.meta.env.VITE_ADMIN_BACKEND_URL|| 'http://localhost:3001';
 
   useEffect(() => {
-    // Get current team ID from session storage
-    const teamId = sessionStorage.getItem('round1_team_id');
-    setMyTeamId(teamId);
+    // Get current team name from session storage instead of ID
+    const teamName = sessionStorage.getItem('round1_team_name');
+    setMyTeamName(teamName);
 
     fetchLeaderboard();
     // Auto-refresh every 30 seconds
@@ -85,10 +85,9 @@ const Leaderboard = () => {
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      second: '2-digit'
     });
   };
 
@@ -131,68 +130,6 @@ const Leaderboard = () => {
             </p>
           </div>
 
-          {/* Statistics Cards */}
-          {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-              <Card className="border-amber-600/30 bg-amber-950/20 backdrop-blur">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <Users className="w-8 h-8 text-amber-500" />
-                    <div>
-                      <p className="text-3xl font-bold text-white">{stats.totalTeams}</p>
-                      <p className="text-sm text-amber-300">Total Teams</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-green-600/30 bg-green-950/20 backdrop-blur">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <Target className="w-8 h-8 text-green-500" />
-                    <div>
-                      <p className="text-3xl font-bold text-white">{stats.solvedTeams}</p>
-                      <p className="text-sm text-green-300">Solved</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-purple-600/30 bg-purple-950/20 backdrop-blur">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <TrendingUp className="w-8 h-8 text-purple-500" />
-                    <div>
-                      <p className="text-3xl font-bold text-white">{stats.solveRate}</p>
-                      <p className="text-sm text-purple-300">Solve Rate</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-blue-600/30 bg-blue-950/20 backdrop-blur">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <Zap className="w-8 h-8 text-blue-500" />
-                    <div>
-                      <p className="text-3xl font-bold text-white">{stats.totalSubmissions}</p>
-                      <p className="text-sm text-blue-300">Submissions</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Error Message */}
-          {error && (
-            <Card className="mb-8 border-red-500/50 bg-red-950/30">
-              <CardContent className="pt-6 text-center text-red-400">
-                {error}
-              </CardContent>
-            </Card>
-          )}
-
           {/* Leaderboard */}
           <Card className="border-amber-600/30 bg-card/50 backdrop-blur-sm shadow-2xl">
             <CardHeader className="border-b border-amber-900/30 bg-gradient-to-r from-amber-950/50 to-transparent">
@@ -226,10 +163,10 @@ const Leaderboard = () => {
                     </thead>
                     <tbody className="divide-y divide-amber-900/20">
                       {leaderboard.map((entry) => {
-                        const isMyTeam = entry.teamId === myTeamId;
+                        const isMyTeam = entry.teamName === myTeamName;
                         return (
                           <tr
-                            key={entry.teamId}
+                            key={entry.rank}
                             className={`transition-colors ${isMyTeam
                               ? 'bg-purple-900/30 border-l-4 border-purple-500'
                               : entry.rank <= 3
@@ -256,7 +193,6 @@ const Leaderboard = () => {
                                     <Badge className="ml-2 bg-purple-600 text-white">You</Badge>
                                   )}
                                 </p>
-                                <p className="text-xs text-amber-400/60 font-mono">{entry.teamId}</p>
                               </div>
                             </td>
 

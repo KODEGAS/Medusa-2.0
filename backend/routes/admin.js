@@ -510,4 +510,117 @@ router.patch('/submissions/:id/update-time', adminAuth, apiRateLimiter, async (r
   }
 });
 
+// Manual flag submission on behalf of a team (Admin only)
+router.post('/submissions/manual-submit', adminAuth, apiRateLimiter, async (req, res) => {
+  try {
+    const { teamId, flag, submittedAt } = req.body;
+    const CORRECT_FLAG = 'MEDUSA{5t3g4n0_1n_7h3_d33p_4bY55_0f_7h3_0c34n_15_4_7r345ur3}';
+
+    // Validate required fields
+    if (!teamId || !flag) {
+      return res.status(400).json({ 
+        error: 'Team ID and flag are required' 
+      });
+    }
+
+    // Validate team exists
+    const team = await Team.findOne({ teamId });
+    if (!team) {
+      return res.status(404).json({ 
+        error: 'Team not found' 
+      });
+    }
+
+    // Check how many submissions this team has made
+    const submissionCount = await FlagSubmission.countDocuments({ teamId });
+
+    // Limit to 2 submissions per team
+    if (submissionCount >= 2) {
+      return res.status(403).json({ 
+        error: 'Team has already submitted 2 flags (maximum limit reached)',
+        submissionCount: submissionCount,
+        maxSubmissions: 2
+      });
+    }
+
+    // Check for duplicate flag
+    const existingSubmission = await FlagSubmission.findOne({ 
+      teamId, 
+      flag: flag.trim()
+    });
+
+    if (existingSubmission) {
+      return res.status(409).json({ 
+        error: 'This exact flag has already been submitted by this team',
+        submittedAt: existingSubmission.submittedAt
+      });
+    }
+
+    // Use provided time or current time
+    const submitTime = submittedAt ? new Date(submittedAt) : new Date();
+    if (submittedAt && isNaN(submitTime.getTime())) {
+      return res.status(400).json({ 
+        error: 'Invalid submission date format' 
+      });
+    }
+
+    // Determine if this is the second submission
+    const isSecondSubmission = submissionCount === 1;
+    const pointDeduction = isSecondSubmission ? 0.25 : 0;
+
+    // Check if flag is correct
+    const isCorrect = flag.trim() === CORRECT_FLAG;
+
+    // Calculate points if correct
+    const points = isCorrect 
+      ? calculatePoints(GLOBAL_COMPETITION_START, submitTime, submissionCount + 1)
+      : 0;
+
+    // Create the submission
+    const flagSubmission = new FlagSubmission({
+      teamId,
+      flag: flag.trim(),
+      ipAddress: getRealIP(req) + ' (Admin)',
+      userAgent: `Admin Manual Submit by ${req.admin.username}`,
+      isCorrect: isCorrect,
+      verified: true, // Auto-verify admin submissions
+      verifiedAt: new Date(),
+      attemptNumber: submissionCount + 1,
+      pointDeduction: pointDeduction,
+      points: points,
+      submittedAt: submitTime
+    });
+
+    await flagSubmission.save();
+
+    console.log(`✅ Admin ${req.admin.username} manually submitted flag for team ${teamId} (Attempt ${submissionCount + 1}/2) - ${isCorrect ? 'CORRECT' : 'INCORRECT'} - ${points} points at ${submitTime.toISOString()}`);
+
+    res.status(201).json({
+      success: true,
+      message: isCorrect 
+        ? '✅ Flag submission successful! The flag is CORRECT.' 
+        : '❌ Flag submitted but INCORRECT.',
+      submission: {
+        _id: flagSubmission._id,
+        teamId,
+        teamName: team.teamName,
+        flag: flag.trim(),
+        attemptNumber: submissionCount + 1,
+        remainingAttempts: 2 - (submissionCount + 1),
+        isCorrect,
+        verified: true,
+        points,
+        submittedAt: submitTime,
+        submittedBy: `Admin: ${req.admin.username}`
+      }
+    });
+
+  } catch (error) {
+    console.error('Manual flag submission error:', error);
+    res.status(500).json({ 
+      error: 'Failed to submit flag manually' 
+    });
+  }
+});
+
 export default router;

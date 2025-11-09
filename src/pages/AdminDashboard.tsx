@@ -16,7 +16,8 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
-  Edit
+  Edit,
+  Send
 } from 'lucide-react';
 import {
   Table,
@@ -72,6 +73,10 @@ const AdminDashboard = () => {
   const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
   const [editingSubmissionId, setEditingSubmissionId] = useState<string | null>(null);
   const [editingTime, setEditingTime] = useState<string>('');
+  const [showManualSubmit, setShowManualSubmit] = useState(false);
+  const [manualTeamId, setManualTeamId] = useState('');
+  const [manualFlag, setManualFlag] = useState('');
+  const [manualSubmitTime, setManualSubmitTime] = useState('');
   const navigate = useNavigate();
 
   // Get obscured paths from environment
@@ -254,6 +259,54 @@ const AdminDashboard = () => {
     setEditingTime('');
   };
 
+  const handleManualSubmit = async () => {
+    if (!manualTeamId || !manualFlag) {
+      alert('Please enter both Team ID and Flag');
+      return;
+    }
+
+    try {
+      const payload: any = {
+        teamId: manualTeamId.trim(),
+        flag: manualFlag.trim(),
+      };
+
+      // Only include submittedAt if provided
+      if (manualSubmitTime) {
+        payload.submittedAt = manualSubmitTime;
+      }
+
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions/manual-submit`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`${data.message}\n\nTeam: ${data.submission.teamName}\nAttempt: ${data.submission.attemptNumber}/2\nPoints: ${data.submission.points}\nRemaining Attempts: ${data.submission.remainingAttempts}`);
+        // Reset form
+        setManualTeamId('');
+        setManualFlag('');
+        setManualSubmitTime('');
+        setShowManualSubmit(false);
+        fetchData(); // Refresh data
+      } else {
+        alert('Failed to submit flag: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Error submitting flag manually');
+      console.error(err);
+    }
+  };
+
   const toggleTeamExpansion = (teamId: string) => {
     const newExpanded = new Set(expandedTeams);
     if (newExpanded.has(teamId)) {
@@ -407,6 +460,84 @@ const AdminDashboard = () => {
           </Card>
         </div>
       )}
+
+      {/* Manual Flag Submission */}
+      <Card className="border-blue-500/20 bg-slate-800/50 mb-8">
+        <CardHeader 
+          className="cursor-pointer hover:bg-slate-800/70 transition-colors"
+          onClick={() => setShowManualSubmit(!showManualSubmit)}
+        >
+          <CardTitle className="text-white flex items-center gap-2">
+            <Send className="h-5 w-5" />
+            Manual Flag Submission
+            <ChevronDown className={`h-5 w-5 ml-auto transition-transform ${showManualSubmit ? 'rotate-180' : ''}`} />
+          </CardTitle>
+          <CardDescription className="text-slate-400">
+            Submit flags on behalf of teams (for technical issues)
+          </CardDescription>
+        </CardHeader>
+        {showManualSubmit && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-slate-300 mb-2 block">Team ID *</label>
+                <input
+                  type="text"
+                  value={manualTeamId}
+                  onChange={(e) => setManualTeamId(e.target.value)}
+                  placeholder="e.g., ro1EA15"
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-slate-300 mb-2 block">Submission Time (optional)</label>
+                <input
+                  type="datetime-local"
+                  value={manualSubmitTime}
+                  onChange={(e) => setManualSubmitTime(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white focus:border-blue-500 focus:outline-none"
+                />
+                <p className="text-xs text-slate-500 mt-1">Leave empty to use current time</p>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm text-slate-300 mb-2 block">Flag *</label>
+              <input
+                type="text"
+                value={manualFlag}
+                onChange={(e) => setManualFlag(e.target.value)}
+                placeholder="MEDUSA{...}"
+                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white font-mono focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleManualSubmit}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                Submit Flag
+              </Button>
+              <Button
+                onClick={() => {
+                  setManualTeamId('');
+                  setManualFlag('');
+                  setManualSubmitTime('');
+                }}
+                variant="outline"
+                className="border-slate-600 text-slate-300"
+              >
+                Clear Form
+              </Button>
+            </div>
+            <Alert className="bg-blue-500/10 border-blue-500/50">
+              <AlertDescription className="text-blue-300 text-sm">
+                ⚠️ This will create a flag submission as if the team submitted it themselves. The flag will be auto-verified and points calculated automatically.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        )}
+      </Card>
 
       {/* Submissions Table */}
       <Card className="border-purple-500/20 bg-slate-800/50">

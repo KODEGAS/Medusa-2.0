@@ -94,10 +94,10 @@ const Leaderboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-950/30 via-amber-900/20 to-background">
         <div className="text-center">
           <div className="h-16 w-16 animate-spin rounded-full border-4 border-amber-500 border-t-transparent mx-auto mb-4" />
-          <p className="text-white text-lg font-serif">Loading Leaderboard...</p>
+          <p className="text-amber-100 text-lg font-serif">Loading Leaderboard...</p>
         </div>
       </div>
     );
@@ -116,7 +116,7 @@ const Leaderboard = () => {
 
       <Header />
 
-      <main className="flex-1 py-12 px-4 relative z-10">
+      <main className="flex-1 pt-24 pb-12 px-4 relative z-10">
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-12">
@@ -301,13 +301,6 @@ const Leaderboard = () => {
               )}
             </CardContent>
           </Card>
-
-          {/* Footer Note */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-amber-400/60 font-serif italic">
-              🏆 Leaderboard updates automatically every 30 seconds
-            </p>
-          </div>
         </div>
       </main>
 

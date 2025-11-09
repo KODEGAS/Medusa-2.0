@@ -217,7 +217,7 @@ const Leaderboard = () => {
                                 variant={entry.attemptNumber === 1 ? 'default' : 'secondary'}
                                 className={entry.attemptNumber === 1 ? 'bg-green-600' : 'bg-orange-600'}
                               >
-                                {entry.attemptNumber === 1 ? '1st try ⚡' : '2nd try'}
+                                {entry.attemptNumber === 1 ? '1st try' : '2nd try'}
                               </Badge>
                             </td>
 

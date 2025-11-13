@@ -12,6 +12,19 @@ const flagSubmissionSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  round: {
+    type: Number,
+    required: true,
+    default: 1,
+    enum: [1, 2],
+    index: true
+  },
+  challengeType: {
+    type: String,
+    enum: ['android', 'pwn', null],
+    default: null,
+    index: true
+  },
   isCorrect: {
     type: Boolean,
     default: false
@@ -59,8 +72,9 @@ const flagSubmissionSchema = new mongoose.Schema({
   }
 });
 
-// Compound index to prevent duplicate submissions
-flagSubmissionSchema.index({ teamId: 1, flag: 1, challengeId: 1 });
+// Compound indexes to prevent duplicate submissions per challenge
+flagSubmissionSchema.index({ teamId: 1, flag: 1, round: 1, challengeType: 1 }, { unique: true });
+flagSubmissionSchema.index({ teamId: 1, round: 1, challengeType: 1 });
 
 // Instance method to verify the flag
 flagSubmissionSchema.methods.verify = function() {

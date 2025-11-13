@@ -13,6 +13,8 @@ const RegistrationPage = lazy(() => import("./pages/RegistrationPage"));
 const FlagSubmissionPage = lazy(() => import("./pages/FlagSubmissionPage"));
 const Round1Page = lazy(() => import("./pages/Round1Page"));
 const Round1Auth = lazy(() => import("./pages/Round1Auth"));
+const Round2Page = lazy(() => import("./pages/Round2Page"));
+const Round2Auth = lazy(() => import("./pages/Round2Auth"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
@@ -95,6 +97,8 @@ const App = () => {
                 <Route path="/submit-flag" element={<FlagSubmissionPage />} />
                 <Route path="/round1-auth" element={<Round1Auth />} />
                 <Route path="/round1" element={<Round1Page />} />
+                <Route path="/round2-auth" element={<Round2Auth />} />
+                <Route path="/round2" element={<Round2Page />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 
                 {/* Admin Routes - Obscured paths for security */}

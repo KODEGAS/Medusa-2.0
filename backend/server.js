@@ -1,9 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+
+// Environment variables are preloaded via -r dotenv/config in package.json
+// This ensures .env is loaded BEFORE any ES6 imports are processed
+
+// Import routes (environment variables are already available)
 import teamRoutes from './routes/team.js';
 import paymentRoutes from './routes/payment.js';
 import flagRoutes from './routes/flag.js';
@@ -12,9 +16,12 @@ import roundsRoutes from './routes/rounds.js';
 import adminRoutes from './routes/admin.js';
 import leaderboardRoutes from './routes/leaderboard.js';
 
-dotenv.config();
-
 const app = express();
+
+// Trust proxy - GCP Cloud Load Balancer Configuration
+// Only trust the first proxy (Google Cloud Load Balancer)
+// This prevents IP spoofing from malicious X-Forwarded-For headers
+app.set('trust proxy', 1);
 
 // Security headers with Helmet
 app.use(helmet({

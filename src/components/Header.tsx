@@ -6,14 +6,14 @@ import logoWhite from "@/assets/logowhite.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { shouldRedirectToCtf, getCtfChallengeUrl } from "@/lib/registrationStorage";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogAction,
-  AlertDialogCancel,
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogAction,
+    AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 
 export const Header = () => {
@@ -121,6 +121,7 @@ export const Header = () => {
     { name: "About", href: "#about", icon: Award, type: "scroll" },
     { name: "Timeline", href: "#timeline", icon: Calendar, type: "scroll" },
     { name: "Round 1", href: "/round1-auth", icon: Shield, type: "route" },
+    { name: "Round 2", href: "/round2-auth", icon: Shield, type: "route" },
     { name: "Submit Flag", href: "/submit-flag", icon: Flag, type: "route" },
     { name: "Contact", href: "#contact", icon: Phone, type: "scroll" },
   ];

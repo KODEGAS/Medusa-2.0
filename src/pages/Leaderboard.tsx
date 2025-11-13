@@ -30,7 +30,7 @@ const Leaderboard = () => {
   const [error, setError] = useState('');
   const [myTeamName, setMyTeamName] = useState<string | null>(null);
 
-  const apiUrl = import.meta.env.VITE_ADMIN_BACKEND_URL|| 'http://localhost:3001';
+  const apiUrl = import.meta.env.VITE_API_URL|| 'http://localhost:3001';
 
   useEffect(() => {
     // Get current team name from session storage instead of ID

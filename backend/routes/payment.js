@@ -9,12 +9,19 @@ const router = express.Router();
 // Multer config for memory storage (buffer)
 const upload = multer({ storage: multer.memoryStorage() });
 
-// GCP Storage config
+// GCP Storage config - using environment variables for security
 const storage = new Storage({
-  projectId: 'medusa-471513',
-  keyFilename: path.join(process.cwd(), 'gcp-service-account.json'),
+  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+  keyFilename: path.join(process.cwd(), process.env.GOOGLE_CLOUD_KEY_FILE || 'gcp-service-account.json'),
 });
-const bucketName = 'YOUR_BUCKET_NAME';
+const bucketName = process.env.GOOGLE_CLOUD_STORAGE_BUCKET;
+
+// Validate required GCP environment variables
+if (!process.env.GOOGLE_CLOUD_PROJECT_ID || !process.env.GOOGLE_CLOUD_STORAGE_BUCKET) {
+  console.error('❌ Missing required GCP environment variables: GOOGLE_CLOUD_PROJECT_ID or GOOGLE_CLOUD_STORAGE_BUCKET');
+  console.error('💡 Add them to your .env file or environment configuration');
+}
+
 const bucket = storage.bucket(bucketName);
 
 router.post('/upload', upload.single('receipt'), async (req, res) => {

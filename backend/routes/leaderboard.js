@@ -1,12 +1,25 @@
 import express from 'express';
 import FlagSubmission from '../models/FlagSubmission.js';
 import Team from '../models/Team.js';
+import Settings from '../models/Settings.js';
 
 const router = express.Router();
 
 // Public leaderboard endpoint - shows teams with correct submissions only
 router.get('/', async (req, res) => {
   try {
+    // Check if leaderboard is enabled
+    const leaderboardSetting = await Settings.findOne({ key: 'leaderboard_enabled' });
+    const isLeaderboardEnabled = leaderboardSetting ? leaderboardSetting.value : true; // Default to enabled
+
+    if (!isLeaderboardEnabled) {
+      return res.status(403).json({
+        success: false,
+        error: 'Leaderboard is temporarily unavailable',
+        message: 'The leaderboard will be available after Round 2 ends',
+        enabled: false
+      });
+    }
     // Get all correct submissions with highest points per team
     const leaderboardData = await FlagSubmission.aggregate([
       // Only correct submissions

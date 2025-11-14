@@ -15,7 +15,7 @@ const hintUnlockSchema = new mongoose.Schema({
   },
   challengeType: {
     type: String,
-    enum: ['android', 'pwn-user', 'pwn-root', null],
+    enum: ['android', 'pwn', null],
     default: null,
     index: true
   },

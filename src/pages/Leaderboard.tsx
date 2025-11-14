@@ -26,13 +26,21 @@ interface LeaderboardStats {
 const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [stats, setStats] = useState<LeaderboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Set to false since we're blocking access
   const [error, setError] = useState('');
   const [myTeamName, setMyTeamName] = useState<string | null>(null);
 
   const apiUrl = import.meta.env.VITE_API_URL|| 'http://localhost:3001';
 
+  // Temporarily disable leaderboard fetching during Round 2
+  const isLeaderboardBlocked = true;
+
   useEffect(() => {
+    if (isLeaderboardBlocked) {
+      // Don't fetch leaderboard during Round 2
+      return;
+    }
+
     // Get current team name from session storage instead of ID
     const teamName = sessionStorage.getItem('round1_team_name');
     setMyTeamName(teamName);
@@ -47,6 +55,12 @@ const Leaderboard = () => {
     try {
       const response = await fetch(`${apiUrl}/api/leaderboard`);
       const data = await response.json();
+
+      if (response.status === 403) {
+        // Leaderboard is blocked
+        setLoading(false);
+        return;
+      }
 
       if (data.success) {
         setLeaderboard(data.leaderboard);
@@ -98,6 +112,76 @@ const Leaderboard = () => {
           <div className="h-16 w-16 animate-spin rounded-full border-4 border-amber-500 border-t-transparent mx-auto mb-4" />
           <p className="text-amber-100 text-lg font-serif">Loading Leaderboard...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show blocked message during Round 2
+  if (isLeaderboardBlocked) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/20 via-background to-background" />
+        <div className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}
+        />
+
+        <Header />
+
+        <main className="flex-1 pt-24 pb-12 px-4 relative z-10 flex items-center justify-center">
+          <Card className="max-w-2xl w-full border-amber-600/30 bg-card/50 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="text-center border-b border-amber-900/30 bg-gradient-to-r from-amber-950/50 to-transparent">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 mb-6 shadow-lg mx-auto">
+                <Trophy className="w-10 h-10 text-white" />
+              </div>
+              <CardTitle className="text-3xl font-serif font-black text-transparent bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text mb-2">
+                Leaderboard Temporarily Unavailable
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center py-12 px-6">
+              <div className="space-y-6">
+                <div className="p-6 bg-amber-950/30 border border-amber-600/30 rounded-lg">
+                  <Clock className="w-16 h-16 mx-auto mb-4 text-amber-400" />
+                  <p className="text-xl font-serif text-amber-100 mb-2">
+                    Round 2 is Currently Active
+                  </p>
+                  <p className="text-amber-200/80 leading-relaxed">
+                    The leaderboard is temporarily hidden to maintain fair competition during Round 2. 
+                  </p>
+                </div>
+                
+                <div className="text-left space-y-3 text-amber-200/70">
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-400 mt-1">•</span>
+                    <span>Focus on solving the challenges without external pressure</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-400 mt-1">•</span>
+                    <span>Rankings will be revealed after Round 2 concludes</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-400 mt-1">•</span>
+                    <span>All submissions are being tracked and scored</span>
+                  </p>
+                </div>
+
+                <div className="pt-6 border-t border-amber-900/30">
+                  <p className="text-2xl font-serif italic text-amber-300/90">
+                    "The true champion emerges when the dust settles"
+                  </p>
+                  <p className="text-sm text-amber-200/60 mt-4">
+                    Leaderboard will open after Round 2 ends
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+
+        <Footer />
       </div>
     );
   }

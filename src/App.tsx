@@ -64,8 +64,8 @@ const PageLoader = () => (
 const queryClient = new QueryClient();
 
 // Admin panel routes from environment (security through obscurity)
-const ADMIN_LOGIN_PATH = import.meta.env.VITE_ADMIN_LOGIN_PATH || '7f3e9a2c1b5d8e4f6a0c7b3d9e1f5a2b';
-const ADMIN_DASHBOARD_PATH = import.meta.env.VITE_ADMIN_DASHBOARD_PATH || '4c9e7f2a6b1d3e8f5a0b9c7d2e6f1a3b';
+const ADMIN_LOGIN_PATH = import.meta.env.VITE_ADMIN_LOGIN_PATH || 'a3f7b9d2e5c8f1a4b7e0d3c6f9a2b5e8';
+const ADMIN_DASHBOARD_PATH = import.meta.env.VITE_ADMIN_DASHBOARD_PATH || 'c6e9f2a5b8d1e4f7a0b3c6e9f2a5b8d1';
 
 const App = () => {
   const [posterLoaded, setPosterLoaded] = useState(false);

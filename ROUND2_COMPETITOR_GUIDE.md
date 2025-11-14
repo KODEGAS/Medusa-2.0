@@ -1,6 +1,6 @@
-# 🏆 MEDUSA CTF - Round 2 Competitor Guide
+# 🏆 Medusa 2.0 – The Cyber Gauntlet Competitor Guide
 
-## 📢 Welcome to Round 2: Advanced Exploitation Challenges
+## 📢 Welcome to Round 2
 
 This comprehensive guide contains everything you need to know about Round 2 of the MEDUSA CTF competition. Please read this document carefully before the competition begins.
 
@@ -82,7 +82,6 @@ Round 2 consists of **TWO separate advanced challenges** with a total of **THREE
 - Post-exploitation techniques
 
 **What You'll Get**:
-- IP address: `138.68.4.31`
 - Web service access
 - Two separate flags to capture (user-level + root-level)
 
@@ -147,7 +146,7 @@ Unlocking hints **deducts points** from your final score:
 **Rules**:
 - Hints must be unlocked sequentially (1 → 2 → 3)
 - Each challenge has its own set of 3 hints
-- Total possible hint penalty: 300 points per challenge (900 max total)
+- Total possible hint penalty: 300 points per challenge
 
 ### Scoring Examples
 
@@ -367,9 +366,8 @@ Complete this before the competition starts:
    ```
 
 #### For PWN Challenge:
-1. Note the target IP address: **138.68.4.31**
-2. Access via web browser or command-line tools
-3. Begin reconnaissance and exploitation
+1. Access via web browser or command-line tools
+2. Begin reconnaissance and exploitation
 
 ### Important Notes
 
@@ -440,10 +438,6 @@ The flag will be in this exact format. Case-sensitive.
 
 ### Challenge 2: Container Escape (PWN Challenge)
 
-#### Challenge Description
-
-A containerized web application is running at **138.68.4.31**. Your mission is to exploit the service, gain initial access, escalate privileges, and break out of the container to capture both flags.
-
 #### Two-Stage Attack
 
 **Stage 1: User-Level Access** (450 points)
@@ -457,77 +451,6 @@ A containerized web application is running at **138.68.4.31**. Your mission is t
 - Break out to the host system
 - Capture the root flag: `HashX{root_flag...}`
 
-#### Common Attack Vectors
-
-**Web Application Exploitation**:
-- SQL injection
-- Command injection
-- File upload vulnerabilities
-- Local file inclusion (LFI)
-- Remote code execution (RCE)
-- Insecure deserialization
-
-**Container Escape Techniques**:
-- Mounted Docker socket (`/var/run/docker.sock`)
-- Privileged containers
-- Host filesystem mounts
-- Kernel exploits
-- Capability abuse (CAP_SYS_ADMIN, CAP_SYS_PTRACE)
-- Misconfigured cgroups
-
-#### Reconnaissance Steps
-
-1. **Initial Scan**:
-   ```bash
-   # Ping the target
-   ping 138.68.4.31
-   
-   # Port scan
-   nmap -sV 138.68.4.31
-   
-   # Web enumeration
-   curl http://138.68.4.31
-   ```
-
-2. **Web Application Analysis**:
-   - Identify technologies used
-   - Find input points (forms, parameters, headers)
-   - Test for common vulnerabilities
-   - Enumerate directories and files
-
-3. **Exploitation**:
-   - Craft payload to gain initial access
-   - Establish reverse shell
-   - Stabilize shell (Python pty, socat, etc.)
-
-4. **Privilege Escalation**:
-   ```bash
-   # Check current privileges
-   id
-   whoami
-   
-   # Look for SUID binaries
-   find / -perm -4000 2>/dev/null
-   
-   # Check Docker environment
-   ls -la /.dockerenv
-   cat /proc/1/cgroup
-   
-   # Look for Docker socket
-   ls -la /var/run/docker.sock
-   
-   # Check capabilities
-   capsh --print
-   
-   # Enumerate mounted volumes
-   mount | grep docker
-   ```
-
-5. **Container Breakout**:
-   - Exploit identified misconfigurations
-   - Access host filesystem
-   - Capture root flag
-
 #### Flag Formats
 
 ```
@@ -537,22 +460,42 @@ Root Flag: HashX{...}
 
 Both flags use the same format. Case-sensitive.
 
-#### Tips & Hints
-
-- Start with thorough web application testing
-- Once inside, stabilize your shell immediately
-- Document your progress - container might reset
-- Look for common Docker misconfigurations
-- The root flag requires container escape, not just root inside container
-- Take notes on all findings for potential hint usage
-
----
-
 ## 💡 Hint System
 
 ### How Hints Work
 
-Each of the **three challenges** (Android, PWN User, PWN Root) has **3 progressive hints** available. Hints provide guidance but **cost points**.
+The Android challenge has **3 hints** and the PWN challenge has **3 hints** (shared between user and root flags). Hints provide guidance but **cost points**.
+
+**Total Available**: 6 hints (3 for Android + 3 for PWN)
+
+### Hint Progression
+
+Hints are designed with increasing specificity:
+
+**Level 1 (50 points)**: 
+- General methodology and approach
+- Points you in the right direction
+- Mentions key concepts and areas to investigate
+
+**Level 2 (100 points)**:
+- Specific techniques and tools
+- Narrows down the attack vector
+- Provides concrete steps to follow
+
+**Level 3 (150 points)**:
+- Very detailed guidance
+- Near step-by-step instructions
+- May include specific commands or code locations
+
+#### Android Challenge Hint Topics
+1. **Hint 1**: Initial Reconnaissance - APK structure analysis and extraction methods
+2. **Hint 2**: Database Analysis - Locating and examining encrypted data in SQLite
+3. **Hint 3**: Decryption Key - Finding the key in native libraries or Java code
+
+#### PWN Challenge Hint Topics (Both Stages)
+1. **Hint 1**: Web Exploitation - Finding vulnerabilities and achieving RCE for user flag
+2. **Hint 2**: Container Enumeration - Identifying Docker misconfigurations and escape vectors
+3. **Hint 3**: Container Escape - Specific exploitation technique for host access and root flag
 
 ### Hint Costs
 
@@ -574,10 +517,14 @@ Each of the **three challenges** (Android, PWN User, PWN Root) has **3 progressi
 
 1. Navigate to Round 2 page after authentication
 2. Scroll to the **"Hint System"** section
-3. Select the challenge (Android, PWN User, or PWN Root)
+3. Select the challenge:
+   - **Android Challenge**: 3 hints specific to Perseus APK
+   - **PWN Challenge**: 3 hints covering both user and root flag strategies
 4. Click **"Unlock"** button for the desired hint
 5. Confirm the point deduction
 6. Hint content will be revealed immediately
+
+**Important**: PWN hints are shared between user and root flags. Unlocking a PWN hint helps with both stages of the container escape challenge.
 
 ### Hint Strategy
 
@@ -595,13 +542,13 @@ Each of the **three challenges** (Android, PWN User, PWN Root) has **3 progressi
 
 ### Hint Impact Example
 
-**Scenario**: Solving PWN User challenge at 3 hours with 2 hints
+**Scenario**: Solving PWN User challenge at 3 hours with 2 PWN hints unlocked
 
 ```
 Base Points: 450
 Time Multiplier: 0.8 (3 hours = 80%)
 Attempt: 1st (100%)
-Hints Used: Hint 1 + Hint 2 = 150 points
+Hints Used: PWN Hint 1 + PWN Hint 2 = 150 points
 
 Calculation:
 Raw Points = 450 × 0.8 × 1.0 = 360
@@ -612,7 +559,9 @@ With 2 hints: 210 points
 Loss: 150 points (41% reduction)
 ```
 
-**Recommendation**: Use hints wisely. The first hint (50 pts) is often worth it, but subsequent hints get expensive quickly.
+**Note**: These same PWN hints will also apply to the PWN Root flag, so the penalty is shared across both flags.
+
+**Recommendation**: Use hints wisely. The first hint (50 pts) is often worth it, but subsequent hints get expensive quickly. Since PWN hints help with both user and root flags, they provide double value.
 
 ---
 
@@ -640,65 +589,13 @@ Loss: 150 points (41% reduction)
 - **Android**: `MEDUSA{...}` (case-sensitive)
 - **PWN**: `HashX{...}` (case-sensitive)
 
-**Examples**:
-```
-✅ Correct: MEDUSA{y0u_f0und_th3_s3cr3t}
-❌ Wrong: medusa{y0u_f0und_th3_s3cr3t}
-❌ Wrong: MEDUSA{Y0U_F0UND_TH3_S3CR3T}
-❌ Wrong: MEDUSA{y0u_f0und_th3_s3cr3t
-
-✅ Correct: HashX{c0nt41n3r_br34k0ut_m4st3r}
-❌ Wrong: hashx{c0nt41n3r_br34k0ut_m4st3r}
-❌ Wrong: HASHX{c0nt41n3r_br34k0ut_m4st3r}
-```
-
 ### Submission Response
 
-After submitting, you'll receive one of these responses:
+After submitting, you'll receive response
 
-#### Success ✅
-```json
-{
-  "correct": true,
-  "message": "Correct flag! Android challenge completed.",
-  "points": 750,
-  "breakdown": {
-    "basePoints": 750,
-    "timeMultiplier": 1.0,
-    "attemptPenalty": 1.0,
-    "hintPenalty": 0,
-    "rawPoints": 750,
-    "finalPoints": 750
-  }
-}
-```
-
-**What happens**:
-- Points are added to your team's score
-- Flag is marked as completed
-- You can view the breakdown of your score
-- Success message displayed in **green**
-
-#### Failure ❌
-```json
-{
-  "correct": false,
-  "message": "Incorrect flag. Try again!",
-  "remainingAttempts": 2
-}
-```
-
-**What happens**:
-- No points awarded
-- Attempt counter decremented
-- Remaining attempts shown
-- Error message displayed in **red**
-- Your next attempt will have a penalty multiplier
-
-### Attempt Tracking
 
 **Android Challenge**:
-- Total: 3 attempts
+- Total: 2 attempts
 - Tracked independently
 
 **PWN Challenge**:
@@ -718,11 +615,10 @@ If you exhaust all attempts without finding the correct flag:
 ### Best Practices
 
 1. **Double-check flags** before submitting (copy-paste carefully)
-2. **Test locally** if possible (verify flag format matches)
-3. **Use first attempt wisely** - no penalty, full points possible
-4. **Document your work** - helps if you need to retrace steps
-5. **Save your progress** - containers may reset, document everything
-6. **Communicate with team** - avoid duplicate submissions
+2. **Use first attempt wisely** - no penalty, full points possible
+3. **Document your work** - helps if you need to retrace steps
+4. **Save your progress** - containers may reset, document everything
+5. **Communicate with team** - avoid duplicate submissions
 
 ---
 
@@ -786,8 +682,8 @@ If you encounter:
 - **Unfair Conduct**: Other teams cheating or violating rules
 
 **How to Report**:
-- Contact organizers via Discord (preferred)
-- Email: support@medusactf.com
+- Contact organizers via WhatsApp (preferred)
+- Email: contact@medusa.ecsc-uok.com
 - In-platform support ticket
 
 **Don't Report**:
@@ -800,9 +696,6 @@ If you encounter:
 ## ❓ FAQs
 
 ### General Questions
-
-**Q: When does Round 2 start?**
-A: Round 2 start time will be announced via email and Discord. Check the platform dashboard for countdown timer.
 
 **Q: How long is Round 2?**
 A: Round 2 duration varies, but time-based scoring decay occurs over 6 hours. Check competition schedule for exact duration.
@@ -818,17 +711,11 @@ A: Yes, but remember that time-based scoring is active. The longer you take, the
 
 ### Technical Questions
 
-**Q: What if my Android emulator won't start?**
-A: Try using a physical device instead, or ensure virtualization is enabled in BIOS. See Prerequisites section for troubleshooting.
-
 **Q: Can I use a rooted Android device?**
 A: Yes, rooted devices are allowed and may be helpful for deeper analysis.
 
 **Q: What if the PWN challenge IP is unreachable?**
 A: Check your network connection first. If the issue persists, contact organizers immediately.
-
-**Q: Can I use automated tools like SQLMap or Metasploit?**
-A: Yes, all tools are permitted for challenge solving.
 
 **Q: What if the container resets while I'm exploiting it?**
 A: This is normal for CTF challenges. Document your steps so you can reproduce your exploit quickly.
@@ -843,12 +730,6 @@ A: No. Flags must be complete and exact to receive points.
 
 **Q: If I unlock a hint but don't use it, am I still charged?**
 A: Yes. Once unlocked, the point cost is immediately deducted.
-
-**Q: Can I see other teams' scores during the competition?**
-A: Yes, the leaderboard is public and updates in real-time (may have slight delay).
-
-**Q: What happens if two teams submit at the exact same time?**
-A: Server timestamp determines order. Both teams get appropriate points based on their submission time.
 
 ### Challenge-Specific Questions
 
@@ -878,27 +759,10 @@ A: Yes, but there's no benefit. Hints are only useful before solving.
 **Q: If I unlock a hint by accident, can I get a refund?**
 A: No. All hint unlocks are final.
 
+**Q: Do PWN hints help with both user and root flags?**
+A: Yes! PWN hints are designed to guide you through the entire container escape process, from initial exploitation to privilege escalation and breakout. They cover both stages and apply to capturing both flags.
+
 ---
-
-## 🎓 Learning Resources
-
-### Before the Competition
-
-**Android Security**:
-- [OWASP Mobile Security Testing Guide](https://mobile-security.gitbook.io/mobile-security-testing-guide/)
-- [Android Security Documentation](https://developer.android.com/topic/security)
-- [APK Analysis Basics](https://github.com/ashishb/android-security-awesome)
-
-**Container Security**:
-- [Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)
-- [Container Escape Techniques](https://book.hacktricks.xyz/linux-hardening/privilege-escalation/docker-security)
-- [Linux Privilege Escalation](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md)
-
-**CTF Practice Platforms**:
-- [HackTheBox](https://www.hackthebox.com/)
-- [TryHackMe](https://tryhackme.com/)
-- [OverTheWire](https://overthewire.org/wargames/)
-- [PicoCTF](https://picoctf.org/)
 
 ### Tool Documentation
 
@@ -934,7 +798,6 @@ Use this checklist on competition day:
 - [ ] Enter Round 2 password
 - [ ] Download Perseus APK immediately
 - [ ] Install APK on device: `adb install perseus.apk`
-- [ ] Note PWN challenge IP: 138.68.4.31
 - [ ] Decide team strategy (split challenges or work together?)
 - [ ] Start timer to track 6-hour scoring window
 - [ ] Begin reconnaissance on both challenges
@@ -960,52 +823,3 @@ Use this checklist on competition day:
 - [ ] Copy-paste carefully (don't type manually)
 
 ---
-
-## 🏆 Final Tips for Success
-
-1. **Start Fast**: Download APK and start reconnaissance immediately
-2. **Time Management**: Remember the 6-hour decay window - speed matters
-3. **First Attempt Counts**: No penalty on first attempt - make it count
-4. **Document Everything**: You might need to retrace your steps
-5. **Team Coordination**: Split tasks efficiently among team members
-6. **Hint Strategy**: First hint is cheapest - use it if stuck for >30 minutes
-7. **Stay Calm**: CTF challenges are designed to be challenging
-8. **Learn from Failures**: Wrong attempts teach you what doesn't work
-9. **Creative Thinking**: Sometimes unintended solutions work
-10. **Have Fun**: This is a learning experience - enjoy the challenge!
-
----
-
-## 📞 Support & Contact
-
-### During Competition
-
-- **Discord Server**: [Join MEDUSA CTF Discord]
-- **Technical Support**: #support channel on Discord
-- **General Questions**: #general channel on Discord
-- **Emergency Contact**: support@medusactf.com
-
-### Office Hours
-
-- Competition support is available during competition hours
-- Response time: Usually within 15-30 minutes
-- For urgent issues, tag @organizers on Discord
-
----
-
-## 🎉 Good Luck!
-
-You've got this! Remember:
-
-- **Preparation is key** - Set up your tools in advance
-- **Strategy matters** - Time-based scoring rewards speed
-- **Hints are tools** - Use them strategically, not immediately
-- **Teamwork wins** - Coordinate with your teammates
-- **Learn and enjoy** - Win or lose, you'll gain valuable skills
-
-**May your shells be stable and your flags be plentiful!** 🚩
-
----
-
-*Last Updated: November 14, 2025*
-*MEDUSA CTF Team*

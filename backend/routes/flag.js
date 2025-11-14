@@ -285,10 +285,12 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     
     // Fetch hint penalty from database (sum all unlocked hints for this team/round/challenge)
     const HintUnlock = (await import('../models/HintUnlock.js')).default;
+    // For PWN challenges (both user and root), use 'pwn' as the hint challengeType
+    const hintChallengeType = (challengeType === 'pwn-user' || challengeType === 'pwn-root') ? 'pwn' : challengeType;
     const unlockedHints = await HintUnlock.find({
       teamId,
       round,
-      challengeType: round === 2 ? challengeType : undefined
+      challengeType: round === 2 ? hintChallengeType : undefined
     });
     const hintPenalty = unlockedHints.reduce((sum, hint) => sum + hint.pointCost, 0);
 

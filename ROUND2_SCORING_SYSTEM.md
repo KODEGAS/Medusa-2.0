@@ -39,6 +39,11 @@ Points are **deducted** (not multiplied) from final score:
 
 **Sequential Unlock Requirement**: Hints must be unlocked in order (1→2→3)
 
+**Note**: 
+- Android challenge has 3 hints
+- PWN challenge has 3 hints (shared for both user and root flags)
+- Total: 6 hints available across all challenges
+
 ## Scoring Examples
 
 ### Example 1: Perfect Android Submission
@@ -83,10 +88,29 @@ Flag submission response includes detailed breakdown:
 
 ## Hint System
 
+### Hint Content Structure
+
+Hints are progressively more detailed:
+- **Level 1 (50 pts)**: General direction and methodology
+- **Level 2 (100 pts)**: Specific techniques and tools to use
+- **Level 3 (150 pts)**: Very detailed guidance, almost step-by-step
+
+#### Android Challenge Hints
+- **Hint 1**: Initial Reconnaissance - APK extraction and structure analysis
+- **Hint 2**: Database Analysis - Finding and examining encrypted data
+- **Hint 3**: Decryption Key - Locating the key in code/libraries
+
+#### PWN Challenge Hints (covers both user and root flags)
+- **Hint 1**: Web Exploitation - Finding RCE and getting initial access
+- **Hint 2**: Container Enumeration - Identifying escape vectors
+- **Hint 3**: Container Escape - Specific exploitation technique
+
 ### Unlocking Hints
 - **Endpoint**: `POST /api/hints/unlock`
-- **Body**: `{ round: 2, challengeType: 'android'|'pwn-user'|'pwn-root', hintNumber: 1-3 }`
+- **Body**: `{ round: 2, challengeType: 'android'|'pwn', hintNumber: 1-3 }`
 - **Response**: `{ success: true, pointCost: 50 }`
+
+**Note**: For PWN challenge, use `challengeType: 'pwn'` - hints are shared between user and root flags.
 
 ### Viewing Unlocked Hints
 - **Endpoint**: `GET /api/hints/unlocked?round=2`
@@ -101,7 +125,7 @@ Flag submission response includes detailed breakdown:
 ```
 
 ### Checking Total Penalty
-- **Endpoint**: `GET /api/hints/penalty?round=2&challengeType=android`
+- **Endpoint**: `GET /api/hints/penalty?round=2&challengeType=android` or `challengeType=pwn`
 - **Response**: `{ totalPenalty: 50 }`
 
 ## Database Models
@@ -111,7 +135,7 @@ Flag submission response includes detailed breakdown:
 {
   teamId: ObjectId,
   round: Number (1 or 2),
-  challengeType: String ('android', 'pwn-user', 'pwn-root'),
+  challengeType: String ('android', 'pwn'),  // 'pwn' covers both user and root flags
   hintNumber: Number (1-3),
   pointCost: Number (50, 100, or 150),
   unlockedAt: Date
@@ -123,22 +147,20 @@ Compound unique index on: `[teamId, round, challengeType, hintNumber]`
 ## Frontend Integration
 
 ### Hint Unlock UI (Round2Page.tsx)
-- **3 columns**: One for each challenge (Android, PWN User, PWN Root)
+- **2 columns**: One for Android, one for PWN (covers both user and root flags)
 - **Color coded**: 
   - Android hints: Emerald theme
-  - PWN User hints: Yellow theme
-  - PWN Root hints: Red theme
+  - PWN hints: Red theme (shared for user + root)
 - **Sequential unlock**: Disabled buttons until previous hint unlocked
 - **Visual feedback**: Shows total penalty at top, "✓ Unlocked" for completed hints
 - **Cost display**: Shows point cost (50/100/150) for each hint
 
 ### State Management
 ```typescript
-const [unlockedHints, setUnlockedHints] = useState<{[key: string]: number[]}>({
+const [unlockedHints, setUnlockedHints] = useState<{[key: string]: number[]}>({{
   android: [],
-  'pwn-user': [],
-  'pwn-root': []
-});
+  pwn: []  // Shared hints for both pwn-user and pwn-root flags
+}});
 const [hintPenalty, setHintPenalty] = useState(0);
 ```
 

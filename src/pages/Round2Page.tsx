@@ -3,13 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 import {
   Download,
   Flag,
   Lock,
   Scroll,
   Shield,
-  Zap,
   Smartphone,
   Server,
   CheckCircle,
@@ -43,6 +43,7 @@ interface RemainingAttemptsData {
 
 const Round2Page = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [downloadedFiles, setDownloadedFiles] = useState<string[]>([]);
   const [remainingAttempts, setRemainingAttempts] = useState<RemainingAttemptsData | null>(null);
   const [loadingAttempts, setLoadingAttempts] = useState(true);
@@ -61,11 +62,45 @@ const Round2Page = () => {
   // Hint unlock states
   const [unlockedHints, setUnlockedHints] = useState<{[key: string]: number[]}>({
     android: [],
-    'pwn-user': [],
-    'pwn-root': []
+    pwn: []
   });
   const [unlockingHint, setUnlockingHint] = useState<string | null>(null);
   const [hintPenalty, setHintPenalty] = useState(0);
+  const [hintContents, setHintContents] = useState<{[key: string]: {title: string; hint: string}}>({});
+
+  // Fetch hint content from backend (only returns if unlocked)
+  const fetchHintContent = async (challengeType: string, hintNumber: number) => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const token = localStorage.getItem('medusa_token');
+
+      const response = await fetch(
+        `${apiUrl}/api/hints/content?round=2&challengeType=${challengeType}&hintNumber=${hintNumber}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const key = `${challengeType}-${hintNumber}`;
+        setHintContents(prev => ({
+          ...prev,
+          [key]: {
+            title: data.title,
+            hint: data.hint
+          }
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching hint content:', error);
+    }
+  };
 
   // Check authentication on mount
   useEffect(() => {
@@ -79,6 +114,15 @@ const Round2Page = () => {
       fetchUnlockedHints();
     }
   }, [navigate]);
+
+  // Poll for hint updates every 10 seconds to sync with team members
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      fetchUnlockedHints();
+    }, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(pollInterval);
+  }, []);
 
   // Fetch remaining attempts for the team
   const fetchRemainingAttempts = async () => {
@@ -129,8 +173,7 @@ const Round2Page = () => {
         // Organize hints by challenge type
         const organized: {[key: string]: number[]} = {
           android: [],
-          'pwn-user': [],
-          'pwn-root': []
+          pwn: []
         };
         data.hints.forEach((hint: any) => {
           if (organized[hint.challengeType]) {
@@ -139,6 +182,11 @@ const Round2Page = () => {
         });
         setUnlockedHints(organized);
         setHintPenalty(data.totalPenalty || 0);
+
+        // Fetch content for all unlocked hints
+        data.hints.forEach((hint: any) => {
+          fetchHintContent(hint.challengeType, hint.hintNumber);
+        });
       } else {
         console.error('Failed to fetch unlocked hints');
       }
@@ -175,13 +223,27 @@ const Round2Page = () => {
       if (response.ok) {
         // Refresh hints
         await fetchUnlockedHints();
-        alert(`Hint unlocked! ${data.pointCost} points will be deducted from your final score.`);
+        // Fetch the newly unlocked hint content
+        await fetchHintContent(challengeType, hintNumber);
+        toast({
+          title: "Hint Unlocked!",
+          description: `${data.pointCost} points will be deducted from your final score.`,
+          variant: "default",
+        });
       } else {
-        alert(data.error || 'Failed to unlock hint');
+        toast({
+          title: "Failed to unlock hint",
+          description: data.error || 'Please try again.',
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Error unlocking hint:', error);
-      alert('Failed to unlock hint. Please try again.');
+      toast({
+        title: "Error",
+        description: 'Failed to unlock hint. Please try again.',
+        variant: "destructive",
+      });
     } finally {
       setUnlockingHint(null);
     }
@@ -785,7 +847,7 @@ const Round2Page = () => {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 {/* Android Hints */}
                 <div className="space-y-3">
                   <h3 className="font-serif font-bold text-emerald-300 text-center mb-4">Android Challenge</h3>
@@ -794,77 +856,67 @@ const Round2Page = () => {
                     const isUnlocked = unlockedHints.android.includes(hintNum);
                     const canUnlock = hintNum === 1 || unlockedHints.android.includes(hintNum - 1);
                     const isUnlocking = unlockingHint === `android-${hintNum}`;
+                    const contentKey = `android-${hintNum}`;
+                    const content = hintContents[contentKey];
                     
                     return (
                       <div key={hintNum} className={`p-4 rounded-lg border ${isUnlocked ? 'bg-emerald-950/30 border-emerald-600/50' : 'bg-gray-900/30 border-gray-700/50'}`}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-serif font-bold text-sm">Hint {hintNum}</span>
+                          <span className="font-serif font-bold text-sm">{isUnlocked && content ? content.title : `Hint ${hintNum}`}</span>
                           <span className="text-xs font-mono text-yellow-400">{cost} pts</span>
                         </div>
-                        <Button
-                          onClick={() => unlockHint('android', hintNum)}
-                          disabled={!canUnlock || isUnlocked || isUnlocking}
-                          size="sm"
-                          className={`w-full ${isUnlocked ? 'bg-emerald-600 hover:bg-emerald-600' : 'bg-yellow-600 hover:bg-yellow-500'}`}
-                        >
-                          {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock'}
-                        </Button>
+                        
+                        {isUnlocked && content ? (
+                          <div className="mt-3 p-3 bg-emerald-900/20 rounded border border-emerald-600/30">
+                            <p className="text-sm text-emerald-100 leading-relaxed">{content.hint}</p>
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={() => unlockHint('android', hintNum)}
+                            disabled={!canUnlock || isUnlocked || isUnlocking}
+                            size="sm"
+                            className={`w-full mt-2 ${isUnlocked ? 'bg-emerald-600 hover:bg-emerald-600' : 'bg-yellow-600 hover:bg-yellow-500'}`}
+                          >
+                            {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock Hint'}
+                          </Button>
+                        )}
                       </div>
                     );
                   })}
                 </div>
 
-                {/* PWN User Hints */}
+                {/* PWN Challenge Hints (shared for both user and root flags) */}
                 <div className="space-y-3">
-                  <h3 className="font-serif font-bold text-yellow-300 text-center mb-4">PWN User Challenge</h3>
+                  <h3 className="font-serif font-bold text-red-300 text-center mb-4">PWN Challenge (User + Root)</h3>
                   {[1, 2, 3].map(hintNum => {
                     const cost = hintNum === 1 ? 50 : hintNum === 2 ? 100 : 150;
-                    const isUnlocked = unlockedHints['pwn-user'].includes(hintNum);
-                    const canUnlock = hintNum === 1 || unlockedHints['pwn-user'].includes(hintNum - 1);
-                    const isUnlocking = unlockingHint === `pwn-user-${hintNum}`;
-                    
-                    return (
-                      <div key={hintNum} className={`p-4 rounded-lg border ${isUnlocked ? 'bg-yellow-950/30 border-yellow-600/50' : 'bg-gray-900/30 border-gray-700/50'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-serif font-bold text-sm">Hint {hintNum}</span>
-                          <span className="text-xs font-mono text-yellow-400">{cost} pts</span>
-                        </div>
-                        <Button
-                          onClick={() => unlockHint('pwn-user', hintNum)}
-                          disabled={!canUnlock || isUnlocked || isUnlocking}
-                          size="sm"
-                          className={`w-full ${isUnlocked ? 'bg-yellow-600 hover:bg-yellow-600' : 'bg-yellow-600 hover:bg-yellow-500'}`}
-                        >
-                          {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock'}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* PWN Root Hints */}
-                <div className="space-y-3">
-                  <h3 className="font-serif font-bold text-red-300 text-center mb-4">PWN Root Challenge</h3>
-                  {[1, 2, 3].map(hintNum => {
-                    const cost = hintNum === 1 ? 50 : hintNum === 2 ? 100 : 150;
-                    const isUnlocked = unlockedHints['pwn-root'].includes(hintNum);
-                    const canUnlock = hintNum === 1 || unlockedHints['pwn-root'].includes(hintNum - 1);
-                    const isUnlocking = unlockingHint === `pwn-root-${hintNum}`;
+                    const isUnlocked = unlockedHints.pwn.includes(hintNum);
+                    const canUnlock = hintNum === 1 || unlockedHints.pwn.includes(hintNum - 1);
+                    const isUnlocking = unlockingHint === `pwn-${hintNum}`;
+                    const contentKey = `pwn-${hintNum}`;
+                    const content = hintContents[contentKey];
                     
                     return (
                       <div key={hintNum} className={`p-4 rounded-lg border ${isUnlocked ? 'bg-red-950/30 border-red-600/50' : 'bg-gray-900/30 border-gray-700/50'}`}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-serif font-bold text-sm">Hint {hintNum}</span>
+                          <span className="font-serif font-bold text-sm">{isUnlocked && content ? content.title : `Hint ${hintNum}`}</span>
                           <span className="text-xs font-mono text-yellow-400">{cost} pts</span>
                         </div>
-                        <Button
-                          onClick={() => unlockHint('pwn-root', hintNum)}
-                          disabled={!canUnlock || isUnlocked || isUnlocking}
-                          size="sm"
-                          className={`w-full ${isUnlocked ? 'bg-red-600 hover:bg-red-600' : 'bg-red-600 hover:bg-red-500'}`}
-                        >
-                          {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock'}
-                        </Button>
+                        
+                        {isUnlocked && content ? (
+                          <div className="mt-3 p-3 bg-red-900/20 rounded border border-red-600/30">
+                            <p className="text-sm text-red-100 leading-relaxed">{content.hint}</p>
+                          </div>
+                        ) : (
+                          <Button
+                            onClick={() => unlockHint('pwn', hintNum)}
+                            disabled={!canUnlock || isUnlocked || isUnlocking}
+                            size="sm"
+                            className={`w-full mt-2 ${isUnlocked ? 'bg-red-600 hover:bg-red-600' : 'bg-red-600 hover:bg-red-500'}`}
+                          >
+                            {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock Hint'}
+                          </Button>
+                        )}
                       </div>
                     );
                   })}
@@ -873,65 +925,9 @@ const Round2Page = () => {
               <Alert className="mt-6 border-yellow-600/30 bg-yellow-950/20">
                 <AlertCircle className="h-4 w-4 text-yellow-500" />
                 <AlertDescription className="text-sm text-yellow-100/80">
-                  Hints must be unlocked sequentially (Hint 1 → Hint 2 → Hint 3). Points are deducted from your final score.
+                  Hints must be unlocked sequentially (Hint 1 → Hint 2 → Hint 3). Points are deducted from your final score. Once unlocked, hint content will be displayed above.
                 </AlertDescription>
               </Alert>
-            </CardContent>
-          </Card>
-
-          {/* Static Hints Section (General Tips) */}
-          <Card className="bg-card/30 backdrop-blur-sm border-2 border-purple-900/30">
-            <CardHeader className="border-b border-purple-900/30">
-              <div className="flex items-center gap-3">
-                <Zap className="w-6 h-6 text-purple-500" />
-                <div>
-                  <CardTitle className="text-xl font-serif text-purple-100">
-                    General Guidance (Free)
-                  </CardTitle>
-                  <CardDescription className="font-serif italic text-purple-200/60">
-                    Free tips to point you in the right direction
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg border bg-emerald-950/10 border-emerald-600/30">
-                  <div className="mb-3 bg-gradient-to-r from-emerald-900/40 to-transparent p-2 rounded border-l-4 border-emerald-400">
-                    <p className="font-serif text-lg font-bold">
-                      <span className="mr-2">�</span>
-                      <span className="text-emerald-200">Android Challenge Hint</span>
-                    </p>
-                  </div>
-                  <p className="text-sm text-white font-mono leading-relaxed bg-emerald-900/20 p-3 rounded border border-emerald-600/30">
-                    APK files are just ZIP archives. Decompile, analyze, and look for hidden strings or obfuscated code.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg border bg-red-950/10 border-red-600/30">
-                  <div className="mb-3 bg-gradient-to-r from-red-900/40 to-transparent p-2 rounded border-l-4 border-red-400">
-                    <p className="font-serif text-lg font-bold">
-                      <span className="mr-2">🔥</span>
-                      <span className="text-red-200">Container Escape Hint</span>
-                    </p>
-                  </div>
-                  <p className="text-sm text-white font-mono leading-relaxed bg-red-900/20 p-3 rounded border border-red-600/30">
-                    Stage 1: Exploit the web service to get inside the container (user flag). Stage 2: Look for Docker misconfigurations like mounted sockets, privileged mode, or host filesystem access (root flag).
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-lg border bg-purple-950/10 border-purple-600/30">
-                  <div className="mb-3 bg-gradient-to-r from-purple-900/40 to-transparent p-2 rounded border-l-4 border-purple-400">
-                    <p className="font-serif text-lg font-bold">
-                      <span className="mr-2">🔍</span>
-                      <span className="text-purple-200">General Hint</span>
-                    </p>
-                  </div>
-                  <p className="text-sm text-white font-mono leading-relaxed bg-purple-900/20 p-3 rounded border border-purple-600/30">
-                    The right tools make all the difference. Use debuggers, disassemblers, and network analysis tools effectively.
-                  </p>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>

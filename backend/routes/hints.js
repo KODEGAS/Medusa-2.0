@@ -46,7 +46,7 @@ router.post('/unlock', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Invalid round number. Must be 1 or 2' });
     }
 
-    if (round === 2 && !['android', 'pwn-user', 'pwn-root'].includes(challengeType)) {
+    if (round === 2 && !['android', 'pwn'].includes(challengeType)) {
       return res.status(400).json({ error: 'Invalid challengeType for Round 2' });
     }
 
@@ -133,6 +133,90 @@ router.get('/penalty', authenticate, async (req, res) => {
     console.error('Error calculating hint penalty:', error);
     res.status(500).json({
       error: 'Failed to calculate hint penalty'
+    });
+  }
+});
+
+// Get hint content (only if unlocked)
+router.get('/content', authenticate, async (req, res) => {
+  try {
+    const teamId = req.user.teamId;
+    const { round, challengeType, hintNumber } = req.query;
+
+    // Validate input
+    if (!round || !challengeType || !hintNumber) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    const parsedHintNumber = parseInt(hintNumber);
+    const parsedRound = parseInt(round);
+
+    // Check if hint is unlocked
+    const unlockedHint = await HintUnlock.findOne({
+      teamId,
+      round: parsedRound,
+      challengeType,
+      hintNumber: parsedHintNumber
+    });
+
+    if (!unlockedHint) {
+      return res.status(403).json({
+        error: 'Hint not unlocked. Please unlock this hint first.',
+        unlocked: false
+      });
+    }
+
+    // Hint content stored securely on backend
+    const hintContent = {
+      android: {
+        1: {
+          title: "Level 1: Initial Reconnaissance",
+          hint: "Start by extracting the APK contents. APK files are essentially ZIP archives. Use `unzip` or APK analysis tools like `apktool` to decompile and examine the app structure. Look for interesting directories like `assets/`, `res/`, and database files in the decompiled output."
+        },
+        2: {
+          title: "Level 2: Database Analysis",
+          hint: "The app stores encrypted data in a SQLite database. Extract the database file using `adb pull` from the app's data directory (/data/data/com.package.name/databases/). Use SQLite browser or command-line tools to examine tables. Pay special attention to Base64 or hex-encoded strings."
+        },
+        3: {
+          title: "Level 3: Decryption Key",
+          hint: "The encryption key is hidden in the native library (.so file) or hardcoded in the Java code. Use `jadx-gui` to decompile the APK and search for keywords like 'key', 'secret', 'decrypt', or 'AES'. The key might be XORed or obfuscated. Look in the MainActivity or database helper classes."
+        }
+      },
+      pwn: {
+        1: {
+          title: "Level 1: Web Exploitation",
+          hint: "Start by enumerating the web application on port 80/443. Test for common vulnerabilities: SQL injection, command injection, file upload, or path traversal. Use tools like `curl`, `Burp Suite`, or `sqlmap`. Focus on input fields and URL parameters. Once you find RCE, establish a reverse shell to get the user flag."
+        },
+        2: {
+          title: "Level 2: Container Enumeration",
+          hint: "You're inside a Docker container. Check for common escape vectors: `ls -la /var/run/docker.sock` (Docker socket), `cat /proc/1/cgroup` (container info), `mount | grep docker` (mounted volumes), and `capsh --print` (capabilities). Look for SUID binaries with `find / -perm -4000 2>/dev/null`."
+        },
+        3: {
+          title: "Level 3: Container Escape",
+          hint: "The container has a privileged misconfiguration or mounted host filesystem. If Docker socket is accessible, use `docker` commands to spawn a privileged container and mount the host's root filesystem. If there's a host volume mount, pivot to it and access the root flag. Look for paths like `/host`, `/mnt`, or unusual mounts in `/proc/mounts`."
+        }
+      }
+    };
+
+    const content = hintContent[challengeType]?.[parsedHintNumber];
+
+    if (!content) {
+      return res.status(404).json({ error: 'Hint content not found' });
+    }
+
+    res.json({
+      success: true,
+      unlocked: true,
+      hintNumber: parsedHintNumber,
+      title: content.title,
+      hint: content.hint,
+      pointCost: unlockedHint.pointCost,
+      unlockedAt: unlockedHint.unlockedAt
+    });
+  } catch (error) {
+    console.error('Error fetching hint content:', error);
+    res.status(500).json({
+      error: 'Failed to fetch hint content'
     });
   }
 });

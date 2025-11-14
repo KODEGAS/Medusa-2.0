@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
 import {
   ShieldCheck,
   LogOut,
@@ -17,7 +18,10 @@ import {
   ChevronDown,
   ChevronUp,
   Edit,
-  Send
+  Send,
+  Trophy,
+  Lightbulb,
+  Target
 } from 'lucide-react';
 import {
   Table,
@@ -65,9 +69,38 @@ interface Statistics {
   };
 }
 
+interface Round2Statistics {
+  teams: {
+    total: number;
+    inRound2: number;
+    participationRate: string;
+  };
+  hints: Array<{
+    challengeType: string;
+    totalUnlocks: number;
+    uniqueTeams: number;
+    totalPointsSpent: number;
+  }>;
+  flags: {
+    totalSubmissions: number;
+    correctSubmissions: number;
+  };
+}
+
+interface Settings {
+  leaderboard_enabled: {
+    value: boolean;
+    description: string;
+    updatedAt: string;
+    updatedBy: string;
+  };
+}
+
 const AdminDashboard = () => {
   const [submissions, setSubmissions] = useState<Record<string, TeamSubmissions>>({});
   const [statistics, setStatistics] = useState<Statistics | null>(null);
+  const [round2Statistics, setRound2Statistics] = useState<Round2Statistics | null>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
@@ -77,11 +110,12 @@ const AdminDashboard = () => {
   const [manualTeamId, setManualTeamId] = useState('');
   const [manualFlag, setManualFlag] = useState('');
   const [manualSubmitTime, setManualSubmitTime] = useState('');
+  const [activeTab, setActiveTab] = useState<'round1' | 'round2' | 'settings'>('round1');
   const navigate = useNavigate();
 
   // Get obscured paths from environment
-  const ADMIN_API_PATH = import.meta.env.VITE_ADMIN_API_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2f3a';
-  const ADMIN_LOGIN_PATH = import.meta.env.VITE_ADMIN_LOGIN_PATH || '7f3e9a2c1b5d8e4f6a0c7b3d9e1f5a2b';
+  const ADMIN_API_PATH = import.meta.env.VITE_ADMIN_API_PATH;
+  const ADMIN_LOGIN_PATH = import.meta.env.VITE_ADMIN_LOGIN_PATH ;
   const ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL || import.meta.env.VITE_API_URL;
 
   const adminToken = localStorage.getItem('adminToken');
@@ -93,6 +127,8 @@ const AdminDashboard = () => {
       return;
     }
     fetchData();
+    fetchRound2Data();
+    fetchSettings();
   }, [adminToken]);
 
   const fetchData = async () => {
@@ -142,6 +178,72 @@ const AdminDashboard = () => {
       setError(err.message || 'Failed to load data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRound2Data = async () => {
+    try {
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/round2/statistics`,
+        {
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setRound2Statistics(data.statistics);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch Round 2 data:', err);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/settings`,
+        {
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(data.settings);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch settings:', err);
+    }
+  };
+
+  const handleToggleLeaderboard = async (enabled: boolean) => {
+    try {
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/settings/leaderboard_enabled`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ value: enabled }),
+        }
+      );
+
+      if (response.ok) {
+        alert(`✅ Leaderboard ${enabled ? 'enabled' : 'disabled'} successfully`);
+        fetchSettings(); // Refresh settings
+      } else {
+        alert('Failed to update leaderboard setting');
+      }
+    } catch (err) {
+      alert('Error updating leaderboard setting');
+      console.error(err);
     }
   };
 
@@ -409,6 +511,45 @@ const AdminDashboard = () => {
         </Alert>
       )}
 
+      {/* Tab Navigation */}
+      <div className="flex gap-2 mb-6 border-b border-slate-700">
+        <button
+          onClick={() => setActiveTab('round1')}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === 'round1'
+              ? 'text-purple-400 border-b-2 border-purple-400'
+              : 'text-slate-400 hover:text-slate-300'
+          }`}
+        >
+          <Flag className="inline-block h-4 w-4 mr-2" />
+          Round 1
+        </button>
+        <button
+          onClick={() => setActiveTab('round2')}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === 'round2'
+              ? 'text-emerald-400 border-b-2 border-emerald-400'
+              : 'text-slate-400 hover:text-slate-300'
+          }`}
+        >
+          <Target className="inline-block h-4 w-4 mr-2" />
+          Round 2
+        </button>
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`px-6 py-3 font-semibold transition-colors ${
+            activeTab === 'settings'
+              ? 'text-blue-400 border-b-2 border-blue-400'
+              : 'text-slate-400 hover:text-slate-300'
+          }`}
+        >
+          <Trophy className="inline-block h-4 w-4 mr-2" />
+          Settings
+        </button>
+      </div>
+
+      {/* Round 1 Content */}
+      {activeTab === 'round1' && (<>
       {/* Statistics Cards */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -760,6 +901,131 @@ const AdminDashboard = () => {
           )}
         </CardContent>
       </Card>
+      </>)}
+
+      {/* Round 2 Content */}
+      {activeTab === 'round2' && round2Statistics && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card className="border-emerald-500/20 bg-slate-800/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Round 2 Participation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-400">{round2Statistics.teams.inRound2}</div>
+                <p className="text-xs text-slate-400 mt-1">
+                  of {round2Statistics.teams.total} teams ({round2Statistics.teams.participationRate})
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-500/20 bg-slate-800/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4" />
+                  Hints Unlocked
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-yellow-400">
+                  {round2Statistics.hints.reduce((sum, h) => sum + h.totalUnlocks, 0)}
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {round2Statistics.hints.reduce((sum, h) => sum + h.totalPointsSpent, 0)} points spent
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-500/20 bg-slate-800/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-slate-400 flex items-center gap-2">
+                  <Flag className="h-4 w-4" />
+                  Flag Submissions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-400">
+                  {round2Statistics.flags.totalSubmissions}
+                </div>
+                <p className="text-xs text-slate-400 mt-1">
+                  {round2Statistics.flags.correctSubmissions} correct
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {round2Statistics.hints.map((hintStat) => (
+              <Card key={hintStat.challengeType} className="border-emerald-500/20 bg-slate-800/50">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2 capitalize">
+                    <Lightbulb className="h-5 w-5 text-yellow-400" />
+                    {hintStat.challengeType} Hints
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Total Unlocks:</span>
+                    <span className="text-white font-semibold">{hintStat.totalUnlocks}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Unique Teams:</span>
+                    <span className="text-white font-semibold">{hintStat.uniqueTeams}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Points Spent:</span>
+                    <span className="text-yellow-400 font-semibold">{hintStat.totalPointsSpent}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Settings Content */}
+      {activeTab === 'settings' && settings && (
+        <Card className="border-blue-500/20 bg-slate-800/50">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Trophy className="h-5 w-5" />
+              Application Settings
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              Control application features and visibility
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+              <div className="flex-1">
+                <h3 className="text-white font-semibold mb-1">Leaderboard Visibility</h3>
+                <p className="text-sm text-slate-400">
+                  {settings.leaderboard_enabled.description}
+                </p>
+                <p className="text-xs text-slate-500 mt-2">
+                  Last updated: {new Date(settings.leaderboard_enabled.updatedAt).toLocaleString()} by {settings.leaderboard_enabled.updatedBy}
+                </p>
+              </div>
+              <Switch
+                checked={settings.leaderboard_enabled.value}
+                onCheckedChange={handleToggleLeaderboard}
+                className="ml-4"
+              />
+            </div>
+
+            <Alert className={settings.leaderboard_enabled.value ? "bg-green-500/10 border-green-500/50" : "bg-red-500/10 border-red-500/50"}>
+              <AlertDescription className={settings.leaderboard_enabled.value ? "text-green-300" : "text-red-300"}>
+                {settings.leaderboard_enabled.value 
+                  ? "✅ Leaderboard is currently VISIBLE to all users"
+                  : "🔒 Leaderboard is currently HIDDEN from users"}
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

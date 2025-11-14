@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import FlagSubmission from '../models/FlagSubmission.js';
 import Team from '../models/Team.js';
+import Settings from '../models/Settings.js';
+import RoundSession from '../models/RoundSession.js';
+import HintUnlock from '../models/HintUnlock.js';
 import adminAuth from '../middlewares/adminAuth.js';
 import getRealIP from '../utils/getRealIP.js';
 import { calculatePoints } from '../utils/calculatePoints.js';
@@ -619,6 +622,164 @@ router.post('/submissions/manual-submit', adminAuth, apiRateLimiter, async (req,
     console.error('Manual flag submission error:', error);
     res.status(500).json({ 
       error: 'Failed to submit flag manually' 
+    });
+  }
+});
+
+// Get application settings (Admin only)
+router.get('/settings', adminAuth, apiRateLimiter, async (req, res) => {
+  try {
+    const settings = await Settings.find({}).sort({ key: 1 });
+    
+    // Convert to key-value object
+    const settingsObj = {};
+    settings.forEach(setting => {
+      settingsObj[setting.key] = {
+        value: setting.value,
+        description: setting.description,
+        updatedAt: setting.updatedAt,
+        updatedBy: setting.updatedBy
+      };
+    });
+
+    // If leaderboard setting doesn't exist, create default
+    if (!settingsObj['leaderboard_enabled']) {
+      const defaultSetting = new Settings({
+        key: 'leaderboard_enabled',
+        value: true,
+        description: 'Controls whether the public leaderboard is visible',
+        updatedBy: 'system'
+      });
+      await defaultSetting.save();
+      settingsObj['leaderboard_enabled'] = {
+        value: true,
+        description: 'Controls whether the public leaderboard is visible',
+        updatedAt: defaultSetting.updatedAt,
+        updatedBy: 'system'
+      };
+    }
+
+    res.json({
+      success: true,
+      settings: settingsObj
+    });
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch settings' 
+    });
+  }
+});
+
+// Update a setting (Admin only)
+router.put('/settings/:key', adminAuth, apiRateLimiter, async (req, res) => {
+  try {
+    const { key } = req.params;
+    const { value } = req.body;
+
+    if (value === undefined) {
+      return res.status(400).json({ 
+        error: 'Value is required' 
+      });
+    }
+
+    // Update or create setting
+    const setting = await Settings.findOneAndUpdate(
+      { key },
+      { 
+        value,
+        updatedBy: req.admin.username,
+        updatedAt: new Date()
+      },
+      { 
+        upsert: true,
+        new: true
+      }
+    );
+
+    console.log(`✅ Admin ${req.admin.username} updated setting ${key} to ${value}`);
+
+    res.json({
+      success: true,
+      message: 'Setting updated successfully',
+      setting: {
+        key: setting.key,
+        value: setting.value,
+        updatedAt: setting.updatedAt
+      }
+    });
+  } catch (error) {
+    console.error('Error updating setting:', error);
+    res.status(500).json({ 
+      error: 'Failed to update setting' 
+    });
+  }
+});
+
+// Get Round 2 statistics (Admin only)
+router.get('/round2/statistics', adminAuth, apiRateLimiter, async (req, res) => {
+  try {
+    const totalTeams = await Team.countDocuments();
+    const teamsInRound2 = await RoundSession.distinct('teamId', { round: 2 });
+    
+    // Get hint statistics
+    const hintStats = await HintUnlock.aggregate([
+      { $match: { round: 2 } },
+      {
+        $group: {
+          _id: '$challengeType',
+          totalUnlocks: { $sum: 1 },
+          uniqueTeams: { $addToSet: '$teamId' },
+          totalPoints: { $sum: '$pointCost' }
+        }
+      }
+    ]);
+
+    // Get flag submissions for Round 2
+    const flagStats = await FlagSubmission.aggregate([
+      {
+        $match: {
+          teamId: { $in: teamsInRound2 },
+          submittedAt: { $gte: new Date('2025-11-08T00:00:00Z') } // Adjust date as needed
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalSubmissions: { $sum: 1 },
+          correctSubmissions: {
+            $sum: { $cond: [{ $eq: ['$isCorrect', true] }, 1, 0] }
+          }
+        }
+      }
+    ]);
+
+    res.json({
+      success: true,
+      statistics: {
+        teams: {
+          total: totalTeams,
+          inRound2: teamsInRound2.length,
+          participationRate: totalTeams > 0 
+            ? ((teamsInRound2.length / totalTeams) * 100).toFixed(2) + '%'
+            : '0%'
+        },
+        hints: hintStats.map(stat => ({
+          challengeType: stat._id,
+          totalUnlocks: stat.totalUnlocks,
+          uniqueTeams: stat.uniqueTeams.length,
+          totalPointsSpent: stat.totalPoints
+        })),
+        flags: flagStats[0] || {
+          totalSubmissions: 0,
+          correctSubmissions: 0
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching Round 2 statistics:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch Round 2 statistics' 
     });
   }
 });

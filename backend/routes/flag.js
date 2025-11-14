@@ -196,14 +196,16 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     
     const submissionCount = await FlagSubmission.countDocuments(submissionQuery).session(session);
 
-    // Limit to 2 submissions per challenge
-    if (submissionCount >= 2) {
+    // Limit: 2 submissions for Round 1 and Android, 3 submissions for PWN
+    const maxSubmissions = (round === 2 && challengeType === 'pwn') ? 3 : 2;
+    
+    if (submissionCount >= maxSubmissions) {
       await session.abortTransaction();
       session.endSession();
       return res.status(403).json({ 
-        error: `Maximum submission limit reached for this challenge. Your team can only submit 2 flags per challenge.`,
+        error: `Maximum submission limit reached for this challenge. Your team can only submit ${maxSubmissions} flags per challenge.`,
         submissionCount: submissionCount,
-        maxSubmissions: 2,
+        maxSubmissions: maxSubmissions,
         challenge: challengeType || 'Round 1'
       });
     }
@@ -293,13 +295,13 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
       submissionId: flagSubmission._id,
       submittedAt: flagSubmission.submittedAt,
       attemptNumber: submissionCount + 1,
-      remainingAttempts: 2 - (submissionCount + 1),
+      remainingAttempts: maxSubmissions - (submissionCount + 1),
       points: points,
       challenge: round === 2 ? `${challengeType}` : 'round1',
-      warning: !isCorrect && isSecondSubmission 
+      warning: !isCorrect && (submissionCount + 1) >= maxSubmissions
         ? 'This was your final submission! No more attempts remaining.' 
         : !isCorrect && submissionCount === 0
-        ? 'You have 1 attempt remaining. Your second submission will have a 25% point deduction.'
+        ? `You have ${maxSubmissions - 1} attempts remaining. Your second submission will have a 25% point deduction.`
         : undefined
     };
 
@@ -396,8 +398,8 @@ router.get('/remaining-attempts', authenticate, async (req, res) => {
           },
           pwn: {
             used: round2PwnCount,
-            remaining: Math.max(0, 2 - round2PwnCount),
-            maxAttempts: 2,
+            remaining: Math.max(0, 3 - round2PwnCount),
+            maxAttempts: 3,
             completed: !!round2PwnCompleted,
             completedAt: round2PwnCompleted?.submittedAt || null,
             points: round2PwnCompleted?.points || 0

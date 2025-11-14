@@ -49,11 +49,14 @@ const Round2Page = () => {
   
   // Flag submission states
   const [androidFlag, setAndroidFlag] = useState("");
-  const [pwnFlag, setPwnFlag] = useState("");
+  const [pwnUserFlag, setPwnUserFlag] = useState("");
+  const [pwnRootFlag, setPwnRootFlag] = useState("");
   const [androidSubmitting, setAndroidSubmitting] = useState(false);
-  const [pwnSubmitting, setPwnSubmitting] = useState(false);
+  const [pwnUserSubmitting, setPwnUserSubmitting] = useState(false);
+  const [pwnRootSubmitting, setPwnRootSubmitting] = useState(false);
   const [androidResult, setAndroidResult] = useState<{ success: boolean; message: string } | null>(null);
-  const [pwnResult, setPwnResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [pwnUserResult, setPwnUserResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [pwnRootResult, setPwnRootResult] = useState<{ success: boolean; message: string } | null>(null);
 
   // Check authentication on mount
   useEffect(() => {
@@ -152,10 +155,28 @@ const Round2Page = () => {
     }
   };
 
-  const handleFlagSubmit = async (challengeType: 'android' | 'pwn') => {
-    const flag = challengeType === 'android' ? androidFlag : pwnFlag;
-    const setSubmitting = challengeType === 'android' ? setAndroidSubmitting : setPwnSubmitting;
-    const setResult = challengeType === 'android' ? setAndroidResult : setPwnResult;
+  const handleFlagSubmit = async (challengeType: 'android' | 'pwn-user' | 'pwn-root') => {
+    let flag = '';
+    let setSubmitting: (val: boolean) => void;
+    let setResult: (val: { success: boolean; message: string } | null) => void;
+    let displayName = '';
+
+    if (challengeType === 'android') {
+      flag = androidFlag;
+      setSubmitting = setAndroidSubmitting;
+      setResult = setAndroidResult;
+      displayName = 'Android';
+    } else if (challengeType === 'pwn-user') {
+      flag = pwnUserFlag;
+      setSubmitting = setPwnUserSubmitting;
+      setResult = setPwnUserResult;
+      displayName = 'PWN User';
+    } else {
+      flag = pwnRootFlag;
+      setSubmitting = setPwnRootSubmitting;
+      setResult = setPwnRootResult;
+      displayName = 'PWN Root';
+    }
 
     if (!flag.trim()) {
       setResult({ success: false, message: "Please enter a flag" });
@@ -179,7 +200,7 @@ const Round2Page = () => {
         body: JSON.stringify({
           flag: flag.trim(),
           round: 2,
-          challengeType: challengeType // Send challenge type to backend
+          challengeType: challengeType === 'android' ? 'android' : 'pwn'
         })
       });
 
@@ -188,7 +209,7 @@ const Round2Page = () => {
       if (response.ok && data.correct) {
         setResult({
         success: true,
-        message: `✅ Correct! ${challengeType === 'android' ? 'Android' : 'PWN'} flag accepted!`
+        message: `✅ Correct! ${displayName} flag accepted!`
         });
         // Refresh remaining attempts after successful submission
         fetchRemainingAttempts();
@@ -324,11 +345,11 @@ const Round2Page = () => {
                   <div className="p-4 rounded-lg bg-gradient-to-br from-red-950/40 to-transparent border border-red-600/30">
                     <div className="flex items-center gap-3 mb-3">
                       <Server className="w-5 h-5 text-red-400" />
-                      <h3 className="font-serif font-bold text-red-100">PWN Challenge</h3>
+                      <h3 className="font-serif font-bold text-red-100">PWN Challenge (2 Flags)</h3>
                     </div>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between items-center">
-                        <span className="text-red-200/70">Attempts Used:</span>
+                        <span className="text-red-200/70">Total Attempts:</span>
                         <span className="font-mono font-bold text-red-300">
                           {remainingAttempts.attempts.round2.pwn.used} / {remainingAttempts.attempts.round2.pwn.maxAttempts}
                         </span>
@@ -342,6 +363,9 @@ const Round2Page = () => {
                         }`}>
                           {remainingAttempts.attempts.round2.pwn.remaining}
                         </span>
+                      </div>
+                      <div className="text-xs text-red-200/50 italic pt-1">
+                        Combined attempts for both User & Root flags
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-red-200/70">Status:</span>
@@ -524,14 +548,7 @@ const Round2Page = () => {
                           <Server className="w-4 h-4 mr-2" />
                           Access Challenge
                         </Button>
-                        <Button
-                          onClick={() => window.open('/ROUND2_PWN_CHALLENGE.md', '_blank')}
-                          variant="outline"
-                          className="border-purple-600/50 text-purple-400 hover:bg-purple-950/50 font-serif"
-                        >
-                          <Scroll className="w-4 h-4 mr-2" />
-                          View Documentation
-                        </Button>
+                    
                       </div>
                     </div>
                   </div>
@@ -541,39 +558,78 @@ const Round2Page = () => {
                 <div className="p-6 bg-gradient-to-br from-red-950/20 to-transparent border border-red-900/30 rounded-lg">
                   <h3 className="text-lg font-serif font-bold text-red-100 mb-4 flex items-center gap-2">
                     <Flag className="w-5 h-5 text-red-500" />
-                    Submit PWN Flags (User & Root)
+                    Submit PWN Flags
                     {remainingAttempts && (
                       <span className="ml-auto text-sm font-mono text-red-400">
                         {remainingAttempts.attempts.round2.pwn.remaining} attempts left
                       </span>
                     )}
                   </h3>
-                  <p className="text-sm text-red-200/60 mb-4">
+                  <p className="text-sm text-red-200/60 mb-6">
                     This challenge has TWO flags: User Flag (inside container) and Root Flag (after breakout). Submit each flag separately below.
                   </p>
-                  <div className="space-y-4">
+
+                  {/* User Flag Submission */}
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                      <h4 className="text-sm font-serif font-bold text-yellow-100">User Flag (Stage 1)</h4>
+                    </div>
                     <div className="flex gap-2">
                       <Input
                         type="text"
-                        placeholder="MEDUSA{...}"
-                        value={pwnFlag}
-                        onChange={(e) => setPwnFlag(e.target.value)}
-                        className="font-mono bg-background/50 border-red-600/30 focus:border-red-500"
-                        disabled={pwnSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                        placeholder="MEDUSA{user_flag...}"
+                        value={pwnUserFlag}
+                        onChange={(e) => setPwnUserFlag(e.target.value)}
+                        className="font-mono bg-background/50 border-yellow-600/30 focus:border-yellow-500"
+                        disabled={pwnUserSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
                       />
                       <Button
-                        onClick={() => handleFlagSubmit('pwn')}
-                        disabled={pwnSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
-                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-serif disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => handleFlagSubmit('pwn-user')}
+                        disabled={pwnUserSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                        className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-500 hover:to-yellow-600 text-white font-serif disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {pwnSubmitting ? 'Submitting...' : remainingAttempts?.attempts.round2.pwn.remaining === 0 ? 'No Attempts' : 'Submit'}
+                        {pwnUserSubmitting ? 'Submitting...' : remainingAttempts?.attempts.round2.pwn.remaining === 0 ? 'No Attempts' : 'Submit'}
                       </Button>
                     </div>
-                    {pwnResult && (
-                      <Alert variant={pwnResult.success ? "default" : "destructive"} className={pwnResult.success ? "border-red-600/50 bg-red-950/30" : ""}>
-                        {pwnResult.success ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                    {pwnUserResult && (
+                      <Alert variant={pwnUserResult.success ? "default" : "destructive"} className={pwnUserResult.success ? "border-yellow-600/50 bg-yellow-950/30" : ""}>
+                        {pwnUserResult.success ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                         <AlertDescription className="font-mono">
-                          {pwnResult.message}
+                          {pwnUserResult.message}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+
+                  {/* Root Flag Submission */}
+                  <div className="space-y-4 pt-6 border-t border-red-600/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <h4 className="text-sm font-serif font-bold text-red-100">Root Flag (Stage 2)</h4>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        placeholder="MEDUSA{root_flag...}"
+                        value={pwnRootFlag}
+                        onChange={(e) => setPwnRootFlag(e.target.value)}
+                        className="font-mono bg-background/50 border-red-600/30 focus:border-red-500"
+                        disabled={pwnRootSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                      />
+                      <Button
+                        onClick={() => handleFlagSubmit('pwn-root')}
+                        disabled={pwnRootSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-serif disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {pwnRootSubmitting ? 'Submitting...' : remainingAttempts?.attempts.round2.pwn.remaining === 0 ? 'No Attempts' : 'Submit'}
+                      </Button>
+                    </div>
+                    {pwnRootResult && (
+                      <Alert variant={pwnRootResult.success ? "default" : "destructive"} className={pwnRootResult.success ? "border-red-600/50 bg-red-950/30" : ""}>
+                        {pwnRootResult.success ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                        <AlertDescription className="font-mono">
+                          {pwnRootResult.message}
                         </AlertDescription>
                       </Alert>
                     )}

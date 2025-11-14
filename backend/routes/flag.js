@@ -75,6 +75,25 @@ const secureCompare = (a, b) => {
 // GLOBAL COMPETITION START TIME - November 8, 2025 at 19:00:00 IST
 const GLOBAL_COMPETITION_START = new Date('2025-11-08T19:00:00+05:30');
 
+// ROUND 2 START TIME - Set this to when Round 2 actually starts
+const ROUND_2_START = new Date('2025-11-09T10:00:00+05:30'); // Adjust this date/time as needed
+
+// Helper function to get round start time from settings or fallback to constants
+async function getRoundStartTime(round) {
+  try {
+    const Settings = (await import('../models/Settings.js')).default;
+    const key = round === 2 ? 'round2_start_time' : 'round1_start_time';
+    const setting = await Settings.findOne({ key });
+    if (setting && setting.value) {
+      return new Date(setting.value);
+    }
+  } catch (error) {
+    console.warn(`Failed to get ${round === 2 ? 'Round 2' : 'Round 1'} start time from settings, using constant`);
+  }
+  // Fallback to constants
+  return round === 2 ? ROUND_2_START : GLOBAL_COMPETITION_START;
+}
+
 // Rate limiter: 20 submissions per 5 minutes per IP+Team combination
 // Prevents false blocks when teams share IPs (mobile networks, same campus)
 const ipRateLimiter = rateLimit({
@@ -257,7 +276,17 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
 
     // Determine if this is the second submission (point deduction applies)
     const isSecondSubmission = submissionCount === 1;
-    const pointDeduction = isSecondSubmission ? 0.25 : 0; // 25% deduction on second attempt
+    const isThirdSubmission = submissionCount === 2;
+    
+    // Calculate point deduction
+    // PWN challenges: No penalty on 2nd attempt, 25% penalty on 3rd attempt
+    // Other challenges: 25% penalty on 2nd attempt
+    let pointDeduction = 0;
+    if (isPwnChallenge) {
+      pointDeduction = isThirdSubmission ? 0.25 : 0; // Only penalize 3rd attempt for PWN
+    } else {
+      pointDeduction = isSecondSubmission ? 0.25 : 0; // Penalize 2nd attempt for others
+    }
 
     // Validate flag based on round and challenge type
     let isCorrect = false;
@@ -280,8 +309,8 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     // Security: Never reveal the correct flag in any response
     // Only reveal success/failure
     
-    // Use global competition start time for fair point calculation
-    const roundStartTime = GLOBAL_COMPETITION_START;
+    // Use appropriate start time based on round from settings
+    const roundStartTime = await getRoundStartTime(round);
     
     // Fetch hint penalty from database (sum all unlocked hints for this team/round/challenge)
     const HintUnlock = (await import('../models/HintUnlock.js')).default;

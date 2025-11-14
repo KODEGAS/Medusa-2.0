@@ -35,11 +35,14 @@ import {
 interface Submission {
   _id: string;
   flag: string;
+  round: number;
+  challengeType?: string;
   attemptNumber: number;
   pointDeduction: number;
   isCorrect: boolean;
   verified: boolean;
   submittedAt: string;
+  points?: number;
 }
 
 interface TeamInfo {
@@ -49,8 +52,20 @@ interface TeamInfo {
   leaderName?: string;
 }
 
+interface HintInfo {
+  hintNumber: number;
+  pointCost: number;
+  unlockedAt: string;
+}
+
+interface TeamHints {
+  android: HintInfo[];
+  pwn: HintInfo[];
+}
+
 interface TeamSubmissions {
   teamInfo: TeamInfo;
+  hints: TeamHints;
   attempts: Submission[];
 }
 
@@ -94,10 +109,23 @@ interface Settings {
     updatedAt: string;
     updatedBy: string;
   };
+  round1_start_time?: {
+    value: string;
+    description: string;
+    updatedAt: string;
+    updatedBy: string;
+  };
+  round2_start_time?: {
+    value: string;
+    description: string;
+    updatedAt: string;
+    updatedBy: string;
+  };
 }
 
 const AdminDashboard = () => {
   const [submissions, setSubmissions] = useState<Record<string, TeamSubmissions>>({});
+  const [round2Submissions, setRound2Submissions] = useState<Record<string, TeamSubmissions>>({});
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [round2Statistics, setRound2Statistics] = useState<Round2Statistics | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -127,6 +155,7 @@ const AdminDashboard = () => {
       return;
     }
     fetchData();
+    fetchRound2Submissions();
     fetchRound2Data();
     fetchSettings();
   }, [adminToken]);
@@ -136,9 +165,9 @@ const AdminDashboard = () => {
     setError('');
 
     try {
-      // Fetch submissions using obscured API path
+      // Fetch Round 1 submissions using obscured API path
       const submissionsResponse = await fetch(
-        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions`,
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions?round=1`,
         {
           headers: {
             'Authorization': `Bearer ${adminToken}`,
@@ -178,6 +207,26 @@ const AdminDashboard = () => {
       setError(err.message || 'Failed to load data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRound2Submissions = async () => {
+    try {
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/submissions?round=2`,
+        {
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setRound2Submissions(data.submissions);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch Round 2 submissions:', err);
     }
   };
 
@@ -243,6 +292,41 @@ const AdminDashboard = () => {
       }
     } catch (err) {
       alert('Error updating leaderboard setting');
+      console.error(err);
+    }
+  };
+
+  const handleUpdateRoundStartTime = async (round: number, dateTimeValue: string) => {
+    if (!dateTimeValue) {
+      alert('Please enter a valid date and time');
+      return;
+    }
+
+    try {
+      const localDate = new Date(dateTimeValue);
+      const isoString = localDate.toISOString();
+      const key = round === 1 ? 'round1_start_time' : 'round2_start_time';
+
+      const response = await fetch(
+        `${ADMIN_BACKEND_URL}/api/${ADMIN_API_PATH}/settings/${key}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ value: isoString }),
+        }
+      );
+
+      if (response.ok) {
+        alert(`✅ Round ${round} start time updated successfully\nNew time: ${localDate.toLocaleString()}`);
+        fetchSettings(); // Refresh settings
+      } else {
+        alert(`Failed to update Round ${round} start time`);
+      }
+    } catch (err) {
+      alert(`Error updating Round ${round} start time`);
       console.error(err);
     }
   };
@@ -957,7 +1041,7 @@ const AdminDashboard = () => {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             {round2Statistics.hints.map((hintStat) => (
               <Card key={hintStat.challengeType} className="border-emerald-500/20 bg-slate-800/50">
                 <CardHeader>
@@ -983,6 +1067,243 @@ const AdminDashboard = () => {
               </Card>
             ))}
           </div>
+
+          {/* Round 2 Submissions Table */}
+          <Card className="border-emerald-500/20 bg-slate-800/50">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Flag className="h-5 w-5" />
+                Round 2 Flag Submissions by Team
+              </CardTitle>
+              <CardDescription className="text-slate-400">
+                Detailed view of all Round 2 submissions (Android, PWN-User, PWN-Root)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-lg border border-slate-700 overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-slate-900/50">
+                    <TableRow className="border-slate-700">
+                      <TableHead className="text-slate-300">Team</TableHead>
+                      <TableHead className="text-slate-300">University</TableHead>
+                      <TableHead className="text-slate-300 text-center">Submissions</TableHead>
+                      <TableHead className="text-slate-300 text-center">Status</TableHead>
+                      <TableHead className="text-slate-300 text-center">Details</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Object.entries(round2Submissions).map(([teamId, teamData]) => (
+                      <>
+                        <TableRow 
+                          key={teamId} 
+                          className="border-slate-700 hover:bg-slate-900/50 cursor-pointer"
+                          onClick={() => toggleTeamExpansion(teamId)}
+                        >
+                          <TableCell className="font-medium text-white">
+                            <div>
+                              <div className="font-semibold">{teamData.teamInfo.teamName}</div>
+                              <div className="text-xs text-slate-400">{teamData.teamInfo.teamId}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-slate-300">
+                            {teamData.teamInfo.university}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge 
+                              variant="default"
+                              className="bg-emerald-500"
+                            >
+                              {teamData.attempts.length} flags
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {teamData.attempts.some(a => a.verified && a.isCorrect) ? (
+                              <Badge className="bg-green-500">
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Solved ({teamData.attempts.filter(a => a.isCorrect).length})
+                              </Badge>
+                            ) : teamData.attempts.some(a => a.verified) ? (
+                              <Badge className="bg-red-500">
+                                <AlertTriangle className="h-3 w-3 mr-1" />
+                                Incorrect
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-yellow-500 text-yellow-400">
+                                <Clock className="h-3 w-3 mr-1" />
+                                Pending
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="text-emerald-400 hover:text-emerald-300"
+                            >
+                              {expandedTeams.has(teamId) ? (
+                                <ChevronUp className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+
+                        {/* Expanded Details */}
+                        {expandedTeams.has(teamId) && (
+                          <TableRow className="border-slate-700 bg-slate-900/80">
+                            <TableCell colSpan={5} className="p-6">
+                              {/* Hints Section */}
+                              {teamData.hints && (teamData.hints.android.length > 0 || teamData.hints.pwn.length > 0) && (
+                                <div className="mb-6 p-4 bg-slate-800/30 border border-yellow-500/20 rounded-lg">
+                                  <h4 className="text-yellow-400 font-semibold mb-3 flex items-center gap-2">
+                                    <Lightbulb className="h-4 w-4" />
+                                    Hints Unlocked
+                                  </h4>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Android Hints */}
+                                    {teamData.hints.android.length > 0 && (
+                                      <div>
+                                        <div className="text-sm font-semibold text-emerald-400 mb-2">Android Challenge</div>
+                                        <div className="space-y-2">
+                                          {teamData.hints.android.map((hint) => (
+                                            <div key={hint.hintNumber} className="flex items-center justify-between text-sm bg-slate-900/50 p-2 rounded">
+                                              <span className="text-slate-300">Hint #{hint.hintNumber}</span>
+                                              <div className="flex items-center gap-2">
+                                                <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+                                                  -{hint.pointCost} pts
+                                                </Badge>
+                                                <span className="text-xs text-slate-500">
+                                                  {new Date(hint.unlockedAt).toLocaleTimeString()}
+                                                </span>
+                                              </div>
+                                            </div>
+                                          ))}
+                                          <div className="text-xs text-slate-400 mt-2">
+                                            Total: -{teamData.hints.android.reduce((sum, h) => sum + h.pointCost, 0)} points
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                    
+                                    {/* PWN Hints */}
+                                    {teamData.hints.pwn.length > 0 && (
+                                      <div>
+                                        <div className="text-sm font-semibold text-red-400 mb-2">PWN Challenge</div>
+                                        <div className="space-y-2">
+                                          {teamData.hints.pwn.map((hint) => (
+                                            <div key={hint.hintNumber} className="flex items-center justify-between text-sm bg-slate-900/50 p-2 rounded">
+                                              <span className="text-slate-300">Hint #{hint.hintNumber}</span>
+                                              <div className="flex items-center gap-2">
+                                                <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+                                                  -{hint.pointCost} pts
+                                                </Badge>
+                                                <span className="text-xs text-slate-500">
+                                                  {new Date(hint.unlockedAt).toLocaleTimeString()}
+                                                </span>
+                                              </div>
+                                            </div>
+                                          ))}
+                                          <div className="text-xs text-slate-400 mt-2">
+                                            Total: -{teamData.hints.pwn.reduce((sum, h) => sum + h.pointCost, 0)} points
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Flag Submissions */}
+                              <div className="space-y-4">
+                                {teamData.attempts.map((attempt) => {
+                                  const dt = formatDateTime(attempt.submittedAt);
+
+                                  return (
+                                    <div 
+                                      key={attempt._id}
+                                      className="border border-slate-700 rounded-lg p-4 bg-slate-800/50"
+                                    >
+                                      <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                          <h4 className="text-white font-semibold flex items-center gap-2">
+                                            {attempt.challengeType && (
+                                              <Badge variant="outline" className="capitalize">
+                                                {attempt.challengeType}
+                                              </Badge>
+                                            )}
+                                            Attempt #{attempt.attemptNumber}
+                                            {attempt.pointDeduction > 0 && (
+                                              <Badge variant="destructive" className="text-xs">
+                                                -{attempt.pointDeduction * 100}% penalty
+                                              </Badge>
+                                            )}
+                                            {attempt.points !== undefined && (
+                                              <Badge className="bg-emerald-600 text-xs">
+                                                {attempt.points} points
+                                              </Badge>
+                                            )}
+                                          </h4>
+                                          <div className="flex items-center gap-4 mt-2 text-sm">
+                                            <span className="text-slate-400 flex items-center gap-1">
+                                              <Calendar className="h-3 w-3" />
+                                              {dt.date}
+                                            </span>
+                                            <span className="text-emerald-400 font-mono flex items-center gap-1">
+                                              <Clock className="h-3 w-3" />
+                                              {dt.time}
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                          {attempt.verified ? (
+                                            attempt.isCorrect ? (
+                                              <Badge className="bg-green-500">
+                                                <CheckCircle className="h-3 w-3 mr-1" />
+                                                Correct
+                                              </Badge>
+                                            ) : (
+                                              <Badge className="bg-red-500">
+                                                <AlertTriangle className="h-3 w-3 mr-1" />
+                                                Incorrect
+                                              </Badge>
+                                            )
+                                          ) : (
+                                            <Badge variant="outline" className="border-yellow-500 text-yellow-400">
+                                              <Clock className="h-3 w-3 mr-1" />
+                                              Pending Verification
+                                            </Badge>
+                                          )}
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="bg-slate-900 rounded p-3 border border-slate-700">
+                                        <div className="text-xs text-slate-500 mb-1">Submitted Flag:</div>
+                                        <code className="text-sm text-emerald-300 font-mono break-all">
+                                          {attempt.flag}
+                                        </code>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {Object.keys(round2Submissions).length === 0 && (
+                <div className="text-center py-12 text-slate-400">
+                  <Flag className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No Round 2 submissions yet</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </>
       )}
 
@@ -1023,6 +1344,90 @@ const AdminDashboard = () => {
                   : "🔒 Leaderboard is currently HIDDEN from users"}
               </AlertDescription>
             </Alert>
+
+            {/* Round 1 Start Time */}
+            {settings.round1_start_time && (
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700 space-y-3">
+                <div>
+                  <h3 className="text-white font-semibold mb-1">Round 1 Start Time</h3>
+                  <p className="text-sm text-slate-400">
+                    {settings.round1_start_time.description}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-2">
+                    Current: {new Date(settings.round1_start_time.value).toLocaleString()} (IST)
+                  </p>
+                  {settings.round1_start_time.updatedAt && (
+                    <p className="text-xs text-slate-500">
+                      Last updated: {new Date(settings.round1_start_time.updatedAt).toLocaleString()} by {settings.round1_start_time.updatedBy}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <label className="text-sm text-slate-400 mb-1 block">New Start Time:</label>
+                    <input
+                      type="datetime-local"
+                      id="round1-time-input"
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                      defaultValue={new Date(settings.round1_start_time.value).toISOString().slice(0, 16)}
+                    />
+                  </div>
+                  <Button
+                    onClick={() => {
+                      const input = document.getElementById('round1-time-input') as HTMLInputElement;
+                      if (input?.value) {
+                        handleUpdateRoundStartTime(1, input.value);
+                      }
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Update Round 1
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Round 2 Start Time */}
+            {settings.round2_start_time && (
+              <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700 space-y-3">
+                <div>
+                  <h3 className="text-white font-semibold mb-1">Round 2 Start Time</h3>
+                  <p className="text-sm text-slate-400">
+                    {settings.round2_start_time.description}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-2">
+                    Current: {new Date(settings.round2_start_time.value).toLocaleString()} (IST)
+                  </p>
+                  {settings.round2_start_time.updatedAt && (
+                    <p className="text-xs text-slate-500">
+                      Last updated: {new Date(settings.round2_start_time.updatedAt).toLocaleString()} by {settings.round2_start_time.updatedBy}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <label className="text-sm text-slate-400 mb-1 block">New Start Time:</label>
+                    <input
+                      type="datetime-local"
+                      id="round2-time-input"
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white text-sm"
+                      defaultValue={new Date(settings.round2_start_time.value).toISOString().slice(0, 16)}
+                    />
+                  </div>
+                  <Button
+                    onClick={() => {
+                      const input = document.getElementById('round2-time-input') as HTMLInputElement;
+                      if (input?.value) {
+                        handleUpdateRoundStartTime(2, input.value);
+                      }
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Update Round 2
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

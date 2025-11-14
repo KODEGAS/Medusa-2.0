@@ -15,6 +15,24 @@ const router = express.Router();
 // GLOBAL COMPETITION START TIME - November 8, 2025 at 19:00:00 IST
 const GLOBAL_COMPETITION_START = new Date('2025-11-08T19:00:00+05:30');
 
+// ROUND 2 START TIME - Set this to when Round 2 actually starts
+const ROUND_2_START = new Date('2025-11-09T10:00:00+05:30'); // Adjust this date/time as needed
+
+// Helper function to get round start time from settings or fallback to constants
+async function getRoundStartTime(round) {
+  try {
+    const key = round === 2 ? 'round2_start_time' : 'round1_start_time';
+    const setting = await Settings.findOne({ key });
+    if (setting && setting.value) {
+      return new Date(setting.value);
+    }
+  } catch (error) {
+    console.warn(`Failed to get ${round === 2 ? 'Round 2' : 'Round 1'} start time from settings, using constant`);
+  }
+  // Fallback to constants
+  return round === 2 ? ROUND_2_START : GLOBAL_COMPETITION_START;
+}
+
 // Rate limiter for admin login - prevent brute force attacks
 const loginRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -114,10 +132,10 @@ router.post('/login', loginRateLimiter, async (req, res) => {
 // Get all flag submissions with team details (Admin only)
 router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
   try {
-    const { teamId, verified, sortBy = 'submittedAt', order = 'desc' } = req.query;
+    const { teamId, verified, sortBy = 'submittedAt', order = 'desc', round } = req.query;
 
     // Log admin access
-    console.log(`Admin ${req.admin.username} accessed submissions at ${new Date().toISOString()}`);
+    console.log(`Admin ${req.admin.username} accessed submissions (Round ${round || 'All'}) at ${new Date().toISOString()}`);
 
     // Validate sortBy parameter to prevent NoSQL injection
     const allowedSortFields = ['submittedAt', 'attemptNumber', 'verified', 'isCorrect'];
@@ -127,6 +145,19 @@ router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
     const query = {};
     if (teamId) query.teamId = teamId;
     if (verified !== undefined) query.verified = verified === 'true';
+    if (round) {
+      const roundNum = parseInt(round);
+      if (roundNum === 1) {
+        // For Round 1, get submissions where round is 1 OR round field doesn't exist (old submissions)
+        query.$or = [
+          { round: 1 },
+          { round: { $exists: false } },
+          { round: null }
+        ];
+      } else {
+        query.round = roundNum;
+      }
+    }
 
     // Get all submissions
     const submissions = await FlagSubmission.find(query)
@@ -143,6 +174,38 @@ router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
       teamMap[team.teamId] = team;
     });
 
+    // Fetch hint unlocks for all teams (for Round 2)
+    const hintUnlocks = round && parseInt(round) === 2 
+      ? await HintUnlock.find({ 
+          teamId: { $in: teamIds }, 
+          round: 2 
+        }).lean()
+      : [];
+    
+    // Group hints by team and challenge type
+    const teamHints = {};
+    hintUnlocks.forEach(hint => {
+      if (!teamHints[hint.teamId]) {
+        teamHints[hint.teamId] = {
+          android: [],
+          pwn: []
+        };
+      }
+      if (hint.challengeType && teamHints[hint.teamId][hint.challengeType]) {
+        teamHints[hint.teamId][hint.challengeType].push({
+          hintNumber: hint.hintNumber,
+          pointCost: hint.pointCost,
+          unlockedAt: hint.unlockedAt
+        });
+      }
+    });
+
+    // Sort hints by hint number for each team
+    Object.values(teamHints).forEach(hints => {
+      hints.android.sort((a, b) => a.hintNumber - b.hintNumber);
+      hints.pwn.sort((a, b) => a.hintNumber - b.hintNumber);
+    });
+
     // Group submissions by team
     const teamSubmissions = {};
     submissions.forEach(submission => {
@@ -153,6 +216,7 @@ router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
             teamName: 'Unknown',
             university: 'Unknown'
           },
+          hints: teamHints[submission.teamId] || { android: [], pwn: [] },
           attempts: []
         };
       }
@@ -354,11 +418,12 @@ router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, r
       
       let points = 0;
       
-      // Calculate points if correct using global competition start time
+      // Calculate points if correct using appropriate round start time
       if (isCorrect) {
         try {
+          const roundStartTime = await getRoundStartTime(submission.round || 1);
           points = calculatePoints(
-            GLOBAL_COMPETITION_START,
+            roundStartTime,
             submission.submittedAt,
             submission.attemptNumber
           );
@@ -415,9 +480,10 @@ router.post('/submissions/recalculate-points', adminAuth, apiRateLimiter, async 
     // Recalculate points for each correct submission
     for (const submission of submissions) {
       try {
-        // Use global competition start time for fair calculation
+        // Use appropriate round start time for fair calculation
+        const roundStartTime = await getRoundStartTime(submission.round || 1);
         const points = calculatePoints(
-          GLOBAL_COMPETITION_START,
+          roundStartTime,
           submission.submittedAt,
           submission.attemptNumber
         );
@@ -483,8 +549,9 @@ router.patch('/submissions/:id/update-time', adminAuth, apiRateLimiter, async (r
 
     // Recalculate points if it's a correct submission
     if (submission.isCorrect && submission.verified) {
+      const roundStartTime = await getRoundStartTime(submission.round || 1);
       const points = calculatePoints(
-        GLOBAL_COMPETITION_START,
+        roundStartTime,
         newDate,
         submission.attemptNumber
       );
@@ -514,6 +581,7 @@ router.patch('/submissions/:id/update-time', adminAuth, apiRateLimiter, async (r
 });
 
 // Manual flag submission on behalf of a team (Admin only)
+// Note: This is currently for Round 1 only
 router.post('/submissions/manual-submit', adminAuth, apiRateLimiter, async (req, res) => {
   try {
     const { teamId, flag, submittedAt } = req.body;
@@ -534,8 +602,15 @@ router.post('/submissions/manual-submit', adminAuth, apiRateLimiter, async (req,
       });
     }
 
-    // Check how many submissions this team has made
-    const submissionCount = await FlagSubmission.countDocuments({ teamId });
+    // Check how many submissions this team has made (Round 1)
+    const submissionCount = await FlagSubmission.countDocuments({ 
+      teamId, 
+      $or: [
+        { round: 1 },
+        { round: { $exists: false } },
+        { round: null }
+      ]
+    });
 
     // Limit to 2 submissions per team
     if (submissionCount >= 2) {
@@ -642,21 +717,39 @@ router.get('/settings', adminAuth, apiRateLimiter, async (req, res) => {
       };
     });
 
-    // If leaderboard setting doesn't exist, create default
-    if (!settingsObj['leaderboard_enabled']) {
-      const defaultSetting = new Settings({
+    // Initialize default settings if they don't exist
+    const defaultSettings = [
+      {
         key: 'leaderboard_enabled',
         value: true,
-        description: 'Controls whether the public leaderboard is visible',
-        updatedBy: 'system'
-      });
-      await defaultSetting.save();
-      settingsObj['leaderboard_enabled'] = {
-        value: true,
-        description: 'Controls whether the public leaderboard is visible',
-        updatedAt: defaultSetting.updatedAt,
-        updatedBy: 'system'
-      };
+        description: 'Controls whether the public leaderboard is visible'
+      },
+      {
+        key: 'round1_start_time',
+        value: GLOBAL_COMPETITION_START.toISOString(),
+        description: 'Round 1 competition start time (ISO 8601 format)'
+      },
+      {
+        key: 'round2_start_time',
+        value: ROUND_2_START.toISOString(),
+        description: 'Round 2 competition start time (ISO 8601 format)'
+      }
+    ];
+
+    for (const defaultSetting of defaultSettings) {
+      if (!settingsObj[defaultSetting.key]) {
+        const newSetting = new Settings({
+          ...defaultSetting,
+          updatedBy: 'system'
+        });
+        await newSetting.save();
+        settingsObj[defaultSetting.key] = {
+          value: defaultSetting.value,
+          description: defaultSetting.description,
+          updatedAt: newSetting.updatedAt,
+          updatedBy: 'system'
+        };
+      }
     }
 
     res.json({

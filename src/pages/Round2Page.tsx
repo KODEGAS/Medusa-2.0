@@ -101,7 +101,7 @@ const Round2Page = () => {
     id: "android",
     name: "Android Exploitation Challenge",
     description: "Reverse engineer the Android application to find the flag",
-    url: "https://your-storage-url.com/android-challenge.apk", 
+    url: "https://medusa-ecsc.s3.ap-south-1.amazonaws.com/app-release.apk", 
     filename: "medusa_android.apk",
     icon: Smartphone,
     color: "emerald"
@@ -109,10 +109,10 @@ const Round2Page = () => {
 
   const pwnChallenge = {
     id: "pwn",
-    name: "PWN Box Challenge",
-    description: "Exploit the vulnerable binary and gain shell access",
-    url: "https://your-storage-url.com/pwn-challenge.zip",
-    filename: "pwn_box.zip",
+    name: "PWN Container Challenge",
+    description: "Break into the containerized environment and capture both flags",
+    url: "http://138.68.4.31",
+    filename: "Access via 138.68.4.31",
     icon: Server,
     color: "red"
   };
@@ -485,10 +485,10 @@ const Round2Page = () => {
                   <Server className="w-8 h-8 text-red-500" />
                   <div className="flex-1">
                     <CardTitle className="text-2xl font-serif text-red-100">
-                      Challenge 2: PWN Box
+                      Challenge 2: Container Escape
                     </CardTitle>
                     <CardDescription className="font-serif italic text-red-200/60">
-                      Exploit the vulnerable binary and capture the flag
+                      Break into a misconfigured container at container.hashx and escalate to root
                     </CardDescription>
                   </div>
                   {downloadedFiles.includes(pwnChallenge.id) && (
@@ -503,23 +503,36 @@ const Round2Page = () => {
                 <div className="p-6 bg-gradient-to-br from-red-950/30 to-transparent border border-red-900/30 rounded-lg">
                   <div className="flex items-start gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-red-900/30 flex items-center justify-center border border-red-600/30">
-                      <Download className="w-6 h-6 text-red-500" />
+                      <Server className="w-6 h-6 text-red-500" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-serif font-bold text-red-100 mb-2">
-                        Download Challenge Files
+                        Challenge Access
                       </h3>
-                      <p className="text-sm text-red-200/70 mb-4">
-                        {pwnChallenge.description}
+                      <p className="text-sm text-red-200/70 mb-3">
+                        This challenge is hosted at <code className="px-2 py-1 bg-red-950/50 rounded text-red-300 font-mono">138.68.4.31</code>
                       </p>
-                      <Button
-                        onClick={() => handleDownload(pwnChallenge.url, pwnChallenge.filename, pwnChallenge.id)}
-                        variant="outline"
-                        className="border-red-600/50 text-red-400 hover:bg-red-950/50 font-serif"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Download {pwnChallenge.filename}
-                      </Button>
+                      <p className="text-sm text-red-200/70 mb-4">
+                        Exploit the weakly protected web service to gain container access, then escalate privileges to capture both the <strong>user flag</strong> and <strong>root flag</strong>.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => window.open('http://138.68.4.31', '_blank')}
+                          variant="outline"
+                          className="border-red-600/50 text-red-400 hover:bg-red-950/50 font-serif"
+                        >
+                          <Server className="w-4 h-4 mr-2" />
+                          Access Challenge
+                        </Button>
+                        <Button
+                          onClick={() => window.open('/ROUND2_PWN_CHALLENGE.md', '_blank')}
+                          variant="outline"
+                          className="border-purple-600/50 text-purple-400 hover:bg-purple-950/50 font-serif"
+                        >
+                          <Scroll className="w-4 h-4 mr-2" />
+                          View Documentation
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -528,13 +541,16 @@ const Round2Page = () => {
                 <div className="p-6 bg-gradient-to-br from-red-950/20 to-transparent border border-red-900/30 rounded-lg">
                   <h3 className="text-lg font-serif font-bold text-red-100 mb-4 flex items-center gap-2">
                     <Flag className="w-5 h-5 text-red-500" />
-                    Submit PWN Flag
+                    Submit PWN Flags (User & Root)
                     {remainingAttempts && (
                       <span className="ml-auto text-sm font-mono text-red-400">
                         {remainingAttempts.attempts.round2.pwn.remaining} attempts left
                       </span>
                     )}
                   </h3>
+                  <p className="text-sm text-red-200/60 mb-4">
+                    This challenge has TWO flags: User Flag (inside container) and Root Flag (after breakout). Submit each flag separately below.
+                  </p>
                   <div className="space-y-4">
                     <div className="flex gap-2">
                       <Input
@@ -583,11 +599,15 @@ const Round2Page = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-500 mt-1">•</span>
-                  <span><strong>PWN Box:</strong> Exploit the vulnerable binary to capture the flag</span>
+                  <span><strong>Container Escape:</strong> Access container.hashx, exploit the web service, escalate privileges, and capture TWO flags (user + root)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-500 mt-1">•</span>
-                  <span>Both flags follow the format: <code className="px-2 py-1 bg-black/40 rounded text-purple-400">MEDUSA&#123;...&#125;</code></span>
+                  <span>All flags follow the format: <code className="px-2 py-1 bg-black/40 rounded text-purple-400">MEDUSA&#123;...&#125;</code></span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-500 mt-1">•</span>
+                  <span>Total: <strong>THREE flags</strong> in Round 2 (1 Android + 2 PWN)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-500 mt-1">•</span>
@@ -629,12 +649,12 @@ const Round2Page = () => {
                 <div className="p-4 rounded-lg border bg-red-950/10 border-red-600/30">
                   <div className="mb-3 bg-gradient-to-r from-red-900/40 to-transparent p-2 rounded border-l-4 border-red-400">
                     <p className="font-serif text-lg font-bold">
-                      <span className="mr-2">�</span>
-                      <span className="text-red-200">PWN Challenge Hint</span>
+                      <span className="mr-2">🔥</span>
+                      <span className="text-red-200">Container Escape Hint</span>
                     </p>
                   </div>
                   <p className="text-sm text-white font-mono leading-relaxed bg-red-900/20 p-3 rounded border border-red-600/30">
-                    Buffer overflows are your friend. Understand the binary, find the vulnerability, and craft your exploit.
+                    Stage 1: Exploit the web service to get inside the container (user flag). Stage 2: Look for Docker misconfigurations like mounted sockets, privileged mode, or host filesystem access (root flag).
                   </p>
                 </div>
 

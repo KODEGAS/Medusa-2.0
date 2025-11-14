@@ -47,6 +47,13 @@ const Round1GuideRedirect = () => {
   return <PageLoader />;
 };
 
+const Round2GuideRedirect = () => {
+  useEffect(() => {
+    window.location.href = "https://drive.google.com/file/d/1QbtkITYlOYXal-2GHk7wu0hPzQQV1m4U/view";
+  }, []);
+  return <PageLoader />;
+};
+
 const AwarenessSessionRedirect = () => {
   window.location.href = "https://zoom.us/j/96715243562?pwd=ap9xBgK9YPyGBsfz0raf7Chehu1HZF.1";
   return null;
@@ -109,6 +116,8 @@ const App = () => {
                 <Route path="/facebook" element={<FacebookRedirect />} />
                 <Route path="/whatsapp" element={<WhatsAppRedirect />} />
                 <Route path="/round1-guide" element={<Round1GuideRedirect />} />
+                <Route path="/round2-guide" element={<Round2GuideRedirect />} />
+    
                 <Route path="/awareness-session" element={<AwarenessSessionRedirect />} />
                 
                 {/* Delegate Book Redirect */}

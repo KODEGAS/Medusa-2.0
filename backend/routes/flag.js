@@ -232,18 +232,30 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     const challengeId = round === 2 ? `${round}-${challengeType}` : `${round}`;
 
     // 🔒 SECURITY: Check submission count within transaction (RACE CONDITION PROTECTION)
-    // For PWN challenge, count all pwn submissions (user + root) together
+    // Track attempts per specific challenge (pwn-user and pwn-root are tracked separately)
     const isPwnChallenge = challengeType === 'pwn-user' || challengeType === 'pwn-root';
-    const submissionQuery = round === 2 && isPwnChallenge
-      ? { teamId, round, challengeType: { $in: ['pwn-user', 'pwn-root'] } }
-      : round === 2
+    
+    // For PWN challenges, also count total PWN submissions (for global PWN limit)
+    let totalPwnSubmissions = 0;
+    if (round === 2 && isPwnChallenge) {
+      totalPwnSubmissions = await FlagSubmission.countDocuments({
+        teamId,
+        round,
+        challengeType: { $in: ['pwn-user', 'pwn-root'] }
+      }).session(session);
+    }
+    
+    // Count submissions for THIS specific challenge (for penalty calculation)
+    const submissionQuery = round === 2
       ? { teamId, round, challengeType }
       : { teamId, round };
     
     const submissionCount = await FlagSubmission.countDocuments(submissionQuery).session(session);
 
-    // Limit: 2 submissions for Round 1 and Android, 3 submissions for PWN (combined user+root)
-    const maxSubmissions = (round === 2 && isPwnChallenge) ? 3 : 2;
+    // Limit: 2 submissions per challenge (Round 1, Android, pwn-user, pwn-root each have 2 attempts)
+    // Plus a global limit of 3 total for PWN (user + root combined)
+    const maxSubmissions = 2;
+    const maxPwnTotal = 3;
     
     if (submissionCount >= maxSubmissions) {
       await session.abortTransaction();
@@ -253,6 +265,18 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
         submissionCount: submissionCount,
         maxSubmissions: maxSubmissions,
         challenge: challengeType || 'Round 1'
+      });
+    }
+    
+    // Additional check for PWN: total PWN submissions (user + root combined) cannot exceed 3
+    if (round === 2 && isPwnChallenge && totalPwnSubmissions >= maxPwnTotal) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(403).json({ 
+        error: `Maximum total PWN submission limit reached. Your team can only submit ${maxPwnTotal} flags across all PWN challenges (user + root combined).`,
+        totalPwnSubmissions: totalPwnSubmissions,
+        maxPwnTotal: maxPwnTotal,
+        challenge: `PWN (${challengeType})`
       });
     }
 
@@ -276,17 +300,10 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
 
     // Determine if this is the second submission (point deduction applies)
     const isSecondSubmission = submissionCount === 1;
-    const isThirdSubmission = submissionCount === 2;
     
     // Calculate point deduction
-    // PWN challenges: No penalty on 2nd attempt, 25% penalty on 3rd attempt
-    // Other challenges: 25% penalty on 2nd attempt
-    let pointDeduction = 0;
-    if (isPwnChallenge) {
-      pointDeduction = isThirdSubmission ? 0.25 : 0; // Only penalize 3rd attempt for PWN
-    } else {
-      pointDeduction = isSecondSubmission ? 0.25 : 0; // Penalize 2nd attempt for others
-    }
+    // All challenges: 25% penalty on 2nd attempt for that specific challenge
+    const pointDeduction = isSecondSubmission ? 0.25 : 0;
 
     // Validate flag based on round and challenge type
     let isCorrect = false;
@@ -363,7 +380,10 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     session.endSession();
 
     // Log submission for audit trail (without revealing correct flag)
-    console.log(`[AUDIT:${requestId}] Flag submitted by team ${teamId} for ${round === 2 ? `Round 2 (${challengeType})` : 'Round 1'} - Attempt ${submissionCount + 1}/2 - ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'} - ${points} points - IP: ${ipAddress} - Time: ${new Date().toISOString()}`);
+    const challengeLabel = round === 2 ? `Round 2 (${challengeType})` : 'Round 1';
+    const attemptLabel = `Attempt ${submissionCount + 1}/2 for ${challengeType || 'Round 1'}`;
+    const pwnTotalLabel = (round === 2 && isPwnChallenge) ? ` (PWN Total: ${totalPwnSubmissions + 1}/3)` : '';
+    console.log(`[AUDIT:${requestId}] Flag submitted by team ${teamId} for ${challengeLabel} - ${attemptLabel}${pwnTotalLabel} - ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'} - ${points} points - IP: ${ipAddress} - Time: ${new Date().toISOString()}`);
 
     // Prepare response with submission info
     // SECURITY: Never include the correct flag or hints about it
@@ -377,12 +397,16 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
       submittedAt: flagSubmission.submittedAt,
       attemptNumber: submissionCount + 1,
       remainingAttempts: maxSubmissions - (submissionCount + 1),
+      ...(round === 2 && isPwnChallenge && {
+        totalPwnSubmissions: totalPwnSubmissions + 1,
+        remainingPwnTotal: maxPwnTotal - (totalPwnSubmissions + 1)
+      }),
       points: points,
       challenge: round === 2 ? `${challengeType}` : 'round1',
       warning: !isCorrect && (submissionCount + 1) >= maxSubmissions
-        ? 'This was your final submission! No more attempts remaining.' 
+        ? `This was your final submission for ${challengeType || 'Round 1'}! No more attempts remaining for this specific challenge.` 
         : !isCorrect && submissionCount === 0
-        ? `You have ${maxSubmissions - 1} attempts remaining. Your second submission will have a 25% point deduction.`
+        ? `You have 1 attempt remaining for this challenge. Your second submission will have a 25% point deduction.`
         : undefined,
       // Include detailed breakdown for Round 2 (breakdown is null if incorrect)
       breakdown: isCorrect && pointsMeta ? {
@@ -437,12 +461,22 @@ router.get('/remaining-attempts', authenticate, async (req, res) => {
       challengeType: 'android' 
     });
 
-    // Count submissions for Round 2 - PWN (both user and root combined)
-    const round2PwnCount = await FlagSubmission.countDocuments({ 
+    // Count submissions for Round 2 - PWN User (separate)
+    const round2PwnUserCount = await FlagSubmission.countDocuments({ 
       teamId, 
       round: 2,
-      challengeType: { $in: ['pwn-user', 'pwn-root'] }
+      challengeType: 'pwn-user'
     });
+
+    // Count submissions for Round 2 - PWN Root (separate)
+    const round2PwnRootCount = await FlagSubmission.countDocuments({ 
+      teamId, 
+      round: 2,
+      challengeType: 'pwn-root'
+    });
+
+    // Total PWN submissions (for global limit tracking)
+    const round2PwnTotalCount = round2PwnUserCount + round2PwnRootCount;
 
     // Check if challenges are completed (correct submission exists)
     const round1Completed = await FlagSubmission.findOne({ 
@@ -497,15 +531,28 @@ router.get('/remaining-attempts', authenticate, async (req, res) => {
             completedAt: round2AndroidCompleted?.submittedAt || null,
             points: round2AndroidCompleted?.points || 0
           },
-          pwn: {
-            used: round2PwnCount,
-            remaining: Math.max(0, 3 - round2PwnCount),
-            maxAttempts: 3,
-            completed: !!round2PwnCompleted,
-            completedAt: round2PwnCompleted ? (round2PwnRootCompleted?.submittedAt || round2PwnUserCompleted?.submittedAt) : null,
-            points: totalPwnPoints,
-            userFlagCompleted: !!round2PwnUserCompleted,
-            rootFlagCompleted: !!round2PwnRootCompleted
+          pwnUser: {
+            used: round2PwnUserCount,
+            remaining: Math.max(0, 2 - round2PwnUserCount),
+            maxAttempts: 2,
+            completed: !!round2PwnUserCompleted,
+            completedAt: round2PwnUserCompleted?.submittedAt || null,
+            points: round2PwnUserCompleted?.points || 0
+          },
+          pwnRoot: {
+            used: round2PwnRootCount,
+            remaining: Math.max(0, 2 - round2PwnRootCount),
+            maxAttempts: 2,
+            completed: !!round2PwnRootCompleted,
+            completedAt: round2PwnRootCompleted?.submittedAt || null,
+            points: round2PwnRootCompleted?.points || 0
+          },
+          pwnTotal: {
+            used: round2PwnTotalCount,
+            remaining: Math.max(0, 3 - round2PwnTotalCount),
+            maxTotal: 3,
+            bothCompleted: !!round2PwnCompleted,
+            totalPoints: totalPwnPoints
           }
         }
       }

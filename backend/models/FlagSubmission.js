@@ -21,7 +21,7 @@ const flagSubmissionSchema = new mongoose.Schema({
   },
   challengeType: {
     type: String,
-    enum: ['android', 'pwn', null],
+    enum: ['android', 'pwn-user', 'pwn-root', null],
     default: null,
     index: true
   },
@@ -62,7 +62,7 @@ const flagSubmissionSchema = new mongoose.Schema({
     type: Number,
     default: 1,
     min: 1,
-    max: 2
+    max: 3 // Changed to 3 for PWN challenge
   },
   pointDeduction: {
     type: Number,

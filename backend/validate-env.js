@@ -27,8 +27,9 @@ const requiredVars = [
   { name: 'ROUND1_API_KEY', minLength: 10 },
   { name: 'ROUND2_API_KEY', minLength: 10 },
   { name: 'ROUND1_FLAG', minLength: 10 },
-  { name: 'ROUND2_PWN_FLAG', minLength: 10 },
   { name: 'ROUND2_ANDROID_FLAG', minLength: 10 },
+  { name: 'ROUND2_PWN_USER_FLAG', minLength: 10 },
+  { name: 'ROUND2_PWN_ROOT_FLAG', minLength: 10 },
   { name: 'GOOGLE_CLOUD_PROJECT_ID', minLength: 5 },
   { name: 'GOOGLE_CLOUD_STORAGE_BUCKET', minLength: 3 },
 ];
@@ -124,12 +125,24 @@ if (mongoUri) {
 }
 
 // Check flag formats
-['ROUND1_FLAG', 'ROUND2_PWN_FLAG', 'ROUND2_ANDROID_FLAG'].forEach(flagName => {
+// MEDUSA{...} format for Round 1 and Android
+['ROUND1_FLAG', 'ROUND2_ANDROID_FLAG'].forEach(flagName => {
   const flag = process.env[flagName];
   if (flag && /^MEDUSA\{.+\}$/.test(flag)) {
-    console.log(`${GREEN}✅ ${flagName}: Valid format${RESET}`);
+    console.log(`${GREEN}✅ ${flagName}: Valid MEDUSA{...} format${RESET}`);
   } else if (flag) {
     console.log(`${RED}❌ ${flagName}: Invalid format (should be MEDUSA{...})${RESET}`);
+    errors++;
+  }
+});
+
+// HashX{...} format for PWN challenge
+['ROUND2_PWN_USER_FLAG', 'ROUND2_PWN_ROOT_FLAG'].forEach(flagName => {
+  const flag = process.env[flagName];
+  if (flag && /^HashX\{.+\}$/.test(flag)) {
+    console.log(`${GREEN}✅ ${flagName}: Valid HashX{...} format${RESET}`);
+  } else if (flag) {
+    console.log(`${RED}❌ ${flagName}: Invalid format (should be HashX{...})${RESET}`);
     errors++;
   }
 });

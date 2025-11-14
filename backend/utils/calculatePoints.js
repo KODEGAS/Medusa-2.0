@@ -6,14 +6,16 @@
  * @param {number} attemptNumber - 1 or 2
  * @returns {number} - Calculated points
  */
-export function calculatePoints(roundStartTime, submitTime, attemptNumber) {
-  const BASE_POINTS = 1000;
-  
+export function calculatePoints(roundStartTime, submitTime, attemptNumber, options = {}) {
+  // options: { basePoints, hintPenalty }
+  const BASE_POINTS = typeof options.basePoints === 'number' ? options.basePoints : 1000;
+  const hintPenalty = typeof options.hintPenalty === 'number' ? options.hintPenalty : 0;
+
   // Calculate time elapsed in seconds (with millisecond precision)
   const timeElapsedMs = new Date(submitTime) - new Date(roundStartTime);
   const secondsElapsed = timeElapsedMs / 1000;
   const minutesElapsed = secondsElapsed / 60;
-  
+
   // Time-based multiplier (continuous linear decay for maximum granularity)
   let timeMultiplier = 1.0;
   
@@ -61,14 +63,30 @@ export function calculatePoints(roundStartTime, submitTime, attemptNumber) {
     timeMultiplier = 0.60;
   }
   
-  // Attempt penalty (25% penalty for 2nd attempt)
-  const attemptPenalty = attemptNumber === 2 ? 0.25 : 0;
-  
-  // Calculate final points rounded to 1 decimal place
-  // This ensures unique scores while being easy to read
-  const points = Math.round((BASE_POINTS * timeMultiplier * (1 - attemptPenalty)) * 10) / 10;
-  
-  return points;
+  // Attempt penalty (25% penalty for 2nd attempt). For attempt numbers beyond 2, apply incremental penalties.
+  let attemptPenalty = 0;
+  if (attemptNumber === 2) attemptPenalty = 0.25;
+  else if (attemptNumber >= 3) attemptPenalty = 0.40; // harsher penalty for 3rd+ attempts
+
+  // Calculate raw points before hint penalty
+  let rawPoints = BASE_POINTS * timeMultiplier * (1 - attemptPenalty);
+
+  // Subtract hint penalty (flat deduction)
+  let finalPoints = rawPoints - hintPenalty;
+  if (finalPoints < 0) finalPoints = 0;
+
+  // Round to 1 decimal place
+  rawPoints = Math.round(rawPoints * 10) / 10;
+  finalPoints = Math.round(finalPoints * 10) / 10;
+
+  return {
+    rawPoints,
+    finalPoints,
+    hintPenalty,
+    basePoints: BASE_POINTS,
+    timeMultiplier,
+    attemptPenalty
+  };
 }
 
 /**

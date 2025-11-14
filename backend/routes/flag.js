@@ -28,12 +28,20 @@ const CORRECT_FLAGS_R2 = {
     console.log('✅ ROUND2_ANDROID_FLAG loaded successfully');
     return flag.trim();
   })(),
-  pwn: (() => {
-    const flag = process.env.ROUND2_PWN_FLAG;
+  pwnUser: (() => {
+    const flag = process.env.ROUND2_PWN_USER_FLAG;
     if (!flag || flag.trim() === '') {
-      throw new Error('Missing ROUND2_PWN_FLAG environment variable');
+      throw new Error('Missing ROUND2_PWN_USER_FLAG environment variable');
     }
-    console.log('✅ ROUND2_PWN_FLAG loaded successfully');
+    console.log('✅ ROUND2_PWN_USER_FLAG loaded successfully');
+    return flag.trim();
+  })(),
+  pwnRoot: (() => {
+    const flag = process.env.ROUND2_PWN_ROOT_FLAG;
+    if (!flag || flag.trim() === '') {
+      throw new Error('Missing ROUND2_PWN_ROOT_FLAG environment variable');
+    }
+    console.log('✅ ROUND2_PWN_ROOT_FLAG loaded successfully');
     return flag.trim();
   })()
 };
@@ -128,11 +136,26 @@ const validateFlagSubmission = (req, res, next) => {
     });
   }
 
-  // Validate flag format - must be MEDUSA{...}
-  if (!/^MEDUSA\{[A-Za-z0-9_\-!@#$%^&*()+={}[\]:;"'<>,.?/\\|`~ ]+\}$/i.test(flag.trim())) {
-    return res.status(400).json({ 
-      error: 'Invalid flag format. Flags must be in the format: MEDUSA{...}' 
-    });
+  // Validate flag format based on challenge type
+  // Android and Round 1: MEDUSA{...}
+  // PWN challenges: HashX{...}
+  const isPwnChallenge = challengeType === 'pwn-user' || challengeType === 'pwn-root';
+  const isAndroidOrRound1 = round === 1 || challengeType === 'android';
+  
+  if (isAndroidOrRound1) {
+    // Validate MEDUSA{...} format
+    if (!/^MEDUSA\{[A-Za-z0-9_\-!@#$%^&*()+={}[\]:;"'<>,.?/\\|`~ ]+\}$/i.test(flag.trim())) {
+      return res.status(400).json({ 
+        error: 'Invalid flag format. Android flag must be in the format: MEDUSA{...}' 
+      });
+    }
+  } else if (isPwnChallenge) {
+    // Validate HashX{...} format
+    if (!/^HashX\{[A-Za-z0-9_\-!@#$%^&*()+={}[\]:;"'<>,.?/\\|`~ ]+\}$/i.test(flag.trim())) {
+      return res.status(400).json({ 
+        error: 'Invalid flag format. PWN challenge flags must be in the format: HashX{...}' 
+      });
+    }
   }
 
   // Validate round
@@ -144,9 +167,9 @@ const validateFlagSubmission = (req, res, next) => {
 
   // For Round 2, validate challengeType
   if (round === 2) {
-    if (!challengeType || !['android', 'pwn'].includes(challengeType)) {
+    if (!challengeType || !['android', 'pwn-user', 'pwn-root'].includes(challengeType)) {
       return res.status(400).json({ 
-        error: 'For Round 2, challengeType must be either "android" or "pwn"' 
+        error: 'For Round 2, challengeType must be "android", "pwn-user", or "pwn-root"' 
       });
     }
   }
@@ -163,14 +186,14 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
   const session = await mongoose.startSession();
   session.startTransaction();
   
+  // Generate unique request ID for audit trail (declare at function scope)
+  const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
   try {
     const teamId = req.user.teamId; // Read from JWT token (secure)
     const { flag, round = 1, challengeType } = req.body;
     const ipAddress = getRealIP(req);
     const userAgent = req.get('user-agent');
-    
-    // Generate unique request ID for audit trail
-    const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // 🔒 SECURITY: Validate that the user's JWT token is for the correct round
     const userRound = req.user.round; // Round from JWT token
@@ -190,14 +213,18 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     const challengeId = round === 2 ? `${round}-${challengeType}` : `${round}`;
 
     // 🔒 SECURITY: Check submission count within transaction (RACE CONDITION PROTECTION)
-    const submissionQuery = round === 2 
+    // For PWN challenge, count all pwn submissions (user + root) together
+    const isPwnChallenge = challengeType === 'pwn-user' || challengeType === 'pwn-root';
+    const submissionQuery = round === 2 && isPwnChallenge
+      ? { teamId, round, challengeType: { $in: ['pwn-user', 'pwn-root'] } }
+      : round === 2
       ? { teamId, round, challengeType }
       : { teamId, round };
     
     const submissionCount = await FlagSubmission.countDocuments(submissionQuery).session(session);
 
-    // Limit: 2 submissions for Round 1 and Android, 3 submissions for PWN
-    const maxSubmissions = (round === 2 && challengeType === 'pwn') ? 3 : 2;
+    // Limit: 2 submissions for Round 1 and Android, 3 submissions for PWN (combined user+root)
+    const maxSubmissions = (round === 2 && isPwnChallenge) ? 3 : 2;
     
     if (submissionCount >= maxSubmissions) {
       await session.abortTransaction();
@@ -242,8 +269,10 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     } else if (round === 2) {
       if (challengeType === 'android') {
         correctFlag = CORRECT_FLAGS_R2.android;
-      } else if (challengeType === 'pwn') {
-        correctFlag = CORRECT_FLAGS_R2.pwn;
+      } else if (challengeType === 'pwn-user') {
+        correctFlag = CORRECT_FLAGS_R2.pwnUser;
+      } else if (challengeType === 'pwn-root') {
+        correctFlag = CORRECT_FLAGS_R2.pwnRoot;
       }
       isCorrect = secureCompare(flag.trim(), correctFlag);
     }
@@ -254,10 +283,31 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     // Use global competition start time for fair point calculation
     const roundStartTime = GLOBAL_COMPETITION_START;
     
-    // Calculate points if correct
-    const points = isCorrect 
-      ? calculatePoints(roundStartTime, new Date(), submissionCount + 1)
-      : 0;
+    // Fetch hint penalty from database (sum all unlocked hints for this team/round/challenge)
+    const HintUnlock = (await import('../models/HintUnlock.js')).default;
+    const unlockedHints = await HintUnlock.find({
+      teamId,
+      round,
+      challengeType: round === 2 ? challengeType : undefined
+    });
+    const hintPenalty = unlockedHints.reduce((sum, hint) => sum + hint.pointCost, 0);
+
+    // Determine basePoints according to Round 2 weighting (total 1500)
+    // 50% Android, 30% PWN-user, 20% PWN-root
+    let basePoints = 1000; // default for legacy behaviour
+    if (round === 2) {
+      if (challengeType === 'android') basePoints = 1500 * 0.5; // 750
+      else if (challengeType === 'pwn-user') basePoints = 1500 * 0.3; // 450
+      else if (challengeType === 'pwn-root') basePoints = 1500 * 0.2; // 300
+    }
+
+    // Calculate points if correct. calculatePoints now returns an object with breakdown.
+    let points = 0;
+    let pointsMeta = null;
+    if (isCorrect) {
+      pointsMeta = calculatePoints(roundStartTime, new Date(), submissionCount + 1, { basePoints, hintPenalty });
+      points = pointsMeta.finalPoints;
+    }
 
     const flagSubmission = new FlagSubmission({
       teamId,
@@ -302,7 +352,16 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
         ? 'This was your final submission! No more attempts remaining.' 
         : !isCorrect && submissionCount === 0
         ? `You have ${maxSubmissions - 1} attempts remaining. Your second submission will have a 25% point deduction.`
-        : undefined
+        : undefined,
+      // Include detailed breakdown for Round 2 (breakdown is null if incorrect)
+      breakdown: isCorrect && pointsMeta ? {
+        basePoints: pointsMeta.basePoints,
+        rawPoints: pointsMeta.rawPoints,
+        finalPoints: pointsMeta.finalPoints,
+        timeMultiplier: pointsMeta.timeMultiplier,
+        attemptPenalty: pointsMeta.attemptPenalty,
+        hintPenalty: pointsMeta.hintPenalty
+      } : undefined
     };
 
     res.status(201).json(response);
@@ -347,11 +406,11 @@ router.get('/remaining-attempts', authenticate, async (req, res) => {
       challengeType: 'android' 
     });
 
-    // Count submissions for Round 2 - PWN
+    // Count submissions for Round 2 - PWN (both user and root combined)
     const round2PwnCount = await FlagSubmission.countDocuments({ 
       teamId, 
       round: 2,
-      challengeType: 'pwn' 
+      challengeType: { $in: ['pwn-user', 'pwn-root'] }
     });
 
     // Check if challenges are completed (correct submission exists)
@@ -368,12 +427,23 @@ router.get('/remaining-attempts', authenticate, async (req, res) => {
       isCorrect: true 
     });
 
-    const round2PwnCompleted = await FlagSubmission.findOne({ 
+    // Check if either user or root flag is completed for PWN
+    const round2PwnUserCompleted = await FlagSubmission.findOne({ 
       teamId, 
       round: 2,
-      challengeType: 'pwn',
+      challengeType: 'pwn-user',
       isCorrect: true 
     });
+
+    const round2PwnRootCompleted = await FlagSubmission.findOne({ 
+      teamId, 
+      round: 2,
+      challengeType: 'pwn-root',
+      isCorrect: true 
+    });
+
+    const round2PwnCompleted = round2PwnUserCompleted && round2PwnRootCompleted;
+    const totalPwnPoints = (round2PwnUserCompleted?.points || 0) + (round2PwnRootCompleted?.points || 0);
 
     res.json({ 
       success: true,
@@ -401,8 +471,10 @@ router.get('/remaining-attempts', authenticate, async (req, res) => {
             remaining: Math.max(0, 3 - round2PwnCount),
             maxAttempts: 3,
             completed: !!round2PwnCompleted,
-            completedAt: round2PwnCompleted?.submittedAt || null,
-            points: round2PwnCompleted?.points || 0
+            completedAt: round2PwnCompleted ? (round2PwnRootCompleted?.submittedAt || round2PwnUserCompleted?.submittedAt) : null,
+            points: totalPwnPoints,
+            userFlagCompleted: !!round2PwnUserCompleted,
+            rootFlagCompleted: !!round2PwnRootCompleted
           }
         }
       }

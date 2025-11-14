@@ -58,6 +58,15 @@ const Round2Page = () => {
   const [pwnUserResult, setPwnUserResult] = useState<{ success: boolean; message: string } | null>(null);
   const [pwnRootResult, setPwnRootResult] = useState<{ success: boolean; message: string } | null>(null);
 
+  // Hint unlock states
+  const [unlockedHints, setUnlockedHints] = useState<{[key: string]: number[]}>({
+    android: [],
+    'pwn-user': [],
+    'pwn-root': []
+  });
+  const [unlockingHint, setUnlockingHint] = useState<string | null>(null);
+  const [hintPenalty, setHintPenalty] = useState(0);
+
   // Check authentication on mount
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem('round2_authenticated');
@@ -65,8 +74,9 @@ const Round2Page = () => {
       // Redirect to authentication page if not authenticated
       navigate('/round2-auth');
     } else {
-      // Fetch remaining attempts
+      // Fetch remaining attempts and hints
       fetchRemainingAttempts();
+      fetchUnlockedHints();
     }
   }, [navigate]);
 
@@ -99,13 +109,91 @@ const Round2Page = () => {
     }
   };
 
+  // Fetch unlocked hints
+  const fetchUnlockedHints = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const token = localStorage.getItem('medusa_token');
+
+      const response = await fetch(`${apiUrl}/api/hints/unlocked?round=2`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Organize hints by challenge type
+        const organized: {[key: string]: number[]} = {
+          android: [],
+          'pwn-user': [],
+          'pwn-root': []
+        };
+        data.hints.forEach((hint: any) => {
+          if (organized[hint.challengeType]) {
+            organized[hint.challengeType].push(hint.hintNumber);
+          }
+        });
+        setUnlockedHints(organized);
+        setHintPenalty(data.totalPenalty || 0);
+      } else {
+        console.error('Failed to fetch unlocked hints');
+      }
+    } catch (error) {
+      console.error('Error fetching unlocked hints:', error);
+    }
+  };
+
+  // Unlock a hint
+  const unlockHint = async (challengeType: string, hintNumber: number) => {
+    const hintKey = `${challengeType}-${hintNumber}`;
+    setUnlockingHint(hintKey);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const token = localStorage.getItem('medusa_token');
+
+      const response = await fetch(`${apiUrl}/api/hints/unlock`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          round: 2,
+          challengeType,
+          hintNumber
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Refresh hints
+        await fetchUnlockedHints();
+        alert(`Hint unlocked! ${data.pointCost} points will be deducted from your final score.`);
+      } else {
+        alert(data.error || 'Failed to unlock hint');
+      }
+    } catch (error) {
+      console.error('Error unlocking hint:', error);
+      alert('Failed to unlock hint. Please try again.');
+    } finally {
+      setUnlockingHint(null);
+    }
+  };
+
   // Challenge files for both challenges
   const androidChallenge = {
     id: "android",
     name: "Android Exploitation Challenge",
     description: "Reverse engineer the Android application to find the flag",
     url: "https://medusa-ecsc.s3.ap-south-1.amazonaws.com/app-release.apk", 
-    filename: "medusa_android.apk",
+    filename: "Perseus.apk",
     icon: Smartphone,
     color: "emerald"
   };
@@ -200,7 +288,7 @@ const Round2Page = () => {
         body: JSON.stringify({
           flag: flag.trim(),
           round: 2,
-          challengeType: challengeType === 'android' ? 'android' : 'pwn'
+          challengeType: challengeType // Send exact challengeType: 'android', 'pwn-user', or 'pwn-root'
         })
       });
 
@@ -209,7 +297,7 @@ const Round2Page = () => {
       if (response.ok && data.correct) {
         setResult({
         success: true,
-        message: `✅ Correct! ${displayName} flag accepted!`
+        message: `Correct flag! ${displayName} challenge completed.`
         });
         // Refresh remaining attempts after successful submission
         fetchRemainingAttempts();
@@ -421,11 +509,9 @@ const Round2Page = () => {
                   <Smartphone className="w-8 h-8 text-emerald-500" />
                   <div className="flex-1">
                     <CardTitle className="text-2xl font-serif text-emerald-100">
-                      Challenge 1: Android Exploitation
+                      Challenge 1: Perseus Android 
                     </CardTitle>
-                    <CardDescription className="font-serif italic text-emerald-200/60">
-                      Reverse engineer the Android application to uncover the hidden flag
-                    </CardDescription>
+                    
                   </div>
                   {downloadedFiles.includes(androidChallenge.id) && (
                     <div className="px-3 py-1 bg-emerald-600/20 border border-emerald-600/30 rounded text-sm text-emerald-400 font-mono">
@@ -511,9 +597,7 @@ const Round2Page = () => {
                     <CardTitle className="text-2xl font-serif text-red-100">
                       Challenge 2: Container Escape
                     </CardTitle>
-                    <CardDescription className="font-serif italic text-red-200/60">
-                      Break into a misconfigured container at container.hashx and escalate to root
-                    </CardDescription>
+                
                   </div>
                   {downloadedFiles.includes(pwnChallenge.id) && (
                     <div className="px-3 py-1 bg-red-600/20 border border-red-600/30 rounded text-sm text-red-400 font-mono">
@@ -578,10 +662,10 @@ const Round2Page = () => {
                     <div className="flex gap-2">
                       <Input
                         type="text"
-                        placeholder="MEDUSA{user_flag...}"
+                        placeholder="HashX{user_flag...}"
                         value={pwnUserFlag}
                         onChange={(e) => setPwnUserFlag(e.target.value)}
-                        className="font-mono bg-background/50 border-yellow-600/30 focus:border-yellow-500"
+                        className="font-mono bg-background/50 border-yellow-600/30 focus:border-yellow-500 focus-visible:ring-yellow-500 focus-visible:ring-offset-0"
                         disabled={pwnUserSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
                       />
                       <Button
@@ -593,8 +677,8 @@ const Round2Page = () => {
                       </Button>
                     </div>
                     {pwnUserResult && (
-                      <Alert variant={pwnUserResult.success ? "default" : "destructive"} className={pwnUserResult.success ? "border-yellow-600/50 bg-yellow-950/30" : ""}>
-                        {pwnUserResult.success ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                      <Alert variant={pwnUserResult.success ? "default" : "destructive"} className={pwnUserResult.success ? "border-green-600/50 bg-green-950/30" : ""}>
+                        {pwnUserResult.success ? <CheckCircle className="h-4 w-4 text-green-400" /> : <AlertCircle className="h-4 w-4" />}
                         <AlertDescription className="font-mono">
                           {pwnUserResult.message}
                         </AlertDescription>
@@ -611,10 +695,10 @@ const Round2Page = () => {
                     <div className="flex gap-2">
                       <Input
                         type="text"
-                        placeholder="MEDUSA{root_flag...}"
+                        placeholder="HashX{root_flag...}"
                         value={pwnRootFlag}
                         onChange={(e) => setPwnRootFlag(e.target.value)}
-                        className="font-mono bg-background/50 border-red-600/30 focus:border-red-500"
+                        className="font-mono bg-background/50 border-red-600/30 focus:border-red-500 focus-visible:ring-red-500 focus-visible:ring-offset-0"
                         disabled={pwnRootSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
                       />
                       <Button
@@ -626,8 +710,8 @@ const Round2Page = () => {
                       </Button>
                     </div>
                     {pwnRootResult && (
-                      <Alert variant={pwnRootResult.success ? "default" : "destructive"} className={pwnRootResult.success ? "border-red-600/50 bg-red-950/30" : ""}>
-                        {pwnRootResult.success ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+                      <Alert variant={pwnRootResult.success ? "default" : "destructive"} className={pwnRootResult.success ? "border-green-600/50 bg-green-950/30" : ""}>
+                        {pwnRootResult.success ? <CheckCircle className="h-4 w-4 text-green-400" /> : <AlertCircle className="h-4 w-4" />}
                         <AlertDescription className="font-mono">
                           {pwnRootResult.message}
                         </AlertDescription>
@@ -655,11 +739,11 @@ const Round2Page = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-500 mt-1">•</span>
-                  <span><strong>Container Escape:</strong> Access container.hashx, exploit the web service, escalate privileges, and capture TWO flags (user + root)</span>
+                  <span><strong>Container Escape:</strong> Access 138.68.4.31, exploit the web service, escalate privileges, and capture TWO flags (user + root)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-500 mt-1">•</span>
-                  <span>All flags follow the format: <code className="px-2 py-1 bg-black/40 rounded text-purple-400">MEDUSA&#123;...&#125;</code></span>
+                  <span>Flag formats: Android uses <code className="px-2 py-1 bg-black/40 rounded text-purple-400">MEDUSA&#123;...&#125;</code>, PWN uses <code className="px-2 py-1 bg-black/40 rounded text-purple-400">HashX&#123;...&#125;</code></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-500 mt-1">•</span>
@@ -669,21 +753,143 @@ const Round2Page = () => {
                   <span className="text-purple-500 mt-1">•</span>
                   <span>Submit each flag separately in their respective sections above</span>
                 </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-500 mt-1">•</span>
+                  <span><strong>Scoring:</strong> 1500 points distributed as 50% Android (750), 30% PWN-User (450), 20% PWN-Root (300) with time-based decay</span>
+                </li>
               </ul>
             </AlertDescription>
           </Alert>
 
-          {/* Hints Section */}
+          {/* Hint Unlock System */}
+          <Card className="bg-card/30 backdrop-blur-sm border-2 border-yellow-900/30 mb-12">
+            <CardHeader className="border-b border-yellow-900/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Lock className="w-6 h-6 text-yellow-500" />
+                  <div>
+                    <CardTitle className="text-xl font-serif text-yellow-100">
+                      Hint System
+                    </CardTitle>
+                    <CardDescription className="font-serif italic text-yellow-200/60">
+                      Unlock hints to guide your path (costs points)
+                    </CardDescription>
+                  </div>
+                </div>
+                {hintPenalty > 0 && (
+                  <div className="text-right">
+                    <p className="text-sm text-yellow-400 font-serif">Total Penalty</p>
+                    <p className="text-2xl font-bold text-red-400">-{hintPenalty} pts</p>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Android Hints */}
+                <div className="space-y-3">
+                  <h3 className="font-serif font-bold text-emerald-300 text-center mb-4">Android Challenge</h3>
+                  {[1, 2, 3].map(hintNum => {
+                    const cost = hintNum === 1 ? 50 : hintNum === 2 ? 100 : 150;
+                    const isUnlocked = unlockedHints.android.includes(hintNum);
+                    const canUnlock = hintNum === 1 || unlockedHints.android.includes(hintNum - 1);
+                    const isUnlocking = unlockingHint === `android-${hintNum}`;
+                    
+                    return (
+                      <div key={hintNum} className={`p-4 rounded-lg border ${isUnlocked ? 'bg-emerald-950/30 border-emerald-600/50' : 'bg-gray-900/30 border-gray-700/50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-serif font-bold text-sm">Hint {hintNum}</span>
+                          <span className="text-xs font-mono text-yellow-400">{cost} pts</span>
+                        </div>
+                        <Button
+                          onClick={() => unlockHint('android', hintNum)}
+                          disabled={!canUnlock || isUnlocked || isUnlocking}
+                          size="sm"
+                          className={`w-full ${isUnlocked ? 'bg-emerald-600 hover:bg-emerald-600' : 'bg-yellow-600 hover:bg-yellow-500'}`}
+                        >
+                          {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock'}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* PWN User Hints */}
+                <div className="space-y-3">
+                  <h3 className="font-serif font-bold text-yellow-300 text-center mb-4">PWN User Challenge</h3>
+                  {[1, 2, 3].map(hintNum => {
+                    const cost = hintNum === 1 ? 50 : hintNum === 2 ? 100 : 150;
+                    const isUnlocked = unlockedHints['pwn-user'].includes(hintNum);
+                    const canUnlock = hintNum === 1 || unlockedHints['pwn-user'].includes(hintNum - 1);
+                    const isUnlocking = unlockingHint === `pwn-user-${hintNum}`;
+                    
+                    return (
+                      <div key={hintNum} className={`p-4 rounded-lg border ${isUnlocked ? 'bg-yellow-950/30 border-yellow-600/50' : 'bg-gray-900/30 border-gray-700/50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-serif font-bold text-sm">Hint {hintNum}</span>
+                          <span className="text-xs font-mono text-yellow-400">{cost} pts</span>
+                        </div>
+                        <Button
+                          onClick={() => unlockHint('pwn-user', hintNum)}
+                          disabled={!canUnlock || isUnlocked || isUnlocking}
+                          size="sm"
+                          className={`w-full ${isUnlocked ? 'bg-yellow-600 hover:bg-yellow-600' : 'bg-yellow-600 hover:bg-yellow-500'}`}
+                        >
+                          {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock'}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* PWN Root Hints */}
+                <div className="space-y-3">
+                  <h3 className="font-serif font-bold text-red-300 text-center mb-4">PWN Root Challenge</h3>
+                  {[1, 2, 3].map(hintNum => {
+                    const cost = hintNum === 1 ? 50 : hintNum === 2 ? 100 : 150;
+                    const isUnlocked = unlockedHints['pwn-root'].includes(hintNum);
+                    const canUnlock = hintNum === 1 || unlockedHints['pwn-root'].includes(hintNum - 1);
+                    const isUnlocking = unlockingHint === `pwn-root-${hintNum}`;
+                    
+                    return (
+                      <div key={hintNum} className={`p-4 rounded-lg border ${isUnlocked ? 'bg-red-950/30 border-red-600/50' : 'bg-gray-900/30 border-gray-700/50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-serif font-bold text-sm">Hint {hintNum}</span>
+                          <span className="text-xs font-mono text-yellow-400">{cost} pts</span>
+                        </div>
+                        <Button
+                          onClick={() => unlockHint('pwn-root', hintNum)}
+                          disabled={!canUnlock || isUnlocked || isUnlocking}
+                          size="sm"
+                          className={`w-full ${isUnlocked ? 'bg-red-600 hover:bg-red-600' : 'bg-red-600 hover:bg-red-500'}`}
+                        >
+                          {isUnlocking ? 'Unlocking...' : isUnlocked ? '✓ Unlocked' : !canUnlock ? '🔒 Locked' : 'Unlock'}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <Alert className="mt-6 border-yellow-600/30 bg-yellow-950/20">
+                <AlertCircle className="h-4 w-4 text-yellow-500" />
+                <AlertDescription className="text-sm text-yellow-100/80">
+                  Hints must be unlocked sequentially (Hint 1 → Hint 2 → Hint 3). Points are deducted from your final score.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+
+          {/* Static Hints Section (General Tips) */}
           <Card className="bg-card/30 backdrop-blur-sm border-2 border-purple-900/30">
             <CardHeader className="border-b border-purple-900/30">
               <div className="flex items-center gap-3">
                 <Zap className="w-6 h-6 text-purple-500" />
                 <div>
                   <CardTitle className="text-xl font-serif text-purple-100">
-                    Guidance from the Masters
+                    General Guidance (Free)
                   </CardTitle>
                   <CardDescription className="font-serif italic text-purple-200/60">
-                    Hints to illuminate your path
+                    Free tips to point you in the right direction
                   </CardDescription>
                 </div>
               </div>

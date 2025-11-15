@@ -338,7 +338,7 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
       round,
       challengeType: round === 2 ? hintChallengeType : undefined
     });
-    const hintPenalty = unlockedHints.reduce((sum, hint) => sum + hint.pointCost, 0);
+    const totalHintPenalty = unlockedHints.reduce((sum, hint) => sum + hint.pointCost, 0);
 
     // Determine basePoints according to Round 2 weighting (total 1500)
     // 50% Android, 30% PWN-user, 20% PWN-root
@@ -349,12 +349,27 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
       else if (challengeType === 'pwn-root') basePoints = 1500 * 0.2; // 300
     }
 
+    // For PWN challenges, split hint penalty proportionally based on basePoints
+    // PWN-user: 450/(450+300) = 60% of hints, PWN-root: 300/(450+300) = 40% of hints
+    let hintPenalty = totalHintPenalty;
+    if (challengeType === 'pwn-user' || challengeType === 'pwn-root') {
+      const pwnUserBase = 450;
+      const pwnRootBase = 300;
+      const totalPwnBase = pwnUserBase + pwnRootBase; // 750
+      
+      if (challengeType === 'pwn-user') {
+        hintPenalty = totalHintPenalty * (pwnUserBase / totalPwnBase); // 60% of hints
+      } else if (challengeType === 'pwn-root') {
+        hintPenalty = totalHintPenalty * (pwnRootBase / totalPwnBase); // 40% of hints
+      }
+    }
+
     // Calculate points if correct. calculatePoints now returns an object with breakdown.
     let points = 0;
     let pointsMeta = null;
     if (isCorrect) {
       pointsMeta = calculatePoints(roundStartTime, new Date(), submissionCount + 1, { basePoints, hintPenalty });
-      points = pointsMeta.finalPoints;
+      points = Math.round(pointsMeta.finalPoints * 10) / 10; // Round to 1 decimal place
     }
 
     const flagSubmission = new FlagSubmission({

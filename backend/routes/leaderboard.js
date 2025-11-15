@@ -20,27 +20,24 @@ router.get('/', async (req, res) => {
         enabled: false
       });
     }
-    // Get all correct submissions with highest points per team
+    // Get all correct submissions with total points per team
     const leaderboardData = await FlagSubmission.aggregate([
       // Only correct submissions
       { $match: { isCorrect: true, verified: true } },
       
-      // Sort first to ensure we get the best submission per team
-      { $sort: { points: -1, submittedAt: 1 } },
-      
-      // Group by team and get the submission with highest points (first after sort)
+      // Group by team and sum all their points
       { 
         $group: { 
           _id: '$teamId',
-          maxPoints: { $first: '$points' },
-          attemptNumber: { $first: '$attemptNumber' },
-          submittedAt: { $first: '$submittedAt' },
-          pointDeduction: { $first: '$pointDeduction' }
+          totalPoints: { $sum: '$points' },
+          submissionCount: { $sum: 1 },
+          lastSubmittedAt: { $max: '$submittedAt' },
+          firstSubmittedAt: { $min: '$submittedAt' }
         } 
       },
       
-      // Sort by points (descending), then by time (ascending - earlier is better)
-      { $sort: { maxPoints: -1, submittedAt: 1 } }
+      // Sort by total points (descending), then by first submission time (ascending - earlier is better)
+      { $sort: { totalPoints: -1, firstSubmittedAt: 1 } }
     ]);
 
     // Enrich with team information
@@ -54,10 +51,10 @@ router.get('/', async (req, res) => {
           teamName: team?.teamName || 'Unknown Team',
           university: team?.university || 'Unknown University',
           leaderName: team?.leaderName || null,
-          points: entry.maxPoints,
-          attemptNumber: entry.attemptNumber,
-          solvedAt: entry.submittedAt,
-          pointDeduction: entry.pointDeduction
+          points: entry.totalPoints,
+          submissionCount: entry.submissionCount,
+          firstSolvedAt: entry.firstSubmittedAt,
+          lastSolvedAt: entry.lastSubmittedAt
         };
       })
     );
@@ -92,28 +89,35 @@ router.get('/team/:teamId', async (req, res) => {
   try {
     const { teamId } = req.params;
 
-    // Get team's best submission
-    const teamSubmission = await FlagSubmission.findOne({ 
-      teamId, 
-      isCorrect: true, 
-      verified: true 
-    })
-    .sort({ points: -1 })
-    .limit(1);
+    // Get team's total points from all correct submissions
+    const teamSubmissions = await FlagSubmission.aggregate([
+      { $match: { teamId, isCorrect: true, verified: true } },
+      { 
+        $group: { 
+          _id: '$teamId',
+          totalPoints: { $sum: '$points' },
+          submissionCount: { $sum: 1 },
+          firstSubmittedAt: { $min: '$submittedAt' },
+          lastSubmittedAt: { $max: '$submittedAt' }
+        } 
+      }
+    ]);
 
-    if (!teamSubmission) {
+    if (!teamSubmissions.length) {
       return res.json({
         success: true,
         hasSolved: false,
-        message: 'Team has not solved the challenge yet'
+        message: 'Team has not solved any challenge yet'
       });
     }
 
-    // Count teams with better scores
+    const teamData = teamSubmissions[0];
+
+    // Count teams with better total scores
     const betterTeams = await FlagSubmission.aggregate([
       { $match: { isCorrect: true, verified: true } },
-      { $group: { _id: '$teamId', maxPoints: { $max: '$points' } } },
-      { $match: { maxPoints: { $gt: teamSubmission.points } } },
+      { $group: { _id: '$teamId', totalPoints: { $sum: '$points' } } },
+      { $match: { totalPoints: { $gt: teamData.totalPoints } } },
       { $count: 'count' }
     ]);
 
@@ -129,9 +133,10 @@ router.get('/team/:teamId', async (req, res) => {
       // teamId removed for security
       teamName: team?.teamName,
       university: team?.university,
-      points: teamSubmission.points,
-      attemptNumber: teamSubmission.attemptNumber,
-      solvedAt: teamSubmission.submittedAt
+      points: teamData.totalPoints,
+      submissionCount: teamData.submissionCount,
+      firstSolvedAt: teamData.firstSubmittedAt,
+      lastSolvedAt: teamData.lastSubmittedAt
     });
 
   } catch (error) {

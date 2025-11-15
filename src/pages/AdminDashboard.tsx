@@ -1153,6 +1153,91 @@ const AdminDashboard = () => {
                         {expandedTeams.has(teamId) && (
                           <TableRow className="border-slate-700 bg-slate-900/80">
                             <TableCell colSpan={5} className="p-6">
+                              {/* Total Points Summary */}
+                              <div className="mb-6 p-4 bg-gradient-to-r from-emerald-950/50 to-transparent border-l-4 border-emerald-500 rounded-lg">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <h4 className="text-emerald-400 font-bold text-lg mb-1 flex items-center gap-2">
+                                      <Trophy className="h-5 w-5" />
+                                      Total Points for Round 2
+                                    </h4>
+                                    <p className="text-sm text-slate-400">
+                                      Points shown include all deductions (time decay, attempts, hints)
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="text-3xl font-bold text-emerald-300 font-mono">
+                                      {teamData.attempts
+                                        .filter(a => a.isCorrect && a.verified)
+                                        .reduce((sum, a) => sum + (a.points || 0), 0)
+                                        .toFixed(1)} pts
+                                    </div>
+                                    <div className="text-xs text-slate-500 mt-1">
+                                      {teamData.attempts.filter(a => a.isCorrect).length} correct flag(s)
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* Breakdown by challenge */}
+                                {teamData.attempts.filter(a => a.isCorrect).length > 0 && (
+                                  <div className="mt-3 pt-3 border-t border-emerald-900/30">
+                                    <div className="grid grid-cols-3 gap-4 text-sm mb-3">
+                                      <div>
+                                        <div className="text-slate-500 text-xs mb-1">Android</div>
+                                        <div className="text-emerald-400 font-mono font-semibold">
+                                          {teamData.attempts
+                                            .filter(a => a.isCorrect && a.challengeType === 'android')
+                                            .reduce((sum, a) => sum + (a.points || 0), 0)
+                                            .toFixed(1)} pts
+                                        </div>
+                                        {teamData.hints?.android.length > 0 && (
+                                          <div className="text-xs text-yellow-500 mt-1">
+                                            (Used {teamData.hints.android.length} hint{teamData.hints.android.length > 1 ? 's' : ''})
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div>
+                                        <div className="text-slate-500 text-xs mb-1">PWN User</div>
+                                        <div className="text-yellow-400 font-mono font-semibold">
+                                          {teamData.attempts
+                                            .filter(a => a.isCorrect && a.challengeType === 'pwn-user')
+                                            .reduce((sum, a) => sum + (a.points || 0), 0)
+                                            .toFixed(1)} pts
+                                        </div>
+                                        {teamData.hints?.pwn.length > 0 && (
+                                          <div className="text-xs text-yellow-500 mt-1">
+                                            (Used {teamData.hints.pwn.length} hint{teamData.hints.pwn.length > 1 ? 's' : ''})
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div>
+                                        <div className="text-slate-500 text-xs mb-1">PWN Root</div>
+                                        <div className="text-red-400 font-mono font-semibold">
+                                          {teamData.attempts
+                                            .filter(a => a.isCorrect && a.challengeType === 'pwn-root')
+                                            .reduce((sum, a) => sum + (a.points || 0), 0)
+                                            .toFixed(1)} pts
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {/* Hint Usage Summary */}
+                                    {teamData.hints && (teamData.hints.android.length > 0 || teamData.hints.pwn.length > 0) && (
+                                      <div className="text-xs text-slate-400 bg-slate-800/30 border border-slate-700 rounded px-3 py-2">
+                                        <div className="flex items-center justify-between">
+                                          <span className="flex items-center gap-1">
+                                            <Lightbulb className="h-3 w-3 text-yellow-400" />
+                                            Hints Used (costs already deducted above):
+                                          </span>
+                                          <span className="font-mono font-bold text-yellow-400">
+                                            {(teamData.hints.android.reduce((sum, h) => sum + h.pointCost, 0) + 
+                                               teamData.hints.pwn.reduce((sum, h) => sum + h.pointCost, 0))} pts
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+
                               {/* Hints Section */}
                               {teamData.hints && (teamData.hints.android.length > 0 || teamData.hints.pwn.length > 0) && (
                                 <div className="mb-6 p-4 bg-slate-800/30 border border-yellow-500/20 rounded-lg">

@@ -30,13 +30,23 @@ interface ChallengeAttempts {
   points: number;
 }
 
+interface PwnTotalAttempts {
+  used: number;
+  remaining: number;
+  maxTotal: number;
+  bothCompleted: boolean;
+  totalPoints: number;
+}
+
 interface RemainingAttemptsData {
   teamId: string;
   attempts: {
     round1: ChallengeAttempts;
     round2: {
       android: ChallengeAttempts;
-      pwn: ChallengeAttempts;
+      pwnUser: ChallengeAttempts;
+      pwnRoot: ChallengeAttempts;
+      pwnTotal: PwnTotalAttempts;
     };
   };
 }
@@ -501,17 +511,17 @@ const Round2Page = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-red-200/70">Total Attempts:</span>
                         <span className="font-mono font-bold text-red-300">
-                          {remainingAttempts.attempts.round2.pwn.used} / {remainingAttempts.attempts.round2.pwn.maxAttempts}
+                          {remainingAttempts.attempts.round2.pwnTotal.used} / {remainingAttempts.attempts.round2.pwnTotal.maxTotal}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-red-200/70">Remaining:</span>
                         <span className={`font-mono font-bold ${
-                          remainingAttempts.attempts.round2.pwn.remaining > 0 
+                          remainingAttempts.attempts.round2.pwnTotal.remaining > 0 
                             ? 'text-red-400' 
                             : 'text-red-600'
                         }`}>
-                          {remainingAttempts.attempts.round2.pwn.remaining}
+                          {remainingAttempts.attempts.round2.pwnTotal.remaining}
                         </span>
                       </div>
                       <div className="text-xs text-red-200/50 italic pt-1">
@@ -519,7 +529,7 @@ const Round2Page = () => {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-red-200/70">Status:</span>
-                        {remainingAttempts.attempts.round2.pwn.completed ? (
+                        {remainingAttempts.attempts.round2.pwnTotal.bothCompleted ? (
                           <span className="flex items-center gap-1 text-red-400 font-bold">
                             <CheckCircle className="w-4 h-4" />
                             Completed
@@ -528,11 +538,11 @@ const Round2Page = () => {
                           <span className="text-yellow-400 font-bold">In Progress</span>
                         )}
                       </div>
-                      {remainingAttempts.attempts.round2.pwn.completed && (
+                      {remainingAttempts.attempts.round2.pwnTotal.bothCompleted && (
                         <div className="flex justify-between items-center pt-2 border-t border-red-600/30">
                           <span className="text-red-200/70">Points:</span>
                           <span className="font-mono font-bold text-red-300">
-                            {remainingAttempts.attempts.round2.pwn.points}
+                            {remainingAttempts.attempts.round2.pwnTotal.totalPoints}
                           </span>
                         </div>
                       )}
@@ -550,7 +560,7 @@ const Round2Page = () => {
                   </Alert>
                 )}
                 
-                {(remainingAttempts.attempts.round2.pwn.remaining === 0 && !remainingAttempts.attempts.round2.pwn.completed) && (
+                {(remainingAttempts.attempts.round2.pwnTotal.remaining === 0 && !remainingAttempts.attempts.round2.pwnTotal.bothCompleted) && (
                   <Alert className="mt-4 border-red-600/50 bg-red-950/30">
                     <AlertCircle className="h-4 w-4 text-red-400" />
                     <AlertDescription className="text-red-200">
@@ -707,7 +717,7 @@ const Round2Page = () => {
                     Submit PWN Flags
                     {remainingAttempts && (
                       <span className="ml-auto text-sm font-mono text-red-400">
-                        {remainingAttempts.attempts.round2.pwn.remaining} attempts left
+                        {remainingAttempts.attempts.round2.pwnTotal.remaining} attempts left
                       </span>
                     )}
                   </h3>
@@ -728,14 +738,14 @@ const Round2Page = () => {
                         value={pwnUserFlag}
                         onChange={(e) => setPwnUserFlag(e.target.value)}
                         className="font-mono bg-background/50 border-yellow-600/30 focus:border-yellow-500 focus-visible:ring-yellow-500 focus-visible:ring-offset-0"
-                        disabled={pwnUserSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                        disabled={pwnUserSubmitting || (remainingAttempts?.attempts.round2.pwnTotal.remaining === 0)}
                       />
                       <Button
                         onClick={() => handleFlagSubmit('pwn-user')}
-                        disabled={pwnUserSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                        disabled={pwnUserSubmitting || (remainingAttempts?.attempts.round2.pwnTotal.remaining === 0)}
                         className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-500 hover:to-yellow-600 text-white font-serif disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {pwnUserSubmitting ? 'Submitting...' : remainingAttempts?.attempts.round2.pwn.remaining === 0 ? 'No Attempts' : 'Submit'}
+                        {pwnUserSubmitting ? 'Submitting...' : remainingAttempts?.attempts.round2.pwnTotal.remaining === 0 ? 'No Attempts' : 'Submit'}
                       </Button>
                     </div>
                     {pwnUserResult && (
@@ -761,14 +771,14 @@ const Round2Page = () => {
                         value={pwnRootFlag}
                         onChange={(e) => setPwnRootFlag(e.target.value)}
                         className="font-mono bg-background/50 border-red-600/30 focus:border-red-500 focus-visible:ring-red-500 focus-visible:ring-offset-0"
-                        disabled={pwnRootSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                        disabled={pwnRootSubmitting || (remainingAttempts?.attempts.round2.pwnTotal.remaining === 0)}
                       />
                       <Button
                         onClick={() => handleFlagSubmit('pwn-root')}
-                        disabled={pwnRootSubmitting || (remainingAttempts?.attempts.round2.pwn.remaining === 0)}
+                        disabled={pwnRootSubmitting || (remainingAttempts?.attempts.round2.pwnTotal.remaining === 0)}
                         className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-serif disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {pwnRootSubmitting ? 'Submitting...' : remainingAttempts?.attempts.round2.pwn.remaining === 0 ? 'No Attempts' : 'Submit'}
+                        {pwnRootSubmitting ? 'Submitting...' : remainingAttempts?.attempts.round2.pwnTotal.remaining === 0 ? 'No Attempts' : 'Submit'}
                       </Button>
                     </div>
                     {pwnRootResult && (

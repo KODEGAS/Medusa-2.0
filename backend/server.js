@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import logger from './utils/logger.js';
 
 // Environment variables are preloaded via -r dotenv/config in package.json
 // This ensures .env is loaded BEFORE any ES6 imports are processed
@@ -104,8 +105,29 @@ const adminPath = process.env.ADMIN_ROUTE_PATH || '9c8f7e3a2b1d4c5e6f7a8b9c0d1e2
 app.use(`/api/${adminPath}`, adminRoutes);
 
 // Log admin route path on startup (only in development)
-if (process.env.NODE_ENV !== 'production') {
-  console.log(`🔐 Admin panel accessible at: /api/${adminPath}`);
+logger.info(`🔐 Admin panel accessible at: /api/${adminPath}`);
+
+// Production error handler - must be last middleware
+if (process.env.NODE_ENV === 'production') {
+  app.use((err, req, res, next) => {
+    // Log error internally
+    logger.error('Internal server error', err.message);
+    
+    // Send sanitized error to client
+    res.status(err.status || 500).json({
+      error: 'Internal server error',
+      ...(err.status && { status: err.status })
+    });
+  });
+} else {
+  // Development error handler - show stack traces
+  app.use((err, req, res, next) => {
+    logger.error('Server error:', err);
+    res.status(err.status || 500).json({
+      error: err.message,
+      stack: err.stack
+    });
+  });
 }
 
 const PORT = process.env.PORT || 3001;
@@ -113,6 +135,9 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(PORT, () => logger.success(`Server running on port ${PORT}`));
   })
-  .catch((error) => console.error('MongoDB connection error:', error));
+  .catch((error) => {
+    logger.critical('MongoDB connection error:', error);
+    process.exit(1);
+  });

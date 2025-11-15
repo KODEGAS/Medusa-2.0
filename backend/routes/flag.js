@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import express from 'express';
 import mongoose from 'mongoose';
 import FlagSubmission from '../models/FlagSubmission.js';
@@ -219,7 +220,7 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     if (userRound !== round) {
       await session.abortTransaction();
       session.endSession();
-      console.log(`[SECURITY:${requestId}] Team ${teamId} attempted to submit Round ${round} flag with Round ${userRound} credentials`);
+      logger.security(`[SECURITY:${requestId}] Team ${teamId} attempted to submit Round ${round} flag with Round ${userRound} credentials`);
       return res.status(403).json({ 
         error: `Access denied. You are authenticated for Round ${userRound}, but trying to submit for Round ${round}.`,
         requiredRound: round,
@@ -398,7 +399,7 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     const challengeLabel = round === 2 ? `Round 2 (${challengeType})` : 'Round 1';
     const attemptLabel = `Attempt ${submissionCount + 1}/2 for ${challengeType || 'Round 1'}`;
     const pwnTotalLabel = (round === 2 && isPwnChallenge) ? ` (PWN Total: ${totalPwnSubmissions + 1}/3)` : '';
-    console.log(`[AUDIT:${requestId}] Flag submitted by team ${teamId} for ${challengeLabel} - ${attemptLabel}${pwnTotalLabel} - ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'} - ${points} points - IP: ${ipAddress} - Time: ${new Date().toISOString()}`);
+    logger.audit(`[AUDIT:${requestId}] Flag submitted by team ${teamId} for ${challengeLabel} - ${attemptLabel}${pwnTotalLabel} - ${isCorrect ? '✅ CORRECT' : '❌ INCORRECT'} - ${points} points - IP: ${ipAddress} - Time: ${new Date().toISOString()}`);
 
     // Prepare response with submission info
     // SECURITY: Never include the correct flag or hints about it
@@ -441,7 +442,7 @@ router.post('/submit', authenticate, ipRateLimiter, teamRateLimiter, validateFla
     await session.abortTransaction();
     session.endSession();
     
-    console.error(`[ERROR:${requestId}] Flag submission error:`, error.message);
+    logger.error(`[ERROR:${requestId}] Flag submission error:`, error.message);
     
     // Handle duplicate key error
     if (error.code === 11000) {
@@ -574,7 +575,7 @@ router.get('/remaining-attempts', authenticate, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching remaining attempts:', error);
+    logger.error('Error fetching remaining attempts:', error);
     res.status(500).json({ 
       error: 'Failed to fetch remaining attempts' 
     });
@@ -606,7 +607,7 @@ router.get('/submissions/:teamId', authenticate, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching submissions:', error);
+    logger.error('Error fetching submissions:', error);
     res.status(500).json({ 
       error: 'Failed to fetch submissions' 
     });
@@ -656,7 +657,7 @@ router.get('/stats', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching stats:', error);
+    logger.error('Error fetching stats:', error);
     res.status(500).json({ 
       error: 'Failed to fetch statistics' 
     });
@@ -664,3 +665,4 @@ router.get('/stats', async (req, res) => {
 });
 
 export default router;
+

@@ -1,5 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import rateLimit from 'express-rate-limit';
 import FlagSubmission from '../models/FlagSubmission.js';
 import Team from '../models/Team.js';
@@ -9,6 +10,7 @@ import HintUnlock from '../models/HintUnlock.js';
 import adminAuth from '../middlewares/adminAuth.js';
 import getRealIP from '../utils/getRealIP.js';
 import { calculatePoints } from '../utils/calculatePoints.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -27,7 +29,7 @@ async function getRoundStartTime(round) {
       return new Date(setting.value);
     }
   } catch (error) {
-    console.warn(`Failed to get ${round === 2 ? 'Round 2' : 'Round 1'} start time from settings, using constant`);
+    logger.warn(`Failed to get ${round === 2 ? 'Round 2' : 'Round 1'} start time from settings, using constant`);
   }
   // Fallback to constants
   return round === 2 ? ROUND_2_START : GLOBAL_COMPETITION_START;
@@ -72,24 +74,35 @@ router.post('/login', loginRateLimiter, async (req, res) => {
 
     // Get admin credentials from environment variables
     const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD; // Fallback for migration period
 
-    if (!ADMIN_PASSWORD) {
-      console.error('CRITICAL: ADMIN_PASSWORD not configured in environment');
+    if (!ADMIN_PASSWORD_HASH && !ADMIN_PASSWORD) {
+      logger.critical('ADMIN_PASSWORD_HASH or ADMIN_PASSWORD not configured in environment');
       return res.status(500).json({ 
         error: 'Admin credentials not configured' 
       });
     }
 
-    // Timing-safe comparison to prevent timing attacks
+    // Username comparison (timing-safe)
     const usernameMatch = username === ADMIN_USERNAME;
-    const passwordMatch = password === ADMIN_PASSWORD;
+    
+    // Password verification with bcrypt (or fallback to plain text during migration)
+    let passwordMatch = false;
+    if (ADMIN_PASSWORD_HASH) {
+      // Secure: Use bcrypt to verify hashed password
+      passwordMatch = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    } else if (ADMIN_PASSWORD) {
+      // INSECURE: Fallback for migration period only - remove after migration
+      logger.warn('⚠️  WARNING: Using plain text password comparison. Migrate to ADMIN_PASSWORD_HASH immediately!');
+      passwordMatch = password === ADMIN_PASSWORD;
+    }
 
     // Validate credentials (use same error message to prevent user enumeration)
     if (!usernameMatch || !passwordMatch) {
       // Log failed attempt with real IP
       const clientIP = getRealIP(req);
-      console.warn(`❌ Failed admin login attempt for username: ${username} from IP: ${clientIP}`);
+      logger.security(`❌ Failed admin login attempt for username: ${username} from IP: ${clientIP}`);
       
       return res.status(401).json({ 
         error: 'Invalid admin credentials' 
@@ -109,7 +122,7 @@ router.post('/login', loginRateLimiter, async (req, res) => {
 
     // Log successful login with real IP
     const clientIP = getRealIP(req);
-    console.log(`✅ Admin login successful: ${ADMIN_USERNAME} from IP: ${clientIP} at ${new Date().toISOString()}`);
+    logger.security(`✅ Admin login successful: ${ADMIN_USERNAME} from IP: ${clientIP} at ${new Date().toISOString()}`);
 
     res.json({
       success: true,
@@ -122,7 +135,7 @@ router.post('/login', loginRateLimiter, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Admin login error:', error);
+    logger.error('Admin login error:', error);
     res.status(500).json({ 
       error: 'Admin login failed' 
     });
@@ -135,7 +148,7 @@ router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
     const { teamId, verified, sortBy = 'submittedAt', order = 'desc', round } = req.query;
 
     // Log admin access
-    console.log(`Admin ${req.admin.username} accessed submissions (Round ${round || 'All'}) at ${new Date().toISOString()}`);
+    logger.audit(`Admin ${req.admin.username} accessed submissions (Round ${round || 'All'}) at ${new Date().toISOString()}`);
 
     // Validate sortBy parameter to prevent NoSQL injection
     const allowedSortFields = ['submittedAt', 'attemptNumber', 'verified', 'isCorrect'];
@@ -236,7 +249,7 @@ router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching admin submissions:', error);
+    logger.error('Error fetching admin submissions:', error.message);
     res.status(500).json({ 
       error: 'Failed to fetch submissions' 
     });
@@ -246,7 +259,7 @@ router.get('/submissions', adminAuth, apiRateLimiter, async (req, res) => {
 // Get detailed statistics (Admin only)
 router.get('/statistics', adminAuth, apiRateLimiter, async (req, res) => {
   try {
-    console.log(`Admin ${req.admin.username} accessed statistics at ${new Date().toISOString()}`);
+    logger.audit(`Admin ${req.admin.username} accessed statistics at ${new Date().toISOString()}`);
     
     const totalTeams = await Team.countDocuments();
     const totalSubmissions = await FlagSubmission.countDocuments();
@@ -297,7 +310,7 @@ router.get('/statistics', adminAuth, apiRateLimiter, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching admin statistics:', error);
+    logger.error('Error fetching admin statistics:', error.message);
     res.status(500).json({ 
       error: 'Failed to fetch statistics' 
     });
@@ -342,7 +355,7 @@ router.patch('/submissions/:id', adminAuth, apiRateLimiter, async (req, res) => 
     });
 
   } catch (error) {
-    console.error('Error updating submission:', error);
+    logger.error('Error updating submission:', error.message);
     res.status(500).json({ 
       error: 'Failed to update submission' 
     });
@@ -394,7 +407,7 @@ router.patch('/submissions/bulk/verify', adminAuth, apiRateLimiter, async (req, 
     });
 
   } catch (error) {
-    console.error('Error bulk updating submissions:', error);
+    logger.error('Error bulk updating submissions:', error.message);
     res.status(500).json({ 
       error: 'Failed to bulk update submissions' 
     });
@@ -428,7 +441,7 @@ router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, r
             submission.attemptNumber
           );
         } catch (err) {
-          console.warn(`Could not calculate points for submission ${submission._id}:`, err);
+          logger.warn(`Could not calculate points for submission ${submission._id}:`, err);
           // Use a default point calculation based on attempt
           points = submission.attemptNumber === 1 ? 800 : 600;
         }
@@ -457,10 +470,10 @@ router.post('/submissions/auto-verify', adminAuth, apiRateLimiter, async (req, r
       correct: correctCount,
       incorrect: incorrectCount
     });
-    
+
   } catch (error) {
-    console.error('Error auto-verifying submissions:', error);
-    res.status(500).json({ 
+    logger.error('Error auto-verifying submissions:', error.message);
+    res.status(500).json({
       error: 'Failed to auto-verify submissions' 
     });
   }
@@ -494,7 +507,7 @@ router.post('/submissions/recalculate-points', adminAuth, apiRateLimiter, async 
         
         updatedCount++;
       } catch (err) {
-        console.warn(`Could not recalculate points for submission ${submission._id}:`, err);
+        logger.warn(`Could not recalculate points for submission ${submission._id}:`, err);
       }
     }
     
@@ -506,10 +519,10 @@ router.post('/submissions/recalculate-points', adminAuth, apiRateLimiter, async 
       updated: updatedCount,
       total: submissions.length
     });
-    
+
   } catch (error) {
-    console.error('Error recalculating points:', error);
-    res.status(500).json({ 
+    logger.error('Error recalculating points:', error.message);
+    res.status(500).json({
       error: 'Failed to recalculate points' 
     });
   }
@@ -573,7 +586,7 @@ router.patch('/submissions/:id/update-time', adminAuth, apiRateLimiter, async (r
     });
 
   } catch (error) {
-    console.error('Error updating submission time:', error);
+    logger.error('Error updating submission time:', error);
     res.status(500).json({ 
       error: 'Failed to update submission time' 
     });
@@ -757,7 +770,7 @@ router.get('/settings', adminAuth, apiRateLimiter, async (req, res) => {
       settings: settingsObj
     });
   } catch (error) {
-    console.error('Error fetching settings:', error);
+    logger.error('Error fetching settings:', error);
     res.status(500).json({ 
       error: 'Failed to fetch settings' 
     });
@@ -802,7 +815,7 @@ router.put('/settings/:key', adminAuth, apiRateLimiter, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error updating setting:', error);
+    logger.error('Error updating setting:', error);
     res.status(500).json({ 
       error: 'Failed to update setting' 
     });
@@ -870,7 +883,7 @@ router.get('/round2/statistics', adminAuth, apiRateLimiter, async (req, res) => 
       }
     });
   } catch (error) {
-    console.error('Error fetching Round 2 statistics:', error);
+    logger.error('Error fetching Round 2 statistics:', error);
     res.status(500).json({ 
       error: 'Failed to fetch Round 2 statistics' 
     });

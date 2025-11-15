@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
@@ -37,11 +38,11 @@ const authLimiter = rateLimit({
     const apiKey = req.body.apiKey ? '***' + req.body.apiKey.slice(-4) : 'none';
     
     console.error(`🚨 RATE LIMIT HIT - Too many authentication attempts`);
-    console.error(`   Team ID: ${teamId}`);
-    console.error(`   IP Address: ${ip}`);
-    console.error(`   API Key (last 4): ${apiKey}`);
-    console.error(`   Timestamp: ${new Date().toISOString()}`);
-    console.error(`   User-Agent: ${req.get('user-agent') || 'unknown'}`);
+    logger.security(`   Team ID: ${teamId}`);
+    logger.security(`   IP Address: ${ip}`);
+    logger.security(`   API Key (last 4): ${apiKey}`);
+    logger.security(`   Timestamp: ${new Date().toISOString()}`);
+    logger.security(`   User-Agent: ${req.get('user-agent') || 'unknown'}`);
     
     res.status(429).json({
       error: 'Too many authentication attempts for this team. Please try again in 5 minutes.',
@@ -97,10 +98,10 @@ router.post('/verify', authLimiter, async (req, res) => {
     if (!keyInfo) {
       // Log failed authentication - Invalid API Key
       console.warn(`⚠️  FAILED AUTH - Invalid API Key`);
-      console.warn(`   Team ID: ${teamId}`);
-      console.warn(`   IP Address: ${req.ip}`);
-      console.warn(`   API Key (last 4): ***${apiKey.slice(-4)}`);
-      console.warn(`   Timestamp: ${new Date().toISOString()}`);
+      logger.security(`   Team ID: ${teamId}`);
+      logger.security(`   IP Address: ${req.ip}`);
+      logger.security(`   API Key (last 4): ***${apiKey.slice(-4)}`);
+      logger.security(`   Timestamp: ${new Date().toISOString()}`);
       
       return res.status(401).json({ 
         error: 'Invalid API Key',
@@ -111,10 +112,10 @@ router.post('/verify', authLimiter, async (req, res) => {
     if (!keyInfo.active) {
       // Log failed authentication - Deactivated API Key
       console.warn(`⚠️  FAILED AUTH - Deactivated API Key`);
-      console.warn(`   Team ID: ${teamId}`);
-      console.warn(`   IP Address: ${req.ip}`);
-      console.warn(`   Round: ${keyInfo.round}`);
-      console.warn(`   Timestamp: ${new Date().toISOString()}`);
+      logger.security(`   Team ID: ${teamId}`);
+      logger.security(`   IP Address: ${req.ip}`);
+      logger.security(`   Round: ${keyInfo.round}`);
+      logger.security(`   Timestamp: ${new Date().toISOString()}`);
       
       return res.status(403).json({ 
         error: 'This API Key has been deactivated',
@@ -126,11 +127,11 @@ router.post('/verify', authLimiter, async (req, res) => {
     if (keyInfo.expiresAt && new Date() > new Date(keyInfo.expiresAt)) {
       // Log failed authentication - Expired API Key
       console.warn(`⚠️  FAILED AUTH - Expired API Key`);
-      console.warn(`   Team ID: ${teamId}`);
-      console.warn(`   IP Address: ${req.ip}`);
-      console.warn(`   Round: ${keyInfo.round}`);
-      console.warn(`   Expired At: ${keyInfo.expiresAt}`);
-      console.warn(`   Timestamp: ${new Date().toISOString()}`);
+      logger.security(`   Team ID: ${teamId}`);
+      logger.security(`   IP Address: ${req.ip}`);
+      logger.security(`   Round: ${keyInfo.round}`);
+      logger.security(`   Expired At: ${keyInfo.expiresAt}`);
+      logger.security(`   Timestamp: ${new Date().toISOString()}`);
       
       return res.status(403).json({ 
         error: 'This API Key has expired',
@@ -144,11 +145,11 @@ router.post('/verify', authLimiter, async (req, res) => {
     if (!team) {
       // Log failed authentication - Invalid Team ID
       console.warn(`⚠️  FAILED AUTH - Invalid Team ID`);
-      console.warn(`   Team ID: ${teamId}`);
-      console.warn(`   IP Address: ${req.ip}`);
-      console.warn(`   Round: ${keyInfo.round}`);
-      console.warn(`   API Key Valid: Yes`);
-      console.warn(`   Timestamp: ${new Date().toISOString()}`);
+      logger.security(`   Team ID: ${teamId}`);
+      logger.security(`   IP Address: ${req.ip}`);
+      logger.security(`   Round: ${keyInfo.round}`);
+      logger.security(`   API Key Valid: Yes`);
+      logger.security(`   Timestamp: ${new Date().toISOString()}`);
       
       return res.status(401).json({ 
         error: 'Invalid Team ID. Please check your Team ID and try again.',
@@ -159,12 +160,12 @@ router.post('/verify', authLimiter, async (req, res) => {
     if (!team.isActive) {
       // Log failed authentication - Deactivated Team
       console.warn(`⚠️  FAILED AUTH - Deactivated Team`);
-      console.warn(`   Team ID: ${teamId}`);
-      console.warn(`   Team Name: ${team.teamName}`);
-      console.warn(`   University: ${team.university}`);
-      console.warn(`   IP Address: ${req.ip}`);
-      console.warn(`   Round: ${keyInfo.round}`);
-      console.warn(`   Timestamp: ${new Date().toISOString()}`);
+      logger.security(`   Team ID: ${teamId}`);
+      logger.security(`   Team Name: ${team.teamName}`);
+      logger.security(`   University: ${team.university}`);
+      logger.security(`   IP Address: ${req.ip}`);
+      logger.security(`   Round: ${keyInfo.round}`);
+      logger.security(`   Timestamp: ${new Date().toISOString()}`);
       
       return res.status(403).json({ 
         error: 'Your team has been deactivated. Please contact organizers.',
@@ -211,7 +212,7 @@ router.post('/verify', authLimiter, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Authentication error:', error);
+    logger.error('Authentication error:', error);
     res.status(500).json({ 
       error: 'Failed to verify API Key. Please try again later.',
       authenticated: false
@@ -265,3 +266,4 @@ router.get('/rounds', async (req, res) => {
 });
 
 export default router;
+

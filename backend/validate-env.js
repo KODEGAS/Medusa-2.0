@@ -23,7 +23,7 @@ const requiredVars = [
   { name: 'MONGODB_URI', minLength: 20 },
   { name: 'JWT_SECRET', minLength: 32 },
   { name: 'ADMIN_USERNAME', minLength: 5 },
-  { name: 'ADMIN_PASSWORD', minLength: 16 },
+  { name: 'ADMIN_PASSWORD_HASH', minLength: 60 }, // bcrypt hash is 60 chars
   { name: 'ROUND1_API_KEY', minLength: 10 },
   { name: 'ROUND2_API_KEY', minLength: 10 },
   { name: 'ROUND1_FLAG', minLength: 10 },
@@ -34,11 +34,17 @@ const requiredVars = [
   { name: 'GOOGLE_CLOUD_STORAGE_BUCKET', minLength: 3 },
 ];
 
+// Optional variables (including migration fallback)
+const migrationVars = [
+  { name: 'ADMIN_PASSWORD', minLength: 16 }, // Fallback during migration period
+];
+
 // Optional but recommended
 const optionalVars = [
   { name: 'ADMIN_ROUTE_PATH', minLength: 32 },
   { name: 'NODE_ENV' },
   { name: 'PORT' },
+  { name: 'ENABLE_GCP_LOGGING' }, // Enable GCP Cloud Logging
 ];
 
 console.log(`${BLUE}Required Variables:${RESET}`);
@@ -73,6 +79,21 @@ optionalVars.forEach(({ name, minLength }) => {
   }
 });
 
+// Migration period check
+console.log(`\n${BLUE}Migration Period Variables:${RESET}`);
+migrationVars.forEach(({ name, minLength }) => {
+  const value = process.env[name];
+  if (!value) {
+    console.log(`${YELLOW}⚠️  ${name}: NOT SET (migration to ADMIN_PASSWORD_HASH recommended)${RESET}`);
+  } else if (minLength && value.length < minLength) {
+    console.log(`${YELLOW}⚠️  ${name}: SET but weak (${value.length} chars, recommended: ${minLength})${RESET}`);
+    warnings++;
+  } else {
+    console.log(`${YELLOW}⚠️  ${name}: SET (migrate to ADMIN_PASSWORD_HASH for security)${RESET}`);
+    warnings++;
+  }
+});
+
 // Security checks
 console.log(`\n${BLUE}Security Checks:${RESET}`);
 
@@ -90,22 +111,39 @@ if (jwtSecret) {
   }
 }
 
-// Check admin password strength
+// Check admin password hash (bcrypt)
+const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
 const adminPassword = process.env.ADMIN_PASSWORD;
-if (adminPassword) {
+
+if (adminPasswordHash) {
+  // Check if it looks like a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+  if (/^\$2[aby]\$\d{2}\$/.test(adminPasswordHash)) {
+    console.log(`${GREEN}✅ ADMIN_PASSWORD_HASH: Valid bcrypt hash detected${RESET}`);
+    if (adminPassword) {
+      console.log(`${YELLOW}⚠️  ADMIN_PASSWORD: Still set - remove after migration complete${RESET}`);
+      warnings++;
+    }
+  } else {
+    console.log(`${RED}❌ ADMIN_PASSWORD_HASH: Invalid format (should be bcrypt hash)${RESET}`);
+    errors++;
+  }
+} else if (adminPassword) {
+  console.log(`${RED}❌ ADMIN_PASSWORD_HASH: NOT SET - Using insecure plain text password${RESET}`);
+  console.log(`${YELLOW}   Run 'npm run hash-password' to generate secure hash${RESET}`);
+  errors++;
+  
+  // Still check plain password strength for fallback
   const hasUpper = /[A-Z]/.test(adminPassword);
   const hasLower = /[a-z]/.test(adminPassword);
   const hasNumber = /[0-9]/.test(adminPassword);
   const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(adminPassword);
   
   if (adminPassword.length >= 20 && hasUpper && hasLower && hasNumber && hasSpecial) {
-    console.log(`${GREEN}✅ ADMIN_PASSWORD: Strong${RESET}`);
+    console.log(`${YELLOW}   ADMIN_PASSWORD (plain): Strong but needs hashing${RESET}`);
   } else if (adminPassword.length >= 16) {
-    console.log(`${YELLOW}⚠️  ADMIN_PASSWORD: Adequate (consider adding more complexity)${RESET}`);
-    warnings++;
+    console.log(`${YELLOW}   ADMIN_PASSWORD (plain): Adequate but needs hashing${RESET}`);
   } else {
-    console.log(`${RED}❌ ADMIN_PASSWORD: WEAK (too short or not complex enough)${RESET}`);
-    errors++;
+    console.log(`${RED}   ADMIN_PASSWORD (plain): WEAK and needs hashing${RESET}`);
   }
 }
 
@@ -146,6 +184,34 @@ if (mongoUri) {
     errors++;
   }
 });
+
+// Check GCP Cloud Logging configuration
+const enableGCPLogging = process.env.ENABLE_GCP_LOGGING === 'true';
+if (enableGCPLogging) {
+  console.log(`\n${BLUE}GCP Cloud Logging Configuration:${RESET}`);
+  
+  const gcpProjectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
+  const gcpKeyFile = process.env.GOOGLE_CLOUD_KEY_FILE;
+  
+  if (gcpProjectId) {
+    console.log(`${GREEN}✅ GOOGLE_CLOUD_PROJECT_ID: SET${RESET}`);
+  } else {
+    console.log(`${RED}❌ GOOGLE_CLOUD_PROJECT_ID: MISSING (required when ENABLE_GCP_LOGGING=true)${RESET}`);
+    errors++;
+  }
+  
+  if (gcpKeyFile) {
+    console.log(`${GREEN}✅ GOOGLE_CLOUD_KEY_FILE: SET (${gcpKeyFile})${RESET}`);
+  } else {
+    console.log(`${YELLOW}⚠️  GOOGLE_CLOUD_KEY_FILE: NOT SET (will use default credentials)${RESET}`);
+    warnings++;
+  }
+  
+  console.log(`${GREEN}✅ GCP Cloud Logging: ENABLED${RESET}`);
+} else {
+  console.log(`\n${BLUE}GCP Cloud Logging:${RESET} ${YELLOW}DISABLED${RESET}`);
+  console.log(`${YELLOW}   Set ENABLE_GCP_LOGGING=true to enable centralized logging${RESET}`);
+}
 
 // Summary
 console.log(`\n${BLUE}═══════════════════════════════════════${RESET}`);

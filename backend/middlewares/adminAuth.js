@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import jwt from 'jsonwebtoken';
 import getRealIP from '../utils/getRealIP.js';
 
@@ -8,7 +9,7 @@ const adminAuth = (req, res, next) => {
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       const clientIP = getRealIP(req);
-      console.warn(`⚠️ Admin access denied - No token provided from IP: ${clientIP}`);
+      logger.warn(`⚠️ Admin access denied - No token provided from IP: ${clientIP}`);
       return res.status(401).json({ 
         error: 'Admin access denied. No token provided.' 
       });
@@ -22,7 +23,7 @@ const adminAuth = (req, res, next) => {
     // Check if user is admin
     if (decoded.role !== 'admin') {
       const clientIP = getRealIP(req);
-      console.warn(`Access denied - Non-admin role attempted: ${decoded.role} from IP: ${clientIP}`);
+      logger.warn(`Access denied - Non-admin role attempted: ${decoded.role} from IP: ${clientIP}`);
       return res.status(403).json({ 
         error: 'Access denied. Admin privileges required.' 
       });
@@ -33,7 +34,7 @@ const adminAuth = (req, res, next) => {
     const maxTokenAge = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
     
     if (decoded.loginTime && tokenAge > maxTokenAge) {
-    console.warn(`Admin token expired - Age: ${Math.floor(tokenAge / 1000 / 60)} minutes`);
+    logger.warn(`Admin token expired - Age: ${Math.floor(tokenAge / 1000 / 60)} minutes`);
     return res.status(401).json({ 
         error: 'Admin token expired. Please login again.' 
     });
@@ -44,7 +45,7 @@ const adminAuth = (req, res, next) => {
     next();
 
 } catch (error) {
-    console.error('Admin auth error:', error.message);
+    logger.error('Admin auth error:', error.message);
     
     if (error.name === 'JsonWebTokenError') {
     return res.status(401).json({ 
@@ -65,3 +66,4 @@ const adminAuth = (req, res, next) => {
 };
 
 export default adminAuth;
+

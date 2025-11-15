@@ -1,3 +1,4 @@
+import logger from '../utils/logger.js';
 import jwt from 'jsonwebtoken';
 
 /**
@@ -36,7 +37,7 @@ export default function authenticate(req, res, next) {
     
     return next();
   } catch (error) {
-    console.error('Authentication error:', error.message);
+    logger.error('Authentication error:', error.message);
     
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ 
@@ -51,3 +52,4 @@ export default function authenticate(req, res, next) {
     });
   }
 }
+

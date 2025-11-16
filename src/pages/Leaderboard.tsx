@@ -10,10 +10,11 @@ interface LeaderboardEntry {
   // teamId removed for security
   teamName: string;
   university: string;
-  points: number;
-  attemptNumber: number;
-  solvedAt: string;
-  pointDeduction: number;
+  points: number; // Total points (Round 1 + Round 2)
+  submissionCount: number;
+  firstSolvedAt: string;
+  lastSolvedAt: string;
+  leaderName: string | null;
 }
 
 interface LeaderboardStats {
@@ -26,18 +27,19 @@ interface LeaderboardStats {
 const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [stats, setStats] = useState<LeaderboardStats | null>(null);
-  const [loading, setLoading] = useState(false); // Set to false since we're blocking access
+  const [loading, setLoading] = useState(true); // Start with loading state
   const [error, setError] = useState('');
   const [myTeamName, setMyTeamName] = useState<string | null>(null);
 
   const apiUrl = import.meta.env.VITE_API_URL|| 'http://localhost:3001';
 
   // Temporarily disable leaderboard fetching during Round 2
-  const isLeaderboardBlocked = true;
+  const isLeaderboardBlocked = false; // Changed to false to show combined scores
 
   useEffect(() => {
     if (isLeaderboardBlocked) {
       // Don't fetch leaderboard during Round 2
+      setLoading(false);
       return;
     }
 
@@ -46,15 +48,16 @@ const Leaderboard = () => {
     setMyTeamName(teamName);
 
     fetchLeaderboard();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchLeaderboard, 30000);
-    return () => clearInterval(interval);
+    // Manual refresh only - no auto-refresh
   }, []);
 
   const fetchLeaderboard = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${apiUrl}/api/leaderboard`);
       const data = await response.json();
+
+      console.log('Leaderboard response:', data); // Debug log
 
       if (response.status === 403) {
         // Leaderboard is blocked
@@ -63,7 +66,8 @@ const Leaderboard = () => {
       }
 
       if (data.success) {
-        setLeaderboard(data.leaderboard);
+        console.log('Leaderboard data:', data.leaderboard); // Debug log
+        setLeaderboard(data.leaderboard || []);
         setStats(data.statistics);
       } else {
         setError('Failed to load leaderboard');
@@ -207,10 +211,13 @@ const Leaderboard = () => {
               <Trophy className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-5xl md:text-6xl font-serif font-black text-transparent bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text mb-4">
-              HALL OF CHAMPIONS
+              GRAND FINALS QUALIFIERS
             </h1>
             <p className="text-xl font-serif text-amber-200/80 italic">
-              "Glory to those who conquered the Oracle's challenge"
+              "The Elite 25 - Legends Forged in Code and Cipher"
+            </p>
+            <p className="text-sm text-amber-300/60 mt-2">
+              Top 25 teams - Combined scores from Round 1 + Round 2
             </p>
           </div>
 
@@ -219,10 +226,10 @@ const Leaderboard = () => {
             <CardHeader className="border-b border-amber-900/30 bg-gradient-to-r from-amber-950/50 to-transparent">
               <CardTitle className="text-2xl font-serif text-amber-100 flex items-center gap-3">
                 <Trophy className="w-6 h-6 text-yellow-500" />
-                Leaderboard - Round 1
+                Grand Finals - Qualified Teams
               </CardTitle>
               <CardDescription className="font-serif text-amber-200/60">
-                Teams ranked by points and solve time
+                Top 25 teams qualified for the Grand Finals of MEDUSA 2.0
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -240,13 +247,12 @@ const Leaderboard = () => {
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-300">Rank</th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-300">Team</th>
                         <th className="px-6 py-4 text-left text-sm font-semibold text-amber-300">University</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-amber-300">Points</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-amber-300">Attempts</th>
-                        <th className="px-6 py-4 text-center text-sm font-semibold text-amber-300">Solved At</th>
+                        <th className="px-6 py-4 text-center text-sm font-semibold text-amber-300">Total Points</th>
+                        <th className="px-6 py-4 text-center text-sm font-semibold text-amber-300">Challenges</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-amber-900/20">
-                      {leaderboard.map((entry) => {
+                      {leaderboard.slice(0, 25).map((entry) => {
                         const isMyTeam = entry.teamName === myTeamName;
                         return (
                           <tr
@@ -283,34 +289,22 @@ const Leaderboard = () => {
                             {/* University */}
                             <td className="px-6 py-4 text-amber-200">{entry.university}</td>
 
-                            {/* Points */}
+                            {/* Total Points */}
                             <td className="px-6 py-4 text-center">
                               <div className="flex flex-col items-center">
                                 <p className="text-2xl font-bold text-yellow-400">{entry.points}</p>
-                                {entry.pointDeduction > 0 && (
-                                  <Badge variant="destructive" className="text-xs mt-1">
-                                    -{entry.pointDeduction * 100}% penalty
-                                  </Badge>
-                                )}
+                                <p className="text-xs text-amber-300/60 mt-1">total points</p>
                               </div>
                             </td>
 
-                            {/* Attempts */}
+                            {/* Challenges Solved */}
                             <td className="px-6 py-4 text-center">
                               <Badge
-                                variant={entry.attemptNumber === 1 ? 'default' : 'secondary'}
-                                className={entry.attemptNumber === 1 ? 'bg-green-600' : 'bg-orange-600'}
+                                variant="default"
+                                className="bg-green-600 text-white px-3 py-1"
                               >
-                                {entry.attemptNumber === 1 ? '1st try' : '2nd try'}
+                                {entry.submissionCount} solved
                               </Badge>
-                            </td>
-
-                            {/* Solved At */}
-                            <td className="px-6 py-4 text-center">
-                              <div className="flex items-center justify-center gap-2 text-amber-300">
-                                <Clock className="w-4 h-4" />
-                                <span className="text-sm font-mono">{formatTime(entry.solvedAt)}</span>
-                              </div>
                             </td>
                           </tr>
                         );

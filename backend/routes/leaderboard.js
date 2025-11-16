@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
           teamName: team?.teamName || 'Unknown Team',
           university: team?.university || 'Unknown University',
           leaderName: team?.leaderName || null,
-          points: entry.totalPoints,
+          points: Math.round(entry.totalPoints * 10) / 10, // Round to 1 decimal place to fix floating point precision
           submissionCount: entry.submissionCount,
           firstSolvedAt: entry.firstSubmittedAt,
           lastSolvedAt: entry.lastSubmittedAt
@@ -133,7 +133,7 @@ router.get('/team/:teamId', async (req, res) => {
       // teamId removed for security
       teamName: team?.teamName,
       university: team?.university,
-      points: teamData.totalPoints,
+      points: Math.round(teamData.totalPoints * 10) / 10, // Round to 1 decimal place to fix floating point precision
       submissionCount: teamData.submissionCount,
       firstSolvedAt: teamData.firstSubmittedAt,
       lastSolvedAt: teamData.lastSubmittedAt

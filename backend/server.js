@@ -5,10 +5,9 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import logger from './utils/logger.js';
 
-// Environment variables are preloaded via -r dotenv/config in package.json
 // This ensures .env is loaded BEFORE any ES6 imports are processed
 
-// Import routes (environment variables are already available)
+// Import routes
 import teamRoutes from './routes/team.js';
 import paymentRoutes from './routes/payment.js';
 import flagRoutes from './routes/flag.js';
